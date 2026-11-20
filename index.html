@@ -200,7 +200,7 @@ label.sm:has(input:focus-visible){outline:2px solid var(--accent);outline-offset
 .measure .krow .tile .v{font-size:1.9rem}
 .agents{pointer-events:none}
 /* the table map: a real map of the place, the intervention drawn on it */
-.geomap{position:absolute;inset:0;z-index:0;background:#e6ebe8}
+.geomap{position:absolute;inset:0;z-index:0;background:#d9e2de}
 .leaflet-container{font-family:var(--font)}
 .stage[data-view="geo"] .alts,.stage[data-view="geo"] .budget,.stage[data-view="geo"] .zoomc{z-index:2}
 .stage[data-view="geo"] .zoomc{bottom:2.3rem}
@@ -629,13 +629,16 @@ function geoInit(stage){
   function far(){ el.classList.toggle("far", map.getZoom() < 16.75); } map.on("zoomend", far); far();
   map.attributionControl.setPrefix(false);
   GEO.tiles = {
-    map:L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxNativeZoom:19, maxZoom:20, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
+    map:L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {subdomains:"abcd", maxNativeZoom:20, maxZoom:20, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>'}),
     satellite:L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {maxNativeZoom:19, maxZoom:20, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"})
   };
   var ok = 0, bad = 0;   // where the tiles cannot load at all, the drawn map takes over
   GEO.tiles.map.on("tileload", function(){ ok++; }); GEO.tiles.map.on("tileerror", function(){ bad++; if (!ok && bad > 3 && !GEO.failed){ GEO.failed = true; render(); } });
   GEO.tiles.map.addTo(map);
-  L.polyline(SITE.river, {color:"#4f8fc4", weight:7, opacity:.4, interactive:false}).addTo(map); glab(SITE.river[9], "Ecorse River").addTo(map);
+  // the light map takes the grey-green of the other screens: a wash laid over the tiles, under everything drawn
+  var tp = map.createPane("tint"); tp.style.zIndex = 250; tp.style.mixBlendMode = "multiply"; tp.style.pointerEvents = "none";
+  GEO.tint = L.rectangle([[-80, -179], [80, 179]], {pane:"tint", stroke:false, fillColor:"#d9e2de", fillOpacity:1, interactive:false}).addTo(map);
+  L.polyline(SITE.river, {color:"#6fa3c4", weight:7, opacity:.45, interactive:false}).addTo(map); glab(SITE.river[9], "Ecorse River").addTo(map);
   L.polygon(SITE.boundary, {color:"#1c2a28", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(map); glab(SITE.boundary[1], "Approximate study parcel", "", "left").addTo(map);
   SITE.places.forEach(function(q){ L.circleMarker([q[1], q[2]], {radius:5, color:"#fbfdfc", weight:2, fillColor:"#3b7a66", fillOpacity:1, interactive:false}).addTo(map); glab([q[1], q[2]], q[0], "", "right").addTo(map); });
   GEO.live = L.layerGroup().addTo(map);
@@ -1005,7 +1008,7 @@ $("main").addEventListener("wheel", function(ev){
 $("main").addEventListener("click", function(ev){
   var z = ev.target.closest ? ev.target.closest("[data-zoom]") : null;
   var bb = ev.target.closest ? ev.target.closest("[data-base]") : null;
-  if (bb && GEO.map){ GEO.map.removeLayer(GEO.tiles[GEO.base]); GEO.base = GEO.base === "map" ? "satellite" : "map"; GEO.tiles[GEO.base].addTo(GEO.map); bb.textContent = GEO.base === "map" ? "Satellite" : "Map"; return; }
+  if (bb && GEO.map){ GEO.map.removeLayer(GEO.tiles[GEO.base]); GEO.base = GEO.base === "map" ? "satellite" : "map"; GEO.tiles[GEO.base].addTo(GEO.map); if (GEO.base === "map") GEO.tint.addTo(GEO.map); else GEO.map.removeLayer(GEO.tint); bb.textContent = GEO.base === "map" ? "Satellite" : "Map"; return; }
   if (z && GEO.map && z.closest('.stage[data-view="geo"]')){ var hz = z.getAttribute("data-zoom"); if (hz === "reset") GEO.map.setView(SITE.center, 16); else GEO.map.setZoom(GEO.map.getZoom() + (hz === "in" ? 1 : -1)); return; }
   if (z){ var how = z.getAttribute("data-zoom"); if (how === "reset"){ MAPV = null; redrawMap(); } else zoomMap(how === "in" ? .72 : 1 / .72, WM / 2, HM / 2); return; }
   var t = ev.target.closest ? ev.target.closest("[data-ch]") : null; if (!t) return; ST.ch = t.getAttribute("data-ch"); render(); tell(); });
