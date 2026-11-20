@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DataScope Four Screens</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -198,6 +199,20 @@ label.sm:has(input:focus-visible){outline:2px solid var(--accent);outline-offset
 .krow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0 1.4rem;border:1px solid var(--line);border-radius:14px;padding:.7rem 1.1rem}
 .measure .krow .tile .v{font-size:1.9rem}
 .agents{pointer-events:none}
+/* the table map: a real map of the place, the intervention drawn on it */
+.geomap{position:absolute;inset:0;z-index:0;background:#e6ebe8}
+.leaflet-container{font-family:var(--font)}
+.stage[data-view="geo"] .alts,.stage[data-view="geo"] .budget,.stage[data-view="geo"] .zoomc{z-index:2}
+.stage[data-view="geo"] .zoomc{bottom:2.3rem}
+.zoomc button.wide{width:auto;padding:0 .8rem;font-size:.85rem}
+.leaflet-tooltip.glab{background:#fbfdfc;border:0;border-radius:999px;box-shadow:0 1px 4px rgba(20,40,34,.28);padding:.12rem .6rem;font-family:var(--font);font-size:.78rem;font-weight:700;color:#1c2a28;white-space:nowrap}
+.leaflet-tooltip.glab::before{display:none}
+.leaflet-tooltip.glab.dk{background:#1c2a28;color:#fff}
+.leaflet-tooltip.glab.s{background:#f3e8f0;color:#7d3a6c}
+.leaflet-tooltip.glab.e{background:#fbeeea;color:#9a3f36}
+.geomap.far .glab.near{display:none}
+.gfp{cursor:grab;touch-action:none}
+.grot{display:flex;align-items:center;justify-content:center;background:#1c2a28;color:#fff;border-radius:50%;font-size:18px;font-weight:700;cursor:ew-resize;touch-action:none;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 .stage[data-view="map"]{cursor:grab;touch-action:none}
 .zoomc{position:absolute;right:.9rem;bottom:.9rem;display:flex;gap:4px;background:var(--surface);border-radius:12px;padding:4px;box-shadow:0 2px 10px rgba(20,40,34,.14)}
 .zoomc button{font:inherit;font-size:1.15rem;font-weight:700;line-height:1;width:2.3rem;height:2.3rem;border:0;border-radius:9px;background:var(--sunk);color:var(--ink);cursor:pointer}
@@ -288,6 +303,7 @@ label.sm:has(input:focus-visible){outline:2px solid var(--accent);outline-offset
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function(){
 "use strict";
@@ -586,6 +602,73 @@ function painting(kind, key, size){
     return (PAINTED[k] = out);
   } catch(e){ CLEAN = false; if (window.console) console.warn("3D view failed", e); return null; }
 }
+// ---------- the table map: a real map of the place, with the intervention drawn on it ----------
+// The site center, the approximate study parcel, the river bends and the landmark points are those of the original DataScope
+// (dist/geography.js in CityScope/DataScope), which gives their sources. Tiles load from their providers, as in the original.
+var SITE = { center:[42.26862, -83.20767],
+  boundary:[[42.26955, -83.20844], [42.27037, -83.20504], [42.26687, -83.20802], [42.26733, -83.20902], [42.26723, -83.20947], [42.26722, -83.20983], [42.26713, -83.21007], [42.26716, -83.21047]],
+  river:[[42.2743, -83.2192], [42.2738, -83.2172], [42.2746, -83.215], [42.2744, -83.2136], [42.2741, -83.2126], [42.2732, -83.211], [42.2723, -83.2117], [42.2717, -83.2116], [42.2714, -83.2104], [42.2726, -83.2081], [42.2716, -83.2067], [42.271, -83.2064], [42.2712, -83.2058], [42.2707, -83.2052], [42.2719, -83.2039], [42.2725, -83.2038], [42.2726, -83.2033], [42.2724, -83.2018], [42.2717, -83.2008], [42.2701, -83.1997], [42.2695, -83.1981], [42.2705, -83.1964], [42.2714, -83.1952]],
+  places:[["John Riel Memorial Park", 42.26855, -83.20563], ["Arno Ave homes", 42.2678, -83.2041], ["Melvindale High School", 42.27421, -83.2034], ["Maple Heights", 42.26933, -83.1985]] };
+var GEO = {map:null, el:null, failed:false, base:"map", tiles:null, live:null, fp:null}, MSC = 2 / 3, MY = 111320, MX = MY * Math.cos(SITE.center[0] * Math.PI / 180);
+function ll(e, s){ return [SITE.center[0] - s / MY, SITE.center[1] + e / MX]; }   // meters east and south of the site center
+// The footprint at its real size, 90 m by 46.45 m (45,000 sq ft), with the equipment yard added for D3. Moves and turns follow the table's pose.
+function bldg(px, pz, rot){
+  var cx = -6.5 * MSC, cz = -10 * MSC, x0 = cx - 45 - (ST.d === "D3" ? 32 : 0), x1 = cx + 45, z0 = cz - 23.225, z1 = cz + 23.225;
+  return [[x0, z0], [x1, z0], [x1, z1], [x0, z1]].map(function(q){ var p = local(q[0], q[1], px * MSC, pz * MSC, rot); return ll(p[0], p[1]); });
+}
+function noiseAt(px, pz, rot){ var p = local(ST.d === "D3" ? -6.5 * MSC - 61 : 0, -10 * MSC, px * MSC, pz * MSC, rot); return p; }
+function inParcel(cs){   // every corner of the footprint inside the study parcel
+  return cs.every(function(q){ var inside = false, b = SITE.boundary; for (var i = 0, j = b.length - 1; i < b.length; j = i++) if ((b[i][0] > q[0]) !== (b[j][0] > q[0]) && q[1] < (b[j][1] - b[i][1]) * (q[0] - b[i][0]) / (b[j][0] - b[i][0]) + b[i][1]) inside = !inside; return inside; });
+}
+function geoOK(){ return !!window.L && !GEO.failed; }
+function glab(latlng, text, cls, dir){ return L.tooltip({permanent:true, direction:dir || "center", className:"glab " + (cls || ""), interactive:false}).setLatLng(latlng).setContent(text); }
+function geoInit(stage){
+  if (GEO.map) return;
+  var el = GEO.el = document.createElement("div"); el.className = "geomap"; stage.insertBefore(el, stage.firstChild);   // in the page first, so the map can measure it
+  var map = GEO.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(SITE.center, 16); el.style.position = "";
+  function far(){ el.classList.toggle("far", map.getZoom() < 16.75); } map.on("zoomend", far); far();
+  map.attributionControl.setPrefix(false);
+  GEO.tiles = {
+    map:L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxNativeZoom:19, maxZoom:20, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
+    satellite:L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {maxNativeZoom:19, maxZoom:20, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"})
+  };
+  var ok = 0, bad = 0;   // where the tiles cannot load at all, the drawn map takes over
+  GEO.tiles.map.on("tileload", function(){ ok++; }); GEO.tiles.map.on("tileerror", function(){ bad++; if (!ok && bad > 3 && !GEO.failed){ GEO.failed = true; render(); } });
+  GEO.tiles.map.addTo(map);
+  L.polyline(SITE.river, {color:"#4f8fc4", weight:7, opacity:.4, interactive:false}).addTo(map); glab(SITE.river[9], "Ecorse River").addTo(map);
+  L.polygon(SITE.boundary, {color:"#1c2a28", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(map); glab(SITE.boundary[1], "Approximate study parcel", "", "left").addTo(map);
+  SITE.places.forEach(function(q){ L.circleMarker([q[1], q[2]], {radius:5, color:"#fbfdfc", weight:2, fillColor:"#3b7a66", fillOpacity:1, interactive:false}).addTo(map); glab([q[1], q[2]], q[0], "", "right").addTo(map); });
+  GEO.live = L.layerGroup().addTo(map);
+}
+function geoDraw(){
+  var g = GEO.live, c = noiseAt(ST.px, ST.pz, ST.rot), r = r55() * MSC, cs; g.clearLayers();
+  L.circle(ll(c[0], c[1]), {radius:r * 3.16, color:"#7d3a6c", weight:1.6, dashArray:"4 6", fill:false, interactive:false}).addTo(g);
+  L.circle(ll(c[0], c[1]), {radius:r, color:"#7d3a6c", weight:1.8, dashArray:"4 6", fillColor:"#b0609a", fillOpacity:.16, interactive:false}).addTo(g);
+  glab(ll(c[0] + r * .72, c[1] - r * .72), "55 dBA", "s near").addTo(g); glab(ll(c[0] + r * 3.16 * .72, c[1] + r * 3.16 * .72), "45 dBA", "s near").addTo(g);
+  if (ST.d === "D4"){ L.polygon([ll(-23, 31), ll(47, 31), ll(47, 65), ll(-23, 65)], {color:"#c56a4b", weight:2, fillColor:"#e7d6a8", fillOpacity:.5, interactive:false}).addTo(g); glab(ll(12, 65), "Community district", "near", "bottom").addTo(g); }
+  if (ST.e === "E4"){ L.polygon([ll(113, -13), ll(153, -13), ll(153, 13), ll(113, 13)], {color:"#3d9b97", weight:2, fillColor:"#eeeae0", fillOpacity:.6, interactive:false}).addTo(g); glab(ll(153, 0), "Microreactors · " + pct(share()) + " funded", "e near", "right").addTo(g); }
+  cs = bldg(ST.px, ST.pz, ST.rot);
+  GEO.fp = L.polygon(cs, {color:"#1c2a28", weight:2.6, fillColor:"#fbfdfc", fillOpacity:.6, className:"gfp", bubblingMouseEvents:false}).addTo(g);
+  glab([Math.max(cs[0][0], cs[1][0]), (cs[0][1] + cs[1][1]) / 2], "Data center", "dk", "top").addTo(g);
+  var south = cs.reduce(function(a, q){ return q[0] < a[0] ? q : a; }), mid = [south[0] - 16 / MY, (cs[0][1] + cs[2][1]) / 2];
+  GEO.rh = L.marker(mid, {icon:L.divIcon({className:"grot", html:"↻", iconSize:[32, 32]}), keyboard:false, title:"Turn the building"}).addTo(g);
+  var a = GEO.fp.getElement(), b = GEO.rh.getElement();
+  if (a){ L.DomEvent.disableClickPropagation(a); a.addEventListener("pointerdown", geoDrag("move")); }
+  if (b){ L.DomEvent.disableClickPropagation(b); b.addEventListener("pointerdown", geoDrag("rot")); }
+}
+function geoDrag(kind){ return function(ev){
+  ev.preventDefault(); ev.stopPropagation();
+  var map = GEO.map, a = map.mouseEventToLatLng(ev), p0 = {px:ST.px, pz:ST.pz, rot:ST.rot}, x0 = ev.clientX, now = null; map.dragging.disable();
+  function mv(e){
+    var to; if (kind === "rot") to = clampPose(p0.px, p0.pz, Math.round(p0.rot + (e.clientX - x0) / 7));
+    else { var b = map.mouseEventToLatLng(e); to = clampPose(p0.px + (b.lng - a.lng) * MX / MSC, p0.pz + (a.lat - b.lat) * MY / MSC, p0.rot); }
+    if (!inParcel(bldg(to.px, to.pz, to.rot))) return;   // the building stays inside the parcel
+    now = to; GEO.fp.setLatLngs(bldg(now.px, now.pz, now.rot));
+  }
+  function up(){ document.removeEventListener("pointermove", mv); document.removeEventListener("pointerup", up); document.removeEventListener("pointercancel", up); map.dragging.enable(); if (now){ setPose(now.px, now.pz, now.rot); render(); tell(); } }
+  document.addEventListener("pointermove", mv); document.addEventListener("pointerup", up); document.addEventListener("pointercancel", up);
+}; }
+
 // ---------- little agents: people walking the park path and the streets ----------
 var WALKS = [[[-150, 104], [-80, 92], [-30, 76], [30, 58], [100, 80], [170, 68], [250, 84]], [[-170, -58], [-170, 128]], [[-215, 214], [232, 214]],
   [[-222, 153], [238, 153]], [[-222, 179], [238, 179]], [[-96, 126], [-96, 206]], [[8, 126], [8, 206]], [[112, 126], [112, 206]]];
@@ -793,13 +876,13 @@ function ominiHTML(){
 }
 function editorHTML(bare){
   var P = PAGES[ST.ch];
-  return '<div class="card stage" data-view="map" data-move><div class="card alts">' +
+  return '<div class="card stage" data-view="' + (geoOK() ? "geo" : "map") + '" data-move><div class="card alts">' +
     '<div class="steps">' + CH.map(function(c, i){ return '<button type="button" data-ch="' + c + '" aria-pressed="' + (c === ST.ch) + '"><b>' + (i + 1) + '</b>' + (c === "benefits" ? "Benefits" : PAGES[c].n) + '</button>'; }).join("") + '</div>' +
     '<h2>' + P.title + '</h2><p>' + P.lead + '</p>' +
     P.opts.map(function(op){ var on = P.multi ? ST.b[op[0]] : ST[P.key] === op[0];
       return '<label class="opt"><input type="' + (P.multi ? "checkbox" : "radio") + '" name="opt" id="opt-' + op[0] + '" value="' + op[0] + '"' + (on ? " checked" : "") + '><span><span class="code">' + op[0] + '</span><span class="nm">' + op[1] + '</span><span class="sub">' + op[2] + '</span><span class="end"><span class="val">' + optValue(ST.ch, op[0]) + '</span><span class="dot"></span></span></span></label>'; }).join("") +
     '</div><div class="budget" aria-live="polite">' + ominiHTML() + '</div>' +
-    '<div class="zoomc"><button type="button" data-zoom="out" aria-label="Zoom out">−</button><button type="button" data-zoom="in" aria-label="Zoom in">+</button><button type="button" data-zoom="reset" aria-label="Reset the map view">⤢</button></div></div>';
+    '<div class="zoomc"><button type="button" data-zoom="out" aria-label="Zoom out">−</button><button type="button" data-zoom="in" aria-label="Zoom in">+</button><button type="button" data-zoom="reset" aria-label="Reset the map view">⤢</button>' + (geoOK() ? '<button type="button" class="wide" data-base>' + (GEO.base === "map" ? "Satellite" : "Map") + '</button>' : '') + '</div></div>';
 }
 function sentimentHTML(bare){
   return '<div class="card stage"><img src="live/sentiment.jpg" alt="The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list">' +
@@ -852,7 +935,8 @@ function render(){
       '<div class="scr wr"><a class="lab" href="#analysis">Right wall · Live analysis</a>' + mini("analysis") + '</div></div>' +
       (NOTES_ON ? '<div class="notes3">' + noteHTML(NOTES.sentiment) + noteHTML(NOTES.see) + noteHTML(SHOW[ST.ch]) + '</div>' : '') +
       '<div class="under">' + noteHTML(NOTES[ST.ch]) + '<div class="scr tb"><a class="lab" href="#editor">Table · Scenario Editor</a>' + mini("editor") + '</div></div></div>';
-  main.querySelectorAll(".stage[data-view]").forEach(function(f){ drawScene(f, f.getAttribute("data-view")); });
+  main.querySelectorAll(".stage[data-view]").forEach(function(f){ if (f.getAttribute("data-view") !== "geo") drawScene(f, f.getAttribute("data-view")); });
+  var gs = main.querySelector('.stage[data-view="geo"]'); if (gs){ try { geoInit(gs); gs.insertBefore(GEO.el, gs.firstChild); GEO.map.invalidateSize(false); geoDraw(); } catch(e){ if (window.console) console.warn("Map failed", e); GEO.failed = true; return render(); } }
   var tok = ++TOK, th = [].slice.call(main.querySelectorAll(".thumb[data-alt]")); if (th.length) setTimeout(function(){ drawThumbs(th, tok); }, 0);
   fit(); animateRadar(); cancelAnimationFrame(agRaf); agRaf = requestAnimationFrame(drawAgents); if (keep && $(keep)) $(keep).focus();
 }
@@ -920,6 +1004,9 @@ $("main").addEventListener("wheel", function(ev){
 }, {passive:false});
 $("main").addEventListener("click", function(ev){
   var z = ev.target.closest ? ev.target.closest("[data-zoom]") : null;
+  var bb = ev.target.closest ? ev.target.closest("[data-base]") : null;
+  if (bb && GEO.map){ GEO.map.removeLayer(GEO.tiles[GEO.base]); GEO.base = GEO.base === "map" ? "satellite" : "map"; GEO.tiles[GEO.base].addTo(GEO.map); bb.textContent = GEO.base === "map" ? "Satellite" : "Map"; return; }
+  if (z && GEO.map && z.closest('.stage[data-view="geo"]')){ var hz = z.getAttribute("data-zoom"); if (hz === "reset") GEO.map.setView(SITE.center, 16); else GEO.map.setZoom(GEO.map.getZoom() + (hz === "in" ? 1 : -1)); return; }
   if (z){ var how = z.getAttribute("data-zoom"); if (how === "reset"){ MAPV = null; redrawMap(); } else zoomMap(how === "in" ? .72 : 1 / .72, WM / 2, HM / 2); return; }
   var t = ev.target.closest ? ev.target.closest("[data-ch]") : null; if (!t) return; ST.ch = t.getAttribute("data-ch"); render(); tell(); });
 function route(){ var h = (location.hash || "").replace("#", ""); VIEW = "all"; VIEWS.forEach(function(v){ if (v[0] === h) VIEW = h; }); render(); }
