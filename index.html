@@ -139,6 +139,47 @@ body.dark{background:var(--bg)}
 .rot{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.2rem .6rem;font-size:.9rem;font-weight:600;border-top:1px solid var(--line);padding-top:.5rem}
 .rot input{grid-column:1 / -1;width:100%;accent-color:var(--accent);margin:0}
 
+/* right wall: the picture, with the measures in white beside it */
+.outcome{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:var(--gap)}
+.side{--surface:#f0f3f2;--sunk:#e3e8e6;--line:#ccd4d1;display:flex;flex-direction:column;gap:var(--gap);min-height:0;min-width:0}
+.pick{position:absolute;top:.9rem;right:.9rem;width:21rem;max-width:calc(100% - 1.8rem);padding:.55rem;display:flex;flex-direction:column;gap:.45rem}
+.chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.4rem}
+.chip{position:relative;display:flex}
+.chip input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.chip > span{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;border:1px solid var(--line);border-radius:10px;padding:.3rem .2rem;background:var(--surface);min-width:0}
+.chip b{font-size:.95rem;color:var(--accent)}
+.chip small{font-size:.72rem;font-weight:600;color:var(--muted);white-space:nowrap}
+.chip input:checked + span{background:var(--accent-soft);border-color:var(--accent)}
+.chip input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.imp{flex:1 1 auto;min-height:0;padding:.8rem 1rem;display:flex;flex-direction:column;gap:.4rem}
+.imp .radar{flex:1 1 auto}
+.radar.mid text{font-size:15px}
+.radar.mid .key{font-size:12px}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem 1rem;border-top:1px solid var(--line);padding-top:.55rem}
+.kpis .tile{border-left:0;padding:0}
+.kpis .tile .k{font-size:.72rem;color:var(--muted)}
+.kpis .tile .v{font-size:1.25rem}
+.kpis .tile .v small{font-size:.7rem}
+.kpis .tile .d{display:none}
+.ben{flex:0 0 auto;padding:.8rem 1rem .5rem;display:flex;flex-direction:column}
+.ben .pill.over{background:var(--over);color:#fff}
+.brow{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:0 .7rem;padding:.45rem .1rem;border-top:1px solid var(--line)}
+.ben .hd + .brow{border-top:0}
+.brow input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.brow .bc{font-size:.75rem;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:7px;padding:.2rem .4rem}
+.brow .bt{display:flex;flex-direction:column;min-width:0}
+.brow small{font-size:.78rem;font-weight:600;color:var(--muted)}
+.brow b{font-size:1.05rem;font-weight:700;line-height:1.2}
+.brow .dot{width:1.05rem;height:1.05rem;border-radius:.3rem;border:2px solid var(--line)}
+.brow.off b{color:var(--muted);font-weight:600}
+.brow.off .bc{color:var(--muted);background:var(--sunk)}
+.brow.on .dot{border-color:var(--accent);background:var(--accent)}
+.brow input:focus-visible ~ .bt{outline:2px solid var(--accent);outline-offset:2px}
+/* table: the map fills the screen, the panel floats on it */
+.budget{position:absolute;left:.9rem;bottom:.9rem;background:var(--surface);border-radius:999px;padding:.45rem .9rem;box-shadow:0 2px 10px rgba(20,40,34,.14)}
+.budget .omini{margin:0}
+a.lab{text-decoration:none}
+.agents{pointer-events:none}
 .omini{margin-left:auto;display:flex;align-items:center;gap:.8rem;font-size:.85rem;font-weight:600;color:var(--muted)}
 .omini .bar{width:12rem;height:.55rem}
 .omini .pill{margin:0}
@@ -432,9 +473,9 @@ function build3D(o, share, r55, pose){
   [[-52, 46], [74, 44], [132, 110], [-30, 124], [196, 54], [226, 104], [150, -26], [-130, 48], [-222, 70], [-236, -20], [262, 14], [-120, 122], [60, 118], [-232, 150], [250, 150]].forEach(function(p){ tree(g, p[0], 0, p[1], .8 + R() * .3, R); });
   return g;
 }
-function brush(src){
-  var w = W3, hh = H3, a = document.createElement("canvas"); a.width = w; a.height = hh; var ac = a.getContext("2d"); ac.drawImage(src, 0, 0, w, hh);
-  var d = ac.getImageData(0, 0, w, hh).data, out = document.createElement("canvas"); out.width = w; out.height = hh; var c = out.getContext("2d"), R = rng(5);
+function brush(src, w0, h0){
+  var w = w0 || W3, hh = h0 || H3, a = document.createElement("canvas"); a.width = w; a.height = hh; var ac = a.getContext("2d"); ac.drawImage(src, 0, 0, w, hh);
+  var img = ac.getImageData(0, 0, w, hh), d = img.data; grade(d); ac.putImageData(img, 0, 0); var out = document.createElement("canvas"); out.width = w; out.height = hh; var c = out.getContext("2d"), R = rng(5);
   var tiny = document.createElement("canvas"); tiny.width = w / 16; tiny.height = hh / 16; tiny.getContext("2d").drawImage(a, 0, 0, tiny.width, tiny.height);
   c.imageSmoothingEnabled = true; c.drawImage(tiny, 0, 0, w, hh);
   function lum(x, y){ x = x < 0 ? 0 : x >= w ? w - 1 : x; y = y < 0 ? 0 : y >= hh ? hh - 1 : y; var i = (y * w + x) * 4; return d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11; }
@@ -451,7 +492,24 @@ function brush(src){
     }
   });
   c.setTransform(1, 0, 0, 1, 0, 0);
+  // a pen line over the paint, along the edges of things
+  c.strokeStyle = "#1c2a28"; c.lineCap = "round"; c.lineWidth = 1.15;
+  for (var y = 2; y < hh - 2; y += 2) for (var x = 2; x < w - 2; x += 2){
+    var gx = lum(x + 2, y) - lum(x - 2, y), gy = lum(x, y + 2) - lum(x, y - 2), mag = Math.abs(gx) + Math.abs(gy); if (mag < 30) continue;
+    var n = Math.hypot(gx, gy) || 1, tx = -gy / n * 2.3, ty = gx / n * 2.3;
+    c.globalAlpha = Math.min(.6, (mag - 16) / 150); c.beginPath(); c.moveTo(x - tx, y - ty); c.lineTo(x + tx, y + ty); c.stroke();
+  }
+  c.globalAlpha = 1;
   return out;
+}
+// The painting's colors lean to the tones of the other screens: sage ground, teal trees, slate blue water, dusty reds.
+function grade(d){
+  for (var i = 0; i < d.length; i += 4){
+    var r = d[i], g = d[i + 1], b = d[i + 2];
+    if (g >= r && g > b) b += (g - b) * .5;
+    else if (b > r && b >= g){ r += (b - r) * .12; g -= (g - r) * .1; }
+    d[i] = r * .74 + 58; d[i + 1] = g * .74 + 60; d[i + 2] = b * .74 + 59;
+  }
 }
 function sceneOptions(){
   var o = []; ({D2:["screen"], D3:["yard"], D4:["district"]}[ST.d] || []).forEach(function(k){ o.push(k); });
@@ -462,30 +520,73 @@ function sceneOptions(){
 }
 function r55(){ return 60 * Math.pow(10, ((DESIGN[ST.d].db - 47.4) + (TECH[ST.t].db - 47.4)) / 20); }
 // Two kinds of picture from the same model: "paint" is the brushed neighborhood view for the wall; "map" is the clean tilted map you touch.
-var EL = 58 * Math.PI / 180, SE = Math.sin(EL);
-var FRAMES = { design:{cx:42, cz:36, hw:400}, technology:{cx:42, cz:36, hw:400}, benefits:{cx:42, cz:36, hw:400}, energy:{cx:42, cz:-56, hw:640}, senti:{cx:40, cz:74, hw:430} };
-function mapCam(fr){ var hh = fr.hw * H3 / W3, c = new THREE.OrthographicCamera(-fr.hw, fr.hw, hh, -hh, 1, 5000); c.position.set(fr.cx, 1500 * SE, fr.cz + 1500 * Math.cos(EL)); c.lookAt(fr.cx, 0, fr.cz); return c; }
-function mapper(fr){ var K = W3 / (2 * fr.hw); return {K:K, x:function(x){ return W3 / 2 + (x - fr.cx) * K; }, y:function(z){ return H3 / 2 + (z - fr.cz) * K * SE; }, inv:function(px, py){ return [(px - W3 / 2) / K + fr.cx, (py - H3 / 2) / (K * SE) + fr.cz]; }}; }
+var SE = 1, WM = 1600, HM = 900;   // the table map is a plan: straight down, north up
+var FRAMES = { design:{cx:60, cz:28, hw:400}, technology:{cx:60, cz:28, hw:400}, benefits:{cx:60, cz:28, hw:400}, energy:{cx:60, cz:-56, hw:640} };
+function mapCam(fr){ var hh = fr.hw * HM / WM, c = new THREE.OrthographicCamera(-fr.hw, fr.hw, hh, -hh, 1, 5000); c.up.set(0, 0, -1); c.position.set(fr.cx, 1500, fr.cz); c.lookAt(fr.cx, 0, fr.cz); return c; }
+function mapper(fr){ var K = WM / (2 * fr.hw); return {K:K, x:function(x){ return WM / 2 + (x - fr.cx) * K; }, y:function(z){ return HM / 2 + (z - fr.cz) * K; }, inv:function(px, py){ return [(px - WM / 2) / K + fr.cx, (py - HM / 2) / K + fr.cz]; }}; }
 var ORDER = [];
-function painting(kind, key){
-  var o = sceneOptions(), sh = share(), rr = r55(), k = kind + "|" + key + "|" + o.join(",") + "|" + Math.round(sh * 200) + "|" + Math.round(rr) + "|" + [ST.px, ST.pz, ST.rot].join(",");
+var WT = 1120, HT = 900, TALLK = {design:1.08, technology:1.3, energy:1.35, benefits:1.5};   // the right wall shows the painting in a taller frame
+function painting(kind, key, tall){
+  var o = sceneOptions(), sh = share(), rr = r55(), k = kind + (tall ? "T" : "") + "|" + key + "|" + o.join(",") + "|" + Math.round(sh * 200) + "|" + Math.round(rr) + "|" + [ST.px, ST.pz, ST.rot].join(",");
   if (PAINTED[k]) return PAINTED[k];
   if (!init3D()) return null;
   try {
     CLEAN = kind === "map"; var g = build3D(o, sh, rr, ST), out;
-    if (CLEAN){ G3.r.render(g, mapCam(FRAMES[key])); out = document.createElement("canvas"); out.width = W3; out.height = H3; out.getContext("2d").drawImage(G3.cv, 0, 0); }
-    else { G3.r.render(g, G3.cams[key]); out = brush(G3.cv); }
+    if (CLEAN){ var mp = mapper(FRAMES[key]); G3.r.setSize(WM, HM, false);
+      try { G3.r.render(g, mapCam(FRAMES[key])); out = document.createElement("canvas"); out.width = WM; out.height = HM; out.getContext("2d").drawImage(G3.cv, 0, 0); } finally { G3.r.setSize(W3, H3, false); }
+      out.walks = walkLines(function(x, z){ return [mp.x(x), mp.y(z), mp.K]; }, 8); }
+    else if (tall){ var c0 = G3.cams[key], c = c0.clone(); c.aspect = WT / HT; c.fov = 2 * Math.atan(Math.tan(c0.fov * Math.PI / 360) * TALLK[key]) * 180 / Math.PI; c.updateProjectionMatrix();
+      G3.r.setSize(WT, HT, false); try { G3.r.render(g, c); out = brush(G3.cv, WT, HT); } finally { G3.r.setSize(W3, H3, false); } out.walks = walkLines(projector(c, WT, HT), 3); }
+    else { G3.r.render(g, G3.cams[key]); out = brush(G3.cv); out.walks = walkLines(projector(G3.cams[key], W3, H3), 3); }
     CLEAN = false; g.traverse(function(m){ if (m.geometry) m.geometry.dispose(); });
     ORDER.push(k); if (ORDER.length > 28) delete PAINTED[ORDER.shift()];
     return (PAINTED[k] = out);
   } catch(e){ CLEAN = false; if (window.console) console.warn("3D view failed", e); return null; }
 }
+// ---------- little agents: people walking the park path and the streets ----------
+var WALKS = [[[-150, 104], [-80, 92], [-30, 76], [30, 58], [100, 80], [170, 68], [250, 84]], [[-170, -58], [-170, 128]], [[-215, 214], [232, 214]],
+  [[-222, 153], [238, 153]], [[-222, 179], [238, 179]], [[-96, 126], [-96, 206]], [[8, 126], [8, 206]], [[112, 126], [112, 206]]];
+function projector(cam, w, h){ return function(x, z){ var a = new THREE.Vector3(x, 0, z).project(cam), b = new THREE.Vector3(x, 1, z).project(cam); return a.z > 1 || a.z < -1 ? null : [(a.x + 1) / 2 * w, (1 - a.y) / 2 * h, Math.abs(b.y - a.y) / 2 * h]; }; }
+function walkLines(proj, n){
+  return WALKS.slice(0, n).map(function(wk, wi){
+    var pts = [], cum = [0], i;
+    if (wi === 0) pts = new THREE.CatmullRomCurve3(wk.map(function(q){ return new THREE.Vector3(q[0], 0, q[1]); })).getPoints(40).map(function(v){ return [v.x, v.z]; });
+    else for (i = 0; i <= 16; i++) pts.push([wk[0][0] + (wk[1][0] - wk[0][0]) * i / 16, wk[0][1] + (wk[1][1] - wk[0][1]) * i / 16]);
+    for (i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    return {p:pts.map(function(q){ return proj(q[0], q[1]); }), cum:cum, len:cum[cum.length - 1]};
+  });
+}
+var AGENTS = [], agRaf = 0, AGC = ["#1c2a28", "#b5534a", "#4d6f8f", "#3b7a66", "#b07a12"];
+(function(){ var R = rng(77); for (var i = 0; i < 28; i++) AGENTS.push({t:R() * 2, v:(9 + R() * 7) * (R() < .5 ? 1 : -1), c:i % 5, ph:R() * 6.28}); })();
+function agentAt(wk, u){
+  var dist = u * wk.len, i = 1; while (i < wk.cum.length - 1 && wk.cum[i] < dist) i++;
+  var a = wk.p[i - 1], b = wk.p[i]; if (!a || !b) return null; var k = (dist - wk.cum[i - 1]) / ((wk.cum[i] - wk.cum[i - 1]) || 1);
+  return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+}
+function drawAgents(ts){
+  var still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches, list = document.querySelectorAll("canvas.agents"), sec = still ? 0 : ts / 1000;
+  for (var n = 0; n < list.length; n++){
+    var cv = list[n], wl = cv._walks, c = cv.getContext("2d"); c.clearRect(0, 0, cv.width, cv.height); if (!wl || !wl.length) continue;
+    for (var i = 0; i < AGENTS.length; i++){
+      var a = AGENTS[i]; if (!cv._plan && i >= 16) break;
+      var wk = wl[i % wl.length], u = (a.t + sec * a.v / wk.len) % 2; if (u < 0) u += 2; if (u > 1) u = 2 - u;
+      var p = agentAt(wk, u); if (!p) continue;
+      if (cv._plan){ c.beginPath(); c.arc(p[0], p[1], 4.4, 0, 6.2832); c.fillStyle = AGC[a.c]; c.fill(); c.lineWidth = 1.6; c.strokeStyle = "#fbfdfc"; c.stroke(); continue; }
+      var hgt = Math.max(10, p[2] * 3.4), bob = still ? 0 : Math.sin(sec * 9 + a.ph) * hgt * .05;
+      c.fillStyle = "rgba(28,42,40,.22)"; c.beginPath(); c.ellipse(p[0] + hgt * .14, p[1], hgt * .28, hgt * .08, 0, 0, 6.2832); c.fill();
+      c.strokeStyle = AGC[a.c]; c.lineWidth = Math.max(1.8, hgt * .2); c.lineCap = "round"; c.beginPath(); c.moveTo(p[0], p[1]); c.lineTo(p[0], p[1] - hgt * .6 + bob); c.stroke();
+      c.fillStyle = AGC[a.c]; c.beginPath(); c.arc(p[0], p[1] - hgt * .84 + bob, hgt * .17, 0, 6.2832); c.fill();
+    }
+  }
+  agRaf = list.length && !still ? requestAnimationFrame(drawAgents) : 0;
+}
 function drawScene(f, view){
-  var src = painting(view === "paint" ? "paint" : "map", ST.ch);
+  var src = painting(view === "map" ? "map" : "paint", ST.ch, view === "tall");
   if (!src){ f.insertAdjacentHTML("afterbegin", '<div class="none">The 3D view needs WebGL, which this browser has turned off.</div>'); return; }
-  var cv = document.createElement("canvas"); cv.width = W3; cv.height = H3; cv.getContext("2d").drawImage(src, 0, 0);
-  cv.setAttribute("role", "img"); cv.setAttribute("aria-label", (view === "paint" ? "Painted view of the neighborhood and the site with " : "Map of the site with ") + [ST.d, ST.t, ST.e].concat(modules()).join(", "));
+  var cv = document.createElement("canvas"); cv.width = src.width; cv.height = src.height; cv.getContext("2d").drawImage(src, 0, 0);
+  cv.setAttribute("role", "img"); cv.setAttribute("aria-label", (view !== "map" ? "Painted view of the neighborhood and the site with " : "Map of the site with ") + [ST.d, ST.t, ST.e].concat(modules()).join(", "));
   f.insertBefore(cv, f.firstChild);
+  var ag = document.createElement("canvas"); ag.className = "agents"; ag.width = src.width; ag.height = src.height; ag._walks = src.walks; ag._plan = view === "map"; ag.setAttribute("aria-hidden", "true"); f.insertBefore(ag, cv.nextSibling);
   if (view === "map") planOverlay(f, f.hasAttribute("data-move"), mapper(FRAMES[ST.ch]));
 }
 
@@ -497,9 +598,9 @@ function planOverlay(f, movable, m){
   MP = m;
   var c = soundAt(ST.px, ST.pz, ST.rot), r = r55(), cs = corners(ST.px, ST.pz, ST.rot), top = cs.reduce(function(a, q){ return q[0] > a[0] ? q : a; }), bot = cs.reduce(function(a, q){ return q[1] > a[1] ? q : a; });
   function ell(id, rad){ return '<ellipse id="' + id + '" cx="' + m.x(c[0]) + '" cy="' + m.y(c[1]) + '" rx="' + rad * m.K + '" ry="' + rad * m.K * SE + '" fill="none" stroke="#7d3a6c" stroke-width="1.6" stroke-dasharray="4 5"/>'; }
-  var o = '<svg class="ov" viewBox="0 0 ' + W3 + ' ' + H3 + '" preserveAspectRatio="xMidYMid slice">' +
+  var o = '<svg class="ov" viewBox="0 0 ' + WM + ' ' + HM + '" preserveAspectRatio="xMidYMid slice">' +
     '<defs><pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="9" stroke="#b5534a" stroke-width="2.2" stroke-opacity=".55"/></pattern></defs>' +
-    '<rect x="0" y="' + m.y(-73) + '" width="' + W3 + '" height="' + (m.y(-59) - m.y(-73)) + '" fill="url(#hatch)"/>' +
+    '<rect x="0" y="' + m.y(-73) + '" width="' + WM + '" height="' + (m.y(-59) - m.y(-73)) + '" fill="url(#hatch)"/>' +
     WETLANDS.map(function(w){ return '<ellipse cx="' + m.x(w[0]) + '" cy="' + m.y(w[1]) + '" rx="' + w[2] * m.K + '" ry="' + w[3] * m.K * SE + '" fill="none" stroke="#2f6f6a" stroke-width="2" stroke-dasharray="6 5"/>'; }).join("") +
     '<polygon points="' + [[PARCEL.x0, PARCEL.z0], [PARCEL.x1, PARCEL.z0], [PARCEL.x1, PARCEL.z1], [PARCEL.x0, PARCEL.z1]].map(function(q){ return m.x(q[0]) + "," + m.y(q[1]); }).join(" ") + '" fill="none" stroke="#1c2a28" stroke-width="2.2" stroke-dasharray="10 7"/>' +
     '<g id="mv">' + ell("ov55", r) + ell("ov45", r * 3.16) +
@@ -556,25 +657,25 @@ function radarFor(page, k){
 }
 var RSHOWN = null, ranim = 0;
 function radarSVG(vals, goal, base, big){
-  var W = big ? 760 : 240, H = big ? 560 : 180, cx = W / 2, cy = big ? 282 : 90, R = big ? 205 : 78, n = RAX.length;
+  var mid = big === "mid", W = mid ? 580 : big ? 760 : 240, H = mid ? 340 : big ? 560 : 180, cx = mid ? 300 : W / 2, cy = mid ? 160 : big ? 282 : 90, R = mid ? 100 : big ? 205 : 78, n = RAX.length;
   var o = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + RAX.map(function(a, i){ return a + " " + Math.round(goal[i]); }).join(", ") + '">';
   function pt(i, v){ var a = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + Math.cos(a) * R * v / 100, cy + Math.sin(a) * R * v / 100]; }
   function poly(v){ return v.map(function(x, i){ var q = pt(i, x); return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" "); }
   (big ? [25, 50, 75, 100] : [50, 100]).forEach(function(r){ o += '<polygon points="' + poly(RAX.map(function(){ return r; })) + '" fill="none" stroke="var(--line)"/>'; });
   for (var i = 0; i < n; i++){ var q = pt(i, 100); o += '<line x1="' + cx + '" y1="' + cy + '" x2="' + q[0].toFixed(1) + '" y2="' + q[1].toFixed(1) + '" stroke="var(--line)"/>'; }
-  o += '<polygon points="' + poly(vals) + '" fill="var(--accent)" fill-opacity=".3" stroke="var(--accent)" stroke-width="' + (big ? 3.5 : 2.2) + '" stroke-linejoin="round"/>';
-  o += '<polygon points="' + poly(base) + '" fill="none" stroke="var(--muted)" stroke-width="' + (big ? 1.8 : 1.2) + '" stroke-dasharray="' + (big ? "6 6" : "3 4") + '"/>';
+  o += '<polygon points="' + poly(vals) + '" fill="var(--accent)" fill-opacity=".3" stroke="var(--accent)" stroke-width="' + (mid ? 2.6 : big ? 3.5 : 2.2) + '" stroke-linejoin="round"/>';
+  o += '<polygon points="' + poly(base) + '" fill="none" stroke="var(--muted)" stroke-width="' + (mid ? 1.5 : big ? 1.8 : 1.2) + '" stroke-dasharray="' + (mid ? "5 5" : big ? "6 6" : "3 4") + '"/>';
   if (big){
-    vals.forEach(function(v, i){ var q = pt(i, v); o += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="5.5" fill="var(--accent)"/>'; });
+    vals.forEach(function(v, i){ var q = pt(i, v); o += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="' + (mid ? 4 : 5.5) + '" fill="var(--accent)"/>'; });
     RAX.forEach(function(a, i){
-      var q = pt(i, 112), dx = q[0] - cx, d = Math.round(goal[i] - base[i]), mark = d === 0 ? "" : ' <tspan class="' + (d > 0 ? "up" : "down") + '">' + (d > 0 ? "▲" : "▼") + '</tspan>';
+      var q = pt(i, mid ? 121 : 112), dx = q[0] - cx, d = Math.round(goal[i] - base[i]), mark = d === 0 ? "" : ' <tspan class="' + (d > 0 ? "up" : "down") + '">' + (d > 0 ? "▲" : "▼") + '</tspan>';
       o += '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + 5).toFixed(1) + '" text-anchor="' + (Math.abs(dx) < 12 ? "middle" : dx > 0 ? "start" : "end") + '">' + a + mark + '</text>';
     });
     o += '<line x1="18" y1="' + (H - 16) + '" x2="52" y2="' + (H - 16) + '" stroke="var(--muted)" stroke-width="1.8" stroke-dasharray="6 6"/><text class="key" x="60" y="' + (H - 11) + '">Conventional campus, nothing spent</text>';
   }
   return o + '</svg>';
 }
-function drawRadar(vals, goal, base){ var el = $("radar"); if (el) el.innerHTML = radarSVG(vals, goal, base, true); }
+function drawRadar(vals, goal, base){ var el = $("radar"); if (el) el.innerHTML = radarSVG(vals, goal, base, "mid"); }
 function animateRadar(){
   var to = radarNow(), base = radarBase(); cancelAnimationFrame(ranim);
   if (!$("radar") || !RSHOWN || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)){ RSHOWN = to; drawRadar(to, to, base); return; }
@@ -646,25 +747,33 @@ function ominiHTML(){
 }
 function editorHTML(bare){
   var P = PAGES[ST.ch];
-  return '<div class="card stage"><img src="live/neighborhood.jpg" alt="The Neighborhood view of the original Scenario Editor: the data center, the Ecorse River, the rail corridor, John Riel Memorial Park and the Arno Ave homes"><div class="card alts">' +
+  return '<div class="card stage" data-view="map" data-move><div class="card alts">' +
     '<div class="steps">' + CH.map(function(c, i){ return '<button type="button" data-ch="' + c + '" aria-pressed="' + (c === ST.ch) + '"><b>' + (i + 1) + '</b>' + (c === "benefits" ? "Benefits" : PAGES[c].n) + '</button>'; }).join("") + '</div>' +
     '<h2>' + P.title + '</h2><p>' + P.lead + '</p>' +
     P.opts.map(function(op){ var on = P.multi ? ST.b[op[0]] : ST[P.key] === op[0];
       return '<label class="opt"><input type="' + (P.multi ? "checkbox" : "radio") + '" name="opt" id="opt-' + op[0] + '" value="' + op[0] + '"' + (on ? " checked" : "") + '><span><span class="code">' + op[0] + '</span><span class="nm">' + op[1] + '</span><span class="sub">' + op[2] + '</span><span class="end"><span class="val">' + optValue(ST.ch, op[0]) + '</span><span class="dot"></span></span></span></label>'; }).join("") +
-    '</div></div><div class="card live" aria-live="polite"><div class="hd">Live analysis' + ominiHTML() + '</div><div class="tiles">' + tiles(ST.ch) + '</div></div>';
+    '</div><div class="budget" aria-live="polite">' + ominiHTML() + '</div></div>';
 }
 function sentimentHTML(bare){
   return '<div class="card stage"><img src="live/sentiment.jpg" alt="The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list">' +
     (bare ? "" : '<a class="openlive" href="' + SENTIMENT + '">Open the live Sentiment map</a>') + '</div>';
 }
-function viewHTML(bare){ return '<div class="card stage" data-view="paint">' + (bare ? "" : noteHTML(NOTES.see)) + '<div class="chap">' + (CH.indexOf(ST.ch) + 1) + ' ' + PAGES[ST.ch].n + '</div><div class="say" aria-live="polite">' + sayLine(ST.ch) + '</div></div>'; }
+function viewHTML(bare){
+  return '<div class="card stage"><img src="live/center.jpg" alt="Photo of the center wall: the original Scenario Editor in Site layout, with the data center, its 55 dBA contour, the design alternatives and the live analysis">' +
+    (bare ? "" : '<a class="openlive" href="' + SENTIMENT + '">Open the live Scenario Editor</a>') + '</div>';
+}
+function benRow(k){
+  var m = funds(), on = modules(), each = on.length ? YEARLY / on.length : 0, up = Math.max(0, m.left), o = PAGES.benefits.opts.filter(function(x){ return x[0] === k; })[0], is = ST.b[k];
+  var v = !is ? "Not funded" : k === "B1" ? money(each + up * .04) + " in grants a year" : k === "B2" ? money(each) + " a year into equity" : k === "B3" ? Math.floor(each * 1000 / 8) + " homes protected a year" : Math.floor(each * 1000 / 15) + " training places a year";
+  return '<label class="brow ' + (is ? "on" : "off") + '"><input type="checkbox" name="ben" id="ben-' + k + '" value="' + k + '"' + (is ? " checked" : "") + '><span class="bc">' + k + '</span><span class="bt"><small>' + o[1] + '</small><b>' + v + '</b></span><span class="dot"></span></label>';
+}
 function analysisHTML(bare){
-  var b = modules(), base = radarBase();
-  return '<div class="card measure" aria-live="polite"><div class="hd">Live analysis · ' + PAGES[ST.ch].n + '<span class="pill">Illustrative figures</span></div>' +
-    '<div class="chosen">' + ["d","t","e"].map(function(k){ var o = chosenName(k); return '<span' + (PAGES[ST.ch].key === k ? ' class="now"' : '') + '><b>' + o[0] + '</b>' + o[1] + '</span>'; }).join("") +
-    '<span' + (ST.ch === "benefits" ? ' class="now"' : '') + '><b>' + (b.length ? b.join(" ") : "B") + '</b>' + (b.length ? "Benefits" : "No benefit yet") + '</span></div>' +
-    '<div class="mbody"><div class="radar" id="radar"></div><div class="smalls">' + PAGES[ST.ch].opts.map(function(op){ var on = PAGES[ST.ch].multi ? ST.b[op[0]] : ST[PAGES[ST.ch].key] === op[0], v = radarFor(ST.ch, op[0]);
-      return '<div class="sm' + (on ? " on" : "") + '"><div class="t"><b>' + op[0] + '</b><span>' + op[1] + '</span><em>' + optValue(ST.ch, op[0]) + '</em></div><div class="r">' + radarSVG(v, v, base, false) + '</div></div>'; }).join("") + '</div></div>' + todoHTML() + offerHTML() + '</div>';
+  var m = funds(), over = m.rest < 0, P = PAGES[ST.ch];
+  return '<div class="outcome"><div class="card stage" data-view="tall"><div class="say" aria-live="polite">' + sayLine(ST.ch) + '</div>' +
+    '<div class="card pick"><div class="steps">' + CH.map(function(c, i){ return '<button type="button" data-ch="' + c + '" aria-pressed="' + (c === ST.ch) + '"><b>' + (i + 1) + '</b>' + (c === "benefits" ? "Benefits" : PAGES[c].n) + '</button>'; }).join("") + '</div>' +
+    (P.multi ? "" : '<div class="chips">' + P.opts.map(function(op){ return '<label class="chip"><input type="radio" name="pick" id="pick-' + op[0] + '" value="' + op[0] + '"' + (ST[P.key] === op[0] ? " checked" : "") + ' aria-label="' + op[0] + " " + op[1] + '"><span><b>' + op[0] + '</b><small>' + optValue(ST.ch, op[0]) + '</small></span></label>'; }).join("") + '</div>') + '</div></div><div class="side">' +
+    '<div class="card imp" aria-live="polite"><div class="hd">Impacts<span class="pill">Illustrative figures</span></div><div class="radar mid" id="radar"></div>' + (P.multi ? "" : '<div class="kpis">' + tiles(ST.ch) + '</div>') + '</div>' +
+    '<div class="card ben" aria-live="polite"><div class="hd">Community benefits<span class="pill' + (over ? " over" : "") + '">' + (over ? "Over the offer by " + money(-m.rest) : "Feasible · " + (m.left > 0 ? money(m.left) : "$0") + " left") + '</span></div>' + ["B1","B2","B3","B4"].map(benRow).join("") + '</div></div></div>';
 }
 function render(){
   var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:analysisHTML};
@@ -673,13 +782,13 @@ function render(){
   document.body.classList.remove("dark");
   if (VIEW !== "all") main.innerHTML = H[VIEW]();
   else main.innerHTML = '<div class="room"><div class="walls">' +
-      '<div class="scr wl"><span class="lab">Left wall · Sentiment map</span>' + mini("sentiment") + '</div>' +
-      '<div class="scr"><span class="lab">Center wall · Neighborhood view</span>' + mini("view") + '</div>' +
-      '<div class="scr wr"><span class="lab">Right wall · Live analysis</span>' + mini("analysis") + '</div></div>' +
+      '<div class="scr wl"><a class="lab" href="#sentiment">Left wall · Sentiment map</a>' + mini("sentiment") + '</div>' +
+      '<div class="scr"><a class="lab" href="#view">Center wall · Neighborhood view</a>' + mini("view") + '</div>' +
+      '<div class="scr wr"><a class="lab" href="#analysis">Right wall · Live analysis</a>' + mini("analysis") + '</div></div>' +
       (NOTES_ON ? '<div class="notes3">' + noteHTML(NOTES.sentiment) + noteHTML(NOTES.see) + noteHTML(SHOW[ST.ch]) + '</div>' : '') +
-      '<div class="under">' + noteHTML(NOTES[ST.ch]) + '<div class="scr tb"><span class="lab">Table · Scenario Editor</span>' + mini("editor") + '</div></div></div>';
+      '<div class="under">' + noteHTML(NOTES[ST.ch]) + '<div class="scr tb"><a class="lab" href="#editor">Table · Scenario Editor</a>' + mini("editor") + '</div></div></div>';
   main.querySelectorAll(".stage[data-view]").forEach(function(f){ drawScene(f, f.getAttribute("data-view")); });
-  fit(); animateRadar(); if (keep && $(keep)) $(keep).focus();
+  fit(); animateRadar(); cancelAnimationFrame(agRaf); agRaf = requestAnimationFrame(drawAgents); if (keep && $(keep)) $(keep).focus();
 }
 function fit(){ document.querySelectorAll(".mini").forEach(function(el){ el.style.setProperty("--k", el.parentNode.clientWidth / 1600); }); }
 window.addEventListener("resize", fit);
@@ -701,7 +810,9 @@ function tell(){ var raw = JSON.stringify(ST); try { localStorage.setItem("dcsco
 window.addEventListener("storage", function(ev){ if (ev.key === "dcscope-v5" && ev.newValue) adopt(ev.newValue); });
 $("main").addEventListener("change", function(ev){
   if (ev.target.id === "rot"){ setPose(ST.px, ST.pz, +ev.target.value); render(); tell(); return; }
-  var v = ev.target.value, P = PAGES[ST.ch]; if (!v || ev.target.name !== "opt") return;
+  var v = ev.target.value, P = PAGES[ST.ch];
+  if (v && ev.target.name === "ben"){ ST.b[v] = ev.target.checked; render(); tell(); return; }
+  if (!v || (ev.target.name !== "opt" && ev.target.name !== "pick")) return;
   if (P.multi) ST.b[v] = ev.target.checked; else ST[P.key] = v;
   if (v === "D1") setPose(0, 0, 0); else if (v === "D2" && !ST.px && !ST.pz && !ST.rot) setPose(10, -12, 10); else setPose(ST.px, ST.pz, ST.rot);
   render(); tell();
