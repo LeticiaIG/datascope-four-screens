@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataScope Four Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: the Scenario Editor's screen, repeated. One large picture of the site, a floating list of alternatives at top right, a live analysis bar underneath. Light only. */
+:root{
+  color-scheme:light;
+  --bg:#dfe8e3; --surface:#fbfdfc; --sunk:#eef3f0; --ink:#1c2a28; --muted:#5d6d69; --line:#d2dcd7;
+  --accent:#3b7a66; --accent-soft:#dcebe4; --warn:#b07a12; --over:#b5534a;
+  --font:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif; --r:18px; --gap:12px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+html{font-size:clamp(14px,1.9vh,22px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:1rem;line-height:1.3}
+.app{height:100%;display:flex;flex-direction:column;gap:var(--gap);padding:14px 18px 16px}
+h2{margin:0;font-size:1.05rem;font-weight:700}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 2px 10px rgba(20,40,34,.05)}
+
+.top{align-self:center;padding:.45rem .6rem;display:flex;align-items:center;gap:1rem;max-width:100%}
+.brand{color:inherit;text-decoration:none;font-weight:700;font-size:1.45rem;letter-spacing:-.03em;padding-left:.3rem;white-space:nowrap}
+.tabs{display:flex;gap:4px;background:var(--sunk);border-radius:12px;padding:4px;overflow-x:auto}
+.tab{font-weight:600;font-size:.9rem;color:var(--muted);border-radius:9px;padding:.4rem .8rem;text-decoration:none;white-space:nowrap}
+.tab[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+
+.main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:var(--gap)}
+.stage{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;padding:0;background:var(--sunk)}
+.stage canvas,.stage > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.openlive{position:absolute;right:.9rem;bottom:.9rem;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:.4rem 1rem;font-size:.9rem;font-weight:700;color:var(--ink);text-decoration:none}
+.stage .none{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600;padding:2rem;text-align:center}
+.say{position:absolute;left:.9rem;bottom:.9rem;max-width:calc(100% - 26rem);background:var(--surface);border-radius:14px;padding:.5rem 1rem;font-size:1rem;font-weight:600}
+.alts{position:absolute;top:.9rem;right:.9rem;width:23rem;max-width:calc(100% - 1.8rem);padding:.9rem;display:flex;flex-direction:column;gap:.5rem}
+.alts p{margin:0;font-size:1.25rem;font-weight:500;letter-spacing:-.01em}
+.opt{position:relative;display:flex}
+.opt input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.opt > span{flex:1 1 auto;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.1rem .6rem;border:1px solid var(--line);border-radius:12px;padding:.5rem .7rem;background:var(--surface)}
+.opt .code{grid-row:1 / span 2;font-size:.78rem;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:7px;padding:.2rem .4rem}
+.opt .nm{font-size:.98rem;font-weight:700;line-height:1.15}
+.opt .sub{grid-column:2;font-size:.82rem;color:var(--muted);line-height:1.2}
+.opt .dot{width:1.05rem;height:1.05rem;border-radius:50%;border:2px solid var(--line)}
+.opt input[type=checkbox] + span .dot{border-radius:.3rem}
+.opt input:checked + span{background:var(--accent-soft);border-color:var(--accent)}
+.opt input:checked + span .dot{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.opt input[type=checkbox]:checked + span .dot{background:var(--accent)}
+.opt input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+
+.live{padding:.7rem 1rem .9rem;display:flex;flex-direction:column;gap:.5rem}
+.hd{display:flex;align-items:center;gap:.5rem;font-weight:700;font-size:.9rem}
+.hd::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:var(--accent)}
+.pill{margin-left:auto;font-size:.75rem;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:.15rem .6rem}
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.tile{padding:0 1rem;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:.1rem;min-width:0}
+.tile:first-child{border-left:0;padding-left:0}
+.tile .k{font-size:.85rem;font-weight:600}
+.tile .v{font-size:1.9rem;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap}
+.tile .v small{font-size:.85rem;font-weight:600;letter-spacing:0;color:var(--muted)}
+.tile .d{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .d em{font-style:normal;font-weight:700;color:var(--accent)}
+.tile .d em.bad{color:var(--over)}
+.meter{height:3px;border-radius:2px;background:var(--line);margin-top:.3rem;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent);transition:width .25s}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}}
+
+/* the room: the table decides, the center wall shows, the right wall measures */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--sunk);border-radius:12px;padding:4px}
+.steps button{font:inherit;font-size:.78rem;font-weight:700;border:0;border-radius:9px;background:none;color:var(--muted);padding:.4rem .2rem;cursor:pointer;line-height:1.1}
+.steps button b{display:block;font-size:1rem}
+.steps button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.chap{position:absolute;top:.9rem;right:.9rem;background:var(--surface);border-radius:999px;padding:.35rem 1rem;font-weight:700}
+.measure{flex:1 1 auto;min-height:0;padding:1.4rem 1.6rem;display:flex;flex-direction:column;gap:1.2rem;position:relative}
+.measure .hd{font-size:1.4rem}
+.chosen{display:flex;flex-wrap:wrap;gap:.5rem}
+.chosen span{font-size:.95rem;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:.3rem .9rem;color:var(--muted)}
+.chosen span.now{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.chosen b{color:var(--accent);margin-right:.35rem}
+.dark{--bg:#050606;--surface:#0f1312;--sunk:#1a201e;--ink:#eef3f1;--muted:#9aaaa5;--line:#2a3230;--accent:#6fd0ac;--accent-soft:#16332b;--warn:#e3a85c;--over:#e98176;color:var(--ink);color-scheme:dark}
+body.dark{background:var(--bg)}
+.dark .card{box-shadow:none}
+.mbody{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:1.5rem}
+.smalls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:.8rem;min-height:0}
+.sm{border:1px solid var(--line);border-radius:14px;padding:.6rem .8rem;display:flex;flex-direction:column;gap:.2rem;min-height:0;min-width:0}
+.sm.on{border-color:var(--accent);background:var(--accent-soft)}
+.sm .t{display:flex;align-items:baseline;gap:.5rem;font-size:.95rem;font-weight:700;line-height:1.15}
+.sm .t b{color:var(--accent)}
+.sm .t span{flex:1 1 auto;min-width:0}
+.sm .t em{font-style:normal;font-size:.85rem;color:var(--muted);white-space:nowrap}
+.sm .r{flex:1 1 auto;min-height:0}
+.sm svg{width:100%;height:100%;display:block}
+.radar{min-height:0;min-width:0}
+.radar svg{width:100%;height:100%;display:block}
+.radar text{font-family:var(--font);font-size:16px;font-weight:600;fill:var(--ink)}
+.radar .up{fill:var(--accent)} .radar .down{fill:var(--over)}
+.radar .key{font-size:13px;fill:var(--muted)}
+.measure .tiles{display:flex;flex-direction:column;gap:1rem}
+.measure .tile{border-left:0;padding:0}
+.measure .tile .k{font-size:1rem}
+.measure .tile .v{font-size:2.3rem}
+.measure .tile .v small{font-size:1rem}
+.measure .tile .d{font-size:.85rem}
+.measure .meter{height:4px;margin-top:.4rem}
+.measure > .note{align-self:flex-start;width:26rem;max-width:100%}
+
+.opt .end{grid-column:3;grid-row:1 / span 2;display:flex;flex-direction:column;align-items:flex-end;gap:.25rem}
+.opt .val{font-size:.82rem;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.offerbar{padding:.7rem 1.1rem;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.6rem 1.8rem}
+.offerbar .offer small{display:block;font-size:.8rem;font-weight:600;color:var(--muted)}
+.offerbar .offer b{font-size:1.45rem;font-weight:500;letter-spacing:-.02em}
+.offerbar .mid{display:flex;flex-direction:column;gap:.35rem}
+.bar{display:flex;height:.9rem;border-radius:999px;overflow:hidden;background:var(--sunk)}
+.bar i{display:block;height:100%;transition:width .25s}
+.legend{display:flex;flex-wrap:wrap;gap:.1rem 1.3rem;font-size:.85rem;font-weight:600}
+.legend span{display:flex;align-items:center;gap:.4rem}
+.legend span::before{content:"";width:.6rem;height:.6rem;border-radius:50%;background:var(--c)}
+.fit{display:flex;flex-direction:column;align-items:flex-end;gap:.2rem}
+.fit b{font-size:1.45rem;font-weight:500;font-variant-numeric:tabular-nums}
+.fit .pill{margin:0}
+.fit.over .pill{background:var(--over);color:#fff}
+.fit.over b{color:var(--over)}
+.goal{font-size:1.05rem;font-weight:600;color:var(--muted);text-align:center}
+.measure .offerbar{border:1px solid var(--line);border-radius:14px}
+
+.ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ov .lb{fill:#fbfdfc;fill-opacity:.94}
+.ov .lt{font-family:var(--font);font-size:13px;font-weight:700;fill:#1c2a28}
+.ov .lb.c{fill:#fbeeea} .ov .lt.c{fill:#9a3f36}
+.live .hd{flex-wrap:wrap}
+.ov .lb.s{fill:#f3e8f0} .ov .lt.s{fill:#7d3a6c}
+.ov .lb.dk{fill:#1c2a28} .ov .lt.dk{fill:#fff}
+#fp{fill:#fbfdfc;fill-opacity:.25;stroke:#1c2a28;stroke-width:2.5}
+#fp.drag{pointer-events:auto;cursor:grab;touch-action:none}
+#fp.drag:focus-visible{outline:none;stroke:var(--accent);stroke-width:5}
+.rot{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.2rem .6rem;font-size:.9rem;font-weight:600;border-top:1px solid var(--line);padding-top:.5rem}
+.rot input{grid-column:1 / -1;width:100%;accent-color:var(--accent);margin:0}
+
+.omini{margin-left:auto;display:flex;align-items:center;gap:.8rem;font-size:.85rem;font-weight:600;color:var(--muted)}
+.omini .bar{width:12rem;height:.55rem}
+.omini .pill{margin:0}
+.omini .pill.over{background:var(--over);color:#fff}
+.todo{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;font-size:.9rem;font-weight:600;color:var(--muted)}
+.todo span{border:1px dashed var(--muted);border-radius:999px;padding:.2rem .7rem}
+#rh circle{fill:#1c2a28} #rh text{font-family:var(--font);font-size:19px;font-weight:700;fill:#fff}
+#rh #rhv{fill:#1c2a28;font-size:13px;text-anchor:start}
+#rh.drag{pointer-events:auto;cursor:ew-resize;touch-action:none}
+#rh:focus-visible{outline:none} #rh:focus-visible circle{stroke:var(--accent);stroke-width:4}
+.ov .lb.e{fill:#fbf1dc} .ov .lt.e{fill:#8a5c08}
+.pin{pointer-events:auto;cursor:pointer}
+.pin:focus-visible{outline:none} .pin:focus-visible circle:last-child{stroke:#1c2a28}
+.key{position:absolute;left:.9rem;bottom:.9rem;padding:.7rem .9rem;display:flex;flex-direction:column;gap:.35rem;font-size:.82rem;font-weight:600}
+.key .r{display:flex;flex-wrap:wrap;gap:.2rem .9rem}
+.key .r span{display:flex;align-items:center;gap:.35rem}
+.key i{width:.8rem;height:.8rem;border-radius:50%;background:var(--c);display:inline-block}
+.key i.ring{background:var(--surface);border:3px solid var(--muted)}
+.key small{font-size:.75rem;color:var(--muted);border-top:1px solid var(--line);padding-top:.35rem}
+.voices{bottom:.9rem;overflow:hidden}
+.tchips{display:flex;flex-wrap:wrap;gap:.3rem}
+.tchips button{font:inherit;font-size:.8rem;font-weight:600;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--muted);padding:.25rem .7rem;cursor:pointer}
+.tchips button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.mix{flex:0 0 auto;display:flex;height:.7rem;border-radius:999px;overflow:hidden;background:var(--sunk)}
+.mix i{display:block;height:100%}
+.vlist{flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:.35rem}
+.vi{font:inherit;text-align:left;display:grid;grid-template-columns:auto 1fr;gap:.1rem .5rem;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:.45rem .6rem;cursor:pointer;font-size:.88rem;line-height:1.25}
+.vi i{width:.7rem;height:.7rem;border-radius:50%;background:var(--c);margin-top:.25rem}
+.vi small{grid-column:2;font-size:.72rem;color:var(--muted);font-weight:600}
+.vi[aria-pressed="true"]{border-color:var(--ink);background:var(--sunk)}
+
+/* notes from the brief: what each screen is there to show */
+.note{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:10px;padding:.5rem .8rem;font-size:.8rem;line-height:1.3}
+.note b{display:block;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--warn)}
+.note strong{display:block;font-size:.92rem}
+.note ul{margin:.2rem 0 0;padding-left:1rem}
+.stage > .note{position:absolute;top:.9rem;left:.9rem;width:21rem;max-width:calc(100% - 26rem)}
+.notes3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;width:94%}
+.under{display:flex;align-items:flex-start;justify-content:center;gap:1.2rem;width:100%}
+.under .note{width:17rem;margin-top:1.5rem}
+.under .swap{flex-direction:column;margin-top:1.5rem}
+.tabs button{font:inherit;font-weight:600;font-size:.9rem;color:var(--muted);border:0;background:none;border-radius:9px;padding:.4rem .8rem;cursor:pointer;white-space:nowrap}
+.tabs button[aria-pressed="true"]{color:var(--warn)}
+
+/* "All": the four screens as they stand in the room */
+.room{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7rem;perspective:2400px}
+.walls{display:flex;align-items:center;justify-content:center;width:100%;perspective:2000px}
+.scr{position:relative;display:block;flex:0 0 auto;width:32.5%;aspect-ratio:16/9;background:var(--bg);border:6px solid #1c2a28;border-radius:10px;overflow:hidden;box-shadow:0 14px 34px rgba(20,40,34,.28);text-decoration:none;color:inherit}
+.scr img{width:100%;height:100%;object-fit:cover;display:block}
+.scr .lab{position:absolute;left:.5rem;top:.5rem;background:#1c2a28;color:#fff;font-size:.78rem;font-weight:700;border-radius:999px;padding:.2rem .7rem;z-index:2}
+.wl{transform:rotateY(34deg);transform-origin:right center}
+.wr{transform:rotateY(-34deg);transform-origin:left center}
+.tb{width:44%;transform:rotateX(46deg);transform-origin:top center}
+.mini{width:1600px;height:900px;transform-origin:0 0;transform:scale(var(--k,.3));padding:14px 18px;display:flex;background:var(--bg)}
+.scr:has(.mini.dark){background:#050606}
+.mini > .main{flex:1 1 auto}
+.swap{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px}
+.swap button{font:inherit;font-size:.85rem;font-weight:600;border:0;border-radius:9px;background:none;color:var(--muted);padding:.3rem .8rem;cursor:pointer}
+.swap button[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink)}
+
+@media (max-width:900px), (max-height:520px){
+  html,body{height:auto}
+  .app{height:auto}
+  .stage{flex:0 0 auto;display:flex;flex-direction:column}
+  .stage canvas{position:static;aspect-ratio:16/9;height:auto}
+  .alts,.say{position:static;width:auto;max-width:none;border:0;box-shadow:none}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem 0}
+  .tile:nth-child(odd){border-left:0;padding-left:0}
+  .walls{flex-direction:column;gap:1rem}
+  .scr,.tb{width:100%;transform:none;margin:0}
+  .notes3{grid-template-columns:minmax(0,1fr);width:100%}
+  .under{flex-direction:column;align-items:stretch}
+  .under .note{width:auto}
+  .stage > .note{position:static;width:auto;max-width:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="card top">
+    <a class="brand" href="#all">DataScope.</a>
+    <nav class="tabs" aria-label="Screens" id="views"></nav>
+  </div>
+  <div class="main" id="main"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+"use strict";
+function $(id){ return document.getElementById(id); }
+function money(m){ return m >= 1 ? "$" + (Math.round(m * 10) / 10) + "M" : "$" + Math.round(m * 1000) + "k"; }
+function pct(x){ return x < .1 ? (Math.round(x * 1000) / 10) + "%" : Math.round(x * 100) + "%"; }
+
+// ---------- the brief ----------
+// Design is the existing Scenario Editor. These screens add the brief's other three groups of choices.
+var PAGES = {
+  design:{n:"Design", title:"Design alternatives", lead:"Choose the site arrangement", key:"d", opts:[
+    ["D1", "Conventional campus", "Baseline: conventional data center design"],
+    ["D2", "Reoriented and screened", "Building moved back; setbacks, berms and planting"],
+    ["D3", "Protected equipment yard", "Noisy equipment behind zigzag sound walls"],
+    ["D4", "Compact community district", "Pool, spa, community rooms and cafes on waste heat"]]},
+  technology:{n:"Technology", title:"Technology alternatives", lead:"Choose the cooling package", key:"t", opts:[
+    ["T1", "Current technical baseline", "Conventional cooling and heat rejection"],
+    ["T2", "Low-water cooling", "Dry heat rejection, liquid capture, efficient controls"],
+    ["T3", "Hybrid or reclaimed-water cooling", "Dry and evaporative modes"],
+    ["T4", "Heat recovery and reuse", "Server heat to customers through heat pumps"]]},
+  energy:{n:"Energy", title:"Energy alternatives", lead:"Choose the energy supply", key:"e", opts:[
+    ["E1", "Grid and smart energy", "Grid supply"],
+    ["E2", "Remote solar matching", "Offsite solar, grid and balancing retained"],
+    ["E3", "Remote wind matching", "Offsite wind generation"],
+    ["E4", "Future microreactors", "Six eVinci units at 5 MWe, on-site"]]},
+  benefits:{n:"Community benefits", title:"Community benefits", lead:"Choose how to use the offer", multi:true, opts:[
+    ["B1", "Community endowment", "Fixed contribution, yearly grants"],
+    ["B2", "Fractional ownership", "Equity in the facility, for the city"],
+    ["B3", "Household protection", "Retrofits or payments for the most affected homes"],
+    ["B4", "Jobs and local enterprise", "Paid training and internships"]]}
+};
+// Technology figures are the Scenario Editor's three cooling designs for the same 17.3 MW IT load, mapped to the brief's packages.
+var TECH = { T1:{gwh:182.2, mw:26.0, water:52.9, db:47.4}, T2:{gwh:191.9, mw:29.1, water:.4, db:52.7}, T3:{gwh:151.8, mw:22.9, water:12.2, db:43.9}, T4:{gwh:182.2, mw:26.0, water:52.9, db:47.4} };
+// Design figures are placeholders, except the 47.4 dBA reference from the Scenario Editor.
+var DESIGN = { D1:{db:47.4, seen:100, cover:12, el:1, wa:1}, D2:{db:44.4, seen:40, cover:14, el:1, wa:1}, D3:{db:39.4, seen:100, cover:16, el:1.02, wa:1}, D4:{db:47.4, seen:90, cover:22, el:1.05, wa:1.04} };
+// Energy: cost to match the full load and land needed, from the project notes. The offer is $10M upfront and $0.5M a year.
+var ENERGY = { E2:{cost:275, land:"1.5 sq mi", what:"solar"}, E3:{cost:150, land:"5–11 sq mi", what:"wind"}, E4:{cost:1000, land:"On-site", what:"microreactors"} };
+var UPFRONT = 10, YEARLY = .5;
+var CH = ["design", "technology", "energy", "benefits"];
+var ST = {d:"D1", t:"T1", e:"E1", b:{B1:true, B2:false, B3:false, B4:false}, ch:"design", topic:"all", px:0, pz:0, rot:0};
+// The site, in metres: x runs east, z runs south. One list feeds the 3D model, the plan's labels and the measurements.
+var PARCEL = {x0:-156, x1:156, z0:-54, z1:50};
+var RIVER = [[-560, -96], [-340, -130], [-190, -104], [-60, -142], [70, -108], [200, -144], [340, -112], [560, -152]];
+var WETLANDS = [[-262, -122, 74, 22], [10, -128, 62, 18], [262, -128, 66, 20]];
+var HOMES = []; [140, 166, 192].forEach(function(hz){ for (var i = 0; i < 17; i++) if (i !== 4 && i !== 8 && i !== 12) HOMES.push([-200 + i * 26, hz]); });
+function local(lx, lz, px, pz, rot){ var a = rot * Math.PI / 180, c = Math.cos(a), sn = Math.sin(a); return [px + lx * c + lz * sn, pz - lx * sn + lz * c]; }
+function corners(px, pz, rot){ var x0 = ST.d === "D3" ? -122 : -74; return [[x0, -34], [61, -34], [61, 14], [x0, 14]].map(function(q){ return local(q[0], q[1], px, pz, rot); }); }
+function clampPose(px, pz, rot){
+  rot = Math.max(-15, Math.min(15, rot)); var c = corners(0, 0, rot), xs = c.map(function(q){ return q[0]; }), zs = c.map(function(q){ return q[1]; });
+  function fit(v, lo, hi){ return lo > hi ? (lo + hi) / 2 : Math.max(lo, Math.min(hi, v)); }
+  return {px:fit(px, PARCEL.x0 - Math.min.apply(null, xs), PARCEL.x1 - Math.max.apply(null, xs)), pz:fit(pz, PARCEL.z0 - Math.min.apply(null, zs), PARCEL.z1 - Math.max.apply(null, zs)), rot:rot};
+}
+function soundAt(px, pz, rot){ return local(ST.d === "D3" ? -98 : 0, -10, px, pz, rot); }
+function nearestHome(){ var c = soundAt(ST.px, ST.pz, ST.rot), d = 1e9; HOMES.forEach(function(hm){ d = Math.min(d, Math.hypot(hm[0] - c[0], hm[1] - c[1])); }); return d; }
+function riverClearance(){
+  var best = 1e9; corners(ST.px, ST.pz, ST.rot).forEach(function(q){ for (var i = 0; i < RIVER.length - 1; i++){ var a = RIVER[i], b = RIVER[i + 1], dx = b[0] - a[0], dz = b[1] - a[1], t = Math.max(0, Math.min(1, ((q[0] - a[0]) * dx + (q[1] - a[1]) * dz) / (dx * dx + dz * dz))); best = Math.min(best, Math.hypot(q[0] - a[0] - t * dx, q[1] - a[1] - t * dz)); } });
+  return best - 12;
+}
+function modules(){ return ["B1","B2","B3","B4"].filter(function(k){ return ST.b[k]; }); }
+// What each design and technology package costs is not in the brief yet: these are placeholders, in $M.
+var COST = {D1:0, D2:2, D3:3, D4:5, T1:0, T2:3, T3:2, T4:4};
+// Upfront money pays for design and technology first; a chosen energy option takes what is left; anything still left goes to benefits with the yearly amount.
+function funds(){ var d = COST[ST.d], t = COST[ST.t], rest = UPFRONT - d - t, en = ENERGY[ST.e], e = en ? Math.max(0, rest) : 0; return {d:d, t:t, e:e, rest:rest, left:rest - e, share:en ? e / en.cost : 0}; }
+function share(){ return funds().share; }
+
+// ---------- 3D scene, painted ----------
+// Each vision is built as a 3D model, rendered once, then repainted with brush strokes. Without WebGL the flat drawing above is used.
+var W3 = 1500, H3 = 640, G3 = null, PAINTED = {};
+function rng(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function init3D(){
+  if (G3 !== null) return G3;
+  try {
+    if (!window.THREE) throw new Error("no three");
+    var cv = document.createElement("canvas"); cv.width = W3; cv.height = H3;
+    var r = new THREE.WebGLRenderer({canvas:cv, antialias:true, preserveDrawingBuffer:true});
+    r.setPixelRatio(1); r.setSize(W3, H3, false); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+    function persp(fov, px, py, pz, lx, ly, lz){ var c = new THREE.PerspectiveCamera(fov, W3 / H3, 1, 5000); c.position.set(px, py, pz); c.lookAt(lx, ly, lz); return c; }
+    var cams = { design:persp(25, 130, 92, 352, -10, 0, 20), technology:persp(20, 150, 62, 235, 40, 14, -10), energy:persp(27, 215, 135, 350, -35, 6, -150), benefits:persp(25, -80, 76, 348, 30, 0, 92) };
+    var sky = document.createElement("canvas"); sky.width = 4; sky.height = 256; var sc = sky.getContext("2d"), gr = sc.createLinearGradient(0, 0, 0, 256);
+    gr.addColorStop(0, "#9dbfdc"); gr.addColorStop(.55, "#d9e3e2"); gr.addColorStop(1, "#f3e6cf"); sc.fillStyle = gr; sc.fillRect(0, 0, 4, 256);
+    var top = new THREE.OrthographicCamera(-400, 400, 400 * H3 / W3, -400 * H3 / W3, 1, 3000); top.up.set(0, 0, -1); top.position.set(42, 900, 30); top.lookAt(42, 0, 30); cams.plan = top;
+    G3 = {r:r, cv:cv, cams:cams, sky:new THREE.CanvasTexture(sky), flat:new THREE.Color("#dfe8e3"), mats:{}};
+  } catch(e){ G3 = false; }
+  return G3;
+}
+var CLEAN = false;   // true while building the clean low-poly map; false for the painted view
+function pastel(hex){ var n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255], m = (c[0] + c[1] + c[2]) / 3; return "rgb(" + c.map(function(v, i){ return Math.round((v + (m - v) * .3) * .5 + [214, 223, 219][i] * .5); }).join(",") + ")"; }
+function M(color, op){
+  var raw = color.charAt(0) === "!", k = (CLEAN ? "c" : "p") + color + (op || ""); if (raw) color = color.slice(1);
+  if (!G3.mats[k]) G3.mats[k] = CLEAN ? new THREE.MeshPhongMaterial({color:raw ? color : pastel(color), flatShading:true, shininess:0, specular:0x000000, transparent:!!op, opacity:op || 1})
+    : new THREE.MeshLambertMaterial(op ? {color:color, transparent:true, opacity:op} : {color:color});
+  return G3.mats[k];
+}
+function put(g, geo, color, x, y, z, op){ var m = new THREE.Mesh(geo, M(color, op)); m.position.set(x, y, z); m.castShadow = !op; m.receiveShadow = true; g.add(m); return m; }
+function box(g, w, h, d, x, y, z, color, ry){ var m = put(g, new THREE.BoxGeometry(w, h, d), color, x, y, z); if (ry) m.rotation.y = ry; return m; }
+function cyl(g, rt, rb, h, x, y, z, color, seg){ return put(g, new THREE.CylinderGeometry(rt, rb, h, seg || 14), color, x, y, z); }
+function ball(g, r, x, y, z, color, sx, sy, sz, op){ var m = put(g, new THREE.SphereGeometry(r, 12, 9), color, x, y, z, op); if (sx) m.scale.set(sx, sy, sz); return m; }
+function tube(g, pts, r, color, flat){ var c = new THREE.CatmullRomCurve3(pts.map(function(p){ return new THREE.Vector3(p[0], p[1], p[2]); })); var m = put(g, new THREE.TubeGeometry(c, 48, r, 7), color, 0, 0, 0); if (flat){ m.scale.y = .04; m.castShadow = false; } return m; }
+var GREENS = ["#5f8f4e", "#4c7d48", "#7aa457", "#3f6f4a", "#8fae5a", "#6a9a62", "#c2a84e"];
+function tree(g, x, y, z, k, R){
+  var a = R();
+  if (CLEAN){ var b1 = a < .22 ? .3 : R(), b2 = a < .22 ? 0 : R(), t1 = put(g, new THREE.IcosahedronGeometry(5.2 * k, 0), ["!#5d9990", "!#7db3a8", "!#4d877f", "!#8cc0b4"][Math.floor(a * 97) % 4], x, y + 5.4 * k, z); t1.rotation.set(a * 6, b1 * 6, 0);
+    if (b2 > .5) put(g, new THREE.IcosahedronGeometry(3.4 * k, 0), "!#6ea79d", x + 3.6 * k, y + 3.6 * k, z + 2 * k); return; }
+  cyl(g, .7 * k, .9 * k, 6 * k, x, y + 3 * k, z, "#6b5444", 6);
+  if (a < .22){ put(g, new THREE.ConeGeometry(4.2 * k, 15 * k, 8), "#3f6a4c", x, y + 11 * k, z); return; }
+  var c = GREENS[Math.floor(R() * GREENS.length)], c2 = GREENS[Math.floor(R() * 5)];
+  ball(g, 5.2 * k, x, y + 10 * k, z, c); ball(g, 3.9 * k, x - 3 * k, y + 8 * k, z + 1.5 * k, c2); ball(g, 4.1 * k, x + 2.8 * k, y + 8.4 * k, z - 1.2 * k, c2);
+}
+function zig(g, x1, z1, x2, z2, h){
+  var len = Math.hypot(x2 - x1, z2 - z1), nseg = Math.max(2, Math.round(len / 7)), base = Math.atan2(-(z2 - z1), x2 - x1), L = len / nseg;
+  for (var i = 0; i < nseg; i++){ var t = (i + .5) / nseg; box(g, L / Math.cos(.5), h, 1.1, x1 + (x2 - x1) * t, h / 2, z1 + (z2 - z1) * t, i % 2 ? "#a9aca4" : "#bfc1b8", base + (i % 2 ? .5 : -.5)); }
+}
+function house(g, x, z, col, retro){
+  box(g, 12, 7, 10, x, 3.5, z, CLEAN ? "!#b9c8d0" : col); var rf = put(g, new THREE.ConeGeometry(9.6, 5.5, 4), CLEAN ? (retro ? "!#5fa58c" : "!#93a6b3") : "#b0604a", x, 9.7, z); rf.rotation.y = Math.PI / 4;
+  if (retro && !CLEAN){ var pn = box(g, 6, .35, 4.2, x + 2.2, 9.9, z + 2.6, "#2f4a78"); pn.rotation.x = .5; pn.rotation.z = -.5; }
+}
+function build3D(o, share, r55, pose){
+  var h = function(k){ return o.indexOf(k) >= 0; }, g = new THREE.Scene(), R = rng(11), i, j;
+  g.background = CLEAN ? G3.flat : G3.sky; g.fog = CLEAN ? null : new THREE.Fog("#dfe6e2", 560, 2100);
+  var ROAD = CLEAN ? "!#cdc2c4" : "#b9b6ad", MAUVE = CLEAN ? "!#b0609a" : "#b0609a";
+  g.add(new THREE.HemisphereLight("#cfe2f2", "#8f8763", .56));
+  var sun = new THREE.DirectionalLight("#fff0d2", .66); sun.position.set(-190, 210, 150); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048); var sc = sun.shadow.camera; sc.left = -340; sc.right = 340; sc.top = 340; sc.bottom = -340; sc.near = 1; sc.far = 900; sun.shadow.bias = -.0006; g.add(sun);
+  var ground = put(g, new THREE.PlaneGeometry(6000, 6000), CLEAN ? "!#d4deda" : "#9db884", 0, 0, 0); ground.rotation.x = -Math.PI / 2; ground.castShadow = false;
+  for (i = 0; i < 26; i++) ball(g, 60, (R() - .5) * 900, -.5, (R() - .6) * 700, ["#adc28c", "#8fae78", "#a3bb80", "#bcc894"][i % 4], 1 + R(), .012, .5 + R() * .6).castShadow = false;
+  for (i = 0; i < 46; i++) ball(g, 34 + R() * 26, -1300 + i * 58 + R() * 30, 6, -940 - R() * 200, ["#5d7f68", "#6f8f72", "#567763"][i % 3], 1.5, .8, 1);
+  for (i = 0; i < 4; i++) ball(g, 420, -1100 + i * 700, -40, -1700, "#a9bcc0", 1.6, .32, .5);
+  // the town on the horizon: low-rise, one spire, one water tower
+  var CITY = ["#d9cfc0", "#c9b9a6", "#b98f78", "#cfd3d0", "#a9a39a", "#e3d8c4", "#b7a089", "#9aa7ad"];
+  for (i = 0; i < 120; i++){ var bw = 18 + R() * 30, bh = 11 + R() * 20 + (R() < .1 ? 16 : 0), bx = -780 + R() * 1480, bz = -520 - R() * 300; box(g, bw, bh, 18 + R() * 22, bx, bh / 2, bz, CITY[i % 8]); if (R() < .35) box(g, bw * .6, 4, 12, bx, bh + 2, bz, "#8d6f62"); }
+  box(g, 14, 44, 14, -150, 22, -610, "#d9cfc0"); put(g, new THREE.ConeGeometry(9, 26, 4), "#6f7f8a", -150, 57, -610).rotation.y = Math.PI / 4;
+  cyl(g, 3, 3, 40, 260, 20, -650, "#c9cdca", 8); cyl(g, 13, 10, 12, 260, 44, -650, "#dfe3e0", 14);
+  for (i = 0; i < 60; i++) tree(g, -760 + R() * 1460, 0, -450 - R() * 60, 1.2 + R() * .8, R);
+
+  // environmental constraints north of the site: the river, its wetlands and its trees
+  if (CLEAN) tube(g, RIVER.map(function(q){ return [q[0], 1, q[1]]; }), 26, "!#c3d6e4", true).position.y = -.03;
+  tube(g, RIVER.map(function(q){ return [q[0], 1, q[1]]; }), 12, CLEAN ? "!#86add0" : "#7fb4c8", true);
+  WETLANDS.forEach(function(w){ ball(g, 1, w[0], .08, w[1], CLEAN ? "!#9cc4bd" : "#8fb9b2", w[2], .012, w[3]).castShadow = false; });
+  for (i = 0; i < 80; i++) tree(g, -470 + R() * 940, 0, -92 - R() * 66, .8 + R() * .5, R);
+  // the rail corridor to keep clear, with the power line beside it; the road on the west side
+  box(g, 1200, .2, 12, 0, .1, -66, CLEAN ? "!#cdb9b4" : "#9a9590").castShadow = false; box(g, 1200, .3, .8, 0, .32, -64, "#6f6a66").castShadow = false; box(g, 1200, .3, .8, 0, .32, -68, "#6f6a66").castShadow = false;
+  for (i = 0; i < 11; i++) tree(g, -350 + i * 24 + R() * 8, 0, -52 - R() * 3, .7 + R() * .3, R);
+  [-300, -180, -60, 60, 180, 300].forEach(function(px){ box(g, 1.4, 30, 1.4, px, 15, -80, "#8b8f8a"); box(g, 16, 1, 1, px, 27, -80, "#8b8f8a"); box(g, 10, 1, 1, px, 22, -80, "#8b8f8a"); });
+  box(g, 9, .2, 196, -170, .1, 32, ROAD).castShadow = false;
+  // the park between the site and the homes
+  ball(g, 1, 60, .04, 80, CLEAN ? "!#bcdcc0" : "#b3cc8f", 170, .012, 44).castShadow = false;
+  tube(g, [[-150, 1, 104], [-80, 1, 92], [-30, 1, 76], [30, 1, 58], [100, 1, 80], [170, 1, 68], [250, 1, 84]], 3.4, "#e6dcc0", true);
+
+  // the data center, wherever the table put it inside the parcel
+  var dc = new THREE.Group(); dc.position.set(pose.px, 0, pose.pz); dc.rotation.y = pose.rot * Math.PI / 180; g.add(dc);
+  function world(lx, lz){ return local(lx, lz, pose.px, pose.pz, pose.rot); }
+  box(dc, 120, 16, 46, 0, 8, -10, "#e9e3d6"); box(dc, 121, 1.2, 47, 0, 16.4, -10, "#d2ccbf"); box(dc, 14, 9, 14, -66, 4.5, -18, "#ddd6c8");
+  for (i = 0; i < 9; i++) box(dc, 4, 3.4, .4, -48 + i * 12, 4.2, 13.2, "#8fa2a8");
+  if (!h("yard")){
+    var nu = h("dry") ? 14 : 10, per = nu / 2, uh = h("dry") ? 8 : 6;
+    for (i = 0; i < nu; i++){ var ux = -48 + (i % per) * (96 / (per - 1)), uz = i < per ? -21 : 1;
+      box(dc, h("dry") ? 12 : 13, uh, 10, ux, 17.4 + uh / 2, uz, "#b9bdb8"); cyl(dc, 3, 3, .7, ux - 3, 17.8 + uh, uz, "#5d676a"); cyl(dc, 3, 3, .7, ux + 3.2, 17.8 + uh, uz, "#5d676a"); }
+  } else {
+    box(dc, 40, .3, 44, -98, .2, -10, "#cfcabd");
+    for (i = 0; i < 6; i++){ box(dc, 11, 6, 8, -108 + (i % 2) * 18, 3.2, -24 + Math.floor(i / 2) * 14, "#b9bdb8"); cyl(dc, 2.8, 2.8, .7, -108 + (i % 2) * 18, 6.6, -24 + Math.floor(i / 2) * 14, "#5d676a"); }
+    zig(dc, -120, 13, -76, 13, 10); zig(dc, -120, -33, -120, 13, 10); zig(dc, -120, -33, -76, -33, 10);
+  }
+  if (h("water")){ cyl(dc, 8, 8, 11, 78, 5.5, -22, "#a9c3cf", 18); cyl(dc, 8.3, 8.3, .8, 78, 11.2, -22, "#8fa9b5", 18); var bs = cyl(dc, 14, 14, .3, 82, .25, 2, "#6bb6c6", 24); bs.scale.z = .6; bs.castShadow = false; }
+  if (h("recovery")){ box(dc, 12, 7, 9, -44, 3.5, 20, "#c9cdc8"); var hp = world(-44, 25); tube(g, [[hp[0], 1.6, hp[1]], [-58, 1.6, 84], [-70, 1.6, 132]], 1.2, "#d9703a"); if (h("district")) tube(g, [[hp[0] + 4, 1.6, hp[1]], [-10, 1.6, 50], [10, 1.6, 58]], 1.2, "#d9703a"); }
+  // D4: the community district
+  if (h("district")){
+    box(g, 44, .5, 22, 44, .3, 66, "#ece6d6").castShadow = false; box(g, 38, .5, 16, 44, .5, 66, "#5fb7c4").castShadow = false;
+    box(g, 16, 6.5, 11, 8, 3.25, 66, "#c9a06c"); box(g, 18, .8, 13, 8, 6.9, 66, "#6d5a4e");
+    for (i = 0; i < 9; i++) ball(g, 2.6 + R() * 2.4, 32 + R() * 26, 4 + R() * 9, 62 + R() * 9, "#ffffff", 1, 1, 1, .5);
+    [[-22, 52, "#d98c6a"], [-24, 74, "#e7d6a8"], [-2, 88, "#b9c7b0"], [24, 90, "#d7b7a0"], [50, 92, "#e3c9a2"]].forEach(function(b, n){ box(g, 18, 7 + (n % 2) * 3, 12, b[0], 3.5 + (n % 2) * 1.5, b[1], b[2]); box(g, 19.5, .8, 13.5, b[0], 7.4 + (n % 2) * 3, b[1], "#6d5a4e"); box(g, 18.4, 1.2, 2.4, b[0], 3.6, b[1] + 7, ["#c56a4b", "#3d9b97", "#e0b23f"][n % 3]); });
+    box(g, 60, .25, 12, 12, .2, 78, "#e9e1cc").castShadow = false;
+  }
+  // energy: remote, beyond the river; what the budget buys is what you see
+  if (h("solar")){ var np = Math.max(4, Math.min(42, Math.round(42 * share / .2))); for (i = 0; i < np; i++){ var sp = box(g, 15, .5, 6.5, -70 + (i % 7) * 18, 2.8, -330 + Math.floor(i / 7) * 12, CLEAN ? "!#3d5f95" : "#2f4a78"); sp.rotation.x = -.5; } }
+  if (h("wind")){ var nt = Math.max(1, Math.min(5, Math.round(share * 16))); [[60, -310, .8], [-30, -330, .72], [150, -325, .7], [240, -305, .7], [-120, -320, .72]].slice(0, nt).forEach(function(t, n){
+    var k = t[2]; cyl(g, 1.3 * k, 2.4 * k, 80 * k, t[0], 40 * k, t[1], "#f4f2ec", 10); box(g, 4 * k, 3.4 * k, 9 * k, t[0], 80 * k, t[1] + 2, "#f4f2ec");
+    var rot = new THREE.Group(); rot.position.set(t[0], 80 * k, t[1] + 7); rot.rotation.z = n * .7 + .3;
+    for (var b = 0; b < 3; b++){ var arm = new THREE.Group(); arm.rotation.z = b * 2.0944; box(arm, 2.6 * k, 34 * k, .7, 0, 17 * k, 0, "#f7f6f1"); rot.add(arm); } g.add(rot); }); }
+  if (h("nuclear")){ box(g, 60, .4, 40, 200, .25, 0, "#cfcabd"); for (i = 0; i < 6; i++){ var nx = 180 + (i % 3) * 18, nz = -10 + Math.floor(i / 3) * 18; put(g, new THREE.BoxGeometry(14, 6, 6), "#eeeae0", nx, 3.3, nz, .42); put(g, new THREE.BoxGeometry(14.3, 1.2, 6.3), "#3d9b97", nx, 4.2, nz, .5); } zig(g, 170, 22, 230, 22, 5); }
+  // sound: the 55 and 45 dBA contours around the noisy equipment
+  var sp0 = world(h("yard") ? -98 : 0, -10), sx = sp0[0], sz = sp0[1], r45 = r55 * 3.16;
+  [[r55, .2, .5], [r45, 0, .38]].forEach(function(rr){
+    if (rr[1]){ var disc = put(g, new THREE.CircleGeometry(rr[0], 64), MAUVE, sx, .32, sz, rr[1]); disc.rotation.x = -Math.PI / 2; }
+    var ring = put(g, new THREE.RingGeometry(rr[0] - 1.6, rr[0] + 1.6, 96), MAUVE, sx, .36, sz, rr[2]); ring.rotation.x = -Math.PI / 2;
+  });
+  // the neighborhood south of the park: three rows of homes on two streets
+  var cols = ["#efe6d2", "#e3d3bd", "#d9e0de", "#ecd9c6", "#e6dcd0"], nh = 0;
+  HOMES.forEach(function(hm){ house(g, hm[0], hm[1], cols[nh++ % 5], h("house") && Math.hypot(hm[0] - sx, hm[1] - sz) < r45); });
+  box(g, 460, .2, 7, 8, .12, 153, ROAD).castShadow = false; box(g, 460, .2, 7, 8, .12, 179, ROAD).castShadow = false;
+  [-96, 8, 112].forEach(function(cxs){ box(g, 7, .2, 84, cxs, .13, 166, ROAD).castShadow = false; });
+  if (h("jobs")){ box(g, 30, 8.5, 17, -66, 4.25, 108, "#c9825f"); box(g, 32, 1, 19, -66, 9, 108, "#6d5a4e"); for (i = 0; i < 5; i++) box(g, 3.6, 3.6, .4, -76 + i * 5.2, 4.6, 116.7, "#9db4bb"); }
+  if (h("endow")){
+    for (i = 0; i < 4; i++) cyl(g, .5, .5, 6, 150 + (i % 2) * 9, 3, 86 + Math.floor(i / 2) * 9, "#efe9dc", 6);
+    put(g, new THREE.ConeGeometry(9, 4.5, 6), "#c56a4b", 154.5, 8.2, 90.5);
+    for (i = 0; i < 150; i++) ball(g, .9 + R() * .7, 112 + R() * 80, .7, 98 + R() * 22, ["#e58fb0", "#f1d05a", "#b58fd6", "#f6f1e4", "#e8734f"][i % 5]).castShadow = false;
+  }
+  if (h("screen")){
+    var sg = new THREE.Group(); sg.position.set(pose.px, 0, pose.pz); g.add(sg);
+    ball(sg, 1, 0, -.5, 36, "#8fb26d", 110, 5, 12);
+    for (i = 0; i < 26; i++){ var tx = -104 + R() * 208, tz = 30 + R() * 13, ty = 4.4 * Math.sqrt(Math.max(0, 1 - Math.pow(tx / 110, 2) - Math.pow((tz - 36) / 12, 2))); tree(sg, tx, ty, tz, .7 + R() * .4, R); }
+    for (i = 0; i < 12; i++) tree(sg, 86 + R() * 20, 0, -40 + R() * 60, .9 + R() * .5, R);
+    for (i = 0; i < 12; i++) tree(sg, -150 + R() * 14, 0, -44 + R() * 60, .9 + R() * .5, R);
+  }
+  [[-52, 46], [74, 44], [132, 110], [-30, 124], [196, 54], [226, 104], [150, -26], [-130, 48], [-222, 70], [-236, -20], [262, 14], [-120, 122], [60, 118], [-232, 150], [250, 150]].forEach(function(p){ tree(g, p[0], 0, p[1], .8 + R() * .3, R); });
+  return g;
+}
+function brush(src){
+  var w = W3, hh = H3, a = document.createElement("canvas"); a.width = w; a.height = hh; var ac = a.getContext("2d"); ac.drawImage(src, 0, 0, w, hh);
+  var d = ac.getImageData(0, 0, w, hh).data, out = document.createElement("canvas"); out.width = w; out.height = hh; var c = out.getContext("2d"), R = rng(5);
+  var tiny = document.createElement("canvas"); tiny.width = w / 16; tiny.height = hh / 16; tiny.getContext("2d").drawImage(a, 0, 0, tiny.width, tiny.height);
+  c.imageSmoothingEnabled = true; c.drawImage(tiny, 0, 0, w, hh);
+  function lum(x, y){ x = x < 0 ? 0 : x >= w ? w - 1 : x; y = y < 0 ? 0 : y >= hh ? hh - 1 : y; var i = (y * w + x) * 4; return d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11; }
+  var S = W3 / 960;
+  [[30 * S, 12 * S, 2600, 30, 0], [17 * S, 7 * S, 9000, 26, 0], [9 * S, 3.6 * S, 26000, 22, 5], [5 * S, 2.2 * S, 22000, 18, 16]].forEach(function(L){
+    for (var nn = 0; nn < L[2]; nn++){
+      var x = R() * w | 0, y = R() * hh | 0, gx = lum(x + 2, y) - lum(x - 2, y), gy = lum(x, y + 2) - lum(x, y - 2), mag = Math.abs(gx) + Math.abs(gy);
+      if (mag < L[4] && R() > .25) continue;
+      var i = (y * w + x) * 4, l = lum(x, y), j = (R() - .5) * L[3], r = d[i] + j + (R() - .5) * 14, gg = d[i + 1] + j + (R() - .5) * 12, b = d[i + 2] + j + (R() - .5) * 16;
+      if (l < 105){ b += 16; r += 5; gg -= 2; } else if (l > 178){ r += 7; gg += 3; b -= 7; }
+      var ang = mag > 9 ? Math.atan2(gy, gx) + Math.PI / 2 + (R() - .5) * .5 : (y < hh * .2 ? 0 : -.35) + (R() - .5) * 1.1, cs = Math.cos(ang), sn = Math.sin(ang);
+      c.setTransform(cs, sn, -sn, cs, x, y); c.fillStyle = "rgba(" + (r | 0) + "," + (gg | 0) + "," + (b | 0) + ",.86)";
+      c.beginPath(); c.ellipse(0, 0, L[0] / 2 * (.7 + R() * .6), L[1] / 2, 0, 0, 6.2832); c.fill();
+    }
+  });
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  return out;
+}
+function sceneOptions(){
+  var o = []; ({D2:["screen"], D3:["yard"], D4:["district"]}[ST.d] || []).forEach(function(k){ o.push(k); });
+  ({T2:["dry"], T3:["water"], T4:["recovery"]}[ST.t] || []).forEach(function(k){ o.push(k); });
+  ({E2:["solar"], E3:["wind"], E4:["nuclear"]}[ST.e] || []).forEach(function(k){ o.push(k); });
+  if (ST.b.B1) o.push("endow"); if (ST.b.B3) o.push("house"); if (ST.b.B4) o.push("jobs");
+  return o;
+}
+function r55(){ return 60 * Math.pow(10, ((DESIGN[ST.d].db - 47.4) + (TECH[ST.t].db - 47.4)) / 20); }
+// Two kinds of picture from the same model: "paint" is the brushed neighborhood view for the wall; "map" is the clean tilted map you touch.
+var EL = 58 * Math.PI / 180, SE = Math.sin(EL);
+var FRAMES = { design:{cx:42, cz:36, hw:400}, technology:{cx:42, cz:36, hw:400}, benefits:{cx:42, cz:36, hw:400}, energy:{cx:42, cz:-56, hw:640}, senti:{cx:40, cz:74, hw:430} };
+function mapCam(fr){ var hh = fr.hw * H3 / W3, c = new THREE.OrthographicCamera(-fr.hw, fr.hw, hh, -hh, 1, 5000); c.position.set(fr.cx, 1500 * SE, fr.cz + 1500 * Math.cos(EL)); c.lookAt(fr.cx, 0, fr.cz); return c; }
+function mapper(fr){ var K = W3 / (2 * fr.hw); return {K:K, x:function(x){ return W3 / 2 + (x - fr.cx) * K; }, y:function(z){ return H3 / 2 + (z - fr.cz) * K * SE; }, inv:function(px, py){ return [(px - W3 / 2) / K + fr.cx, (py - H3 / 2) / (K * SE) + fr.cz]; }}; }
+var ORDER = [];
+function painting(kind, key){
+  var o = sceneOptions(), sh = share(), rr = r55(), k = kind + "|" + key + "|" + o.join(",") + "|" + Math.round(sh * 200) + "|" + Math.round(rr) + "|" + [ST.px, ST.pz, ST.rot].join(",");
+  if (PAINTED[k]) return PAINTED[k];
+  if (!init3D()) return null;
+  try {
+    CLEAN = kind === "map"; var g = build3D(o, sh, rr, ST), out;
+    if (CLEAN){ G3.r.render(g, mapCam(FRAMES[key])); out = document.createElement("canvas"); out.width = W3; out.height = H3; out.getContext("2d").drawImage(G3.cv, 0, 0); }
+    else { G3.r.render(g, G3.cams[key]); out = brush(G3.cv); }
+    CLEAN = false; g.traverse(function(m){ if (m.geometry) m.geometry.dispose(); });
+    ORDER.push(k); if (ORDER.length > 28) delete PAINTED[ORDER.shift()];
+    return (PAINTED[k] = out);
+  } catch(e){ CLEAN = false; if (window.console) console.warn("3D view failed", e); return null; }
+}
+function drawScene(f, view){
+  var src = painting(view === "paint" ? "paint" : "map", ST.ch);
+  if (!src){ f.insertAdjacentHTML("afterbegin", '<div class="none">The 3D view needs WebGL, which this browser has turned off.</div>'); return; }
+  var cv = document.createElement("canvas"); cv.width = W3; cv.height = H3; cv.getContext("2d").drawImage(src, 0, 0);
+  cv.setAttribute("role", "img"); cv.setAttribute("aria-label", (view === "paint" ? "Painted view of the neighborhood and the site with " : "Map of the site with ") + [ST.d, ST.t, ST.e].concat(modules()).join(", "));
+  f.insertBefore(cv, f.firstChild);
+  if (view === "map") planOverlay(f, f.hasAttribute("data-move"), mapper(FRAMES[ST.ch]));
+}
+
+// ---------- the map you touch: labelled layers, and changes inside the parcel ----------
+var MP = mapper(FRAMES.design);
+function fpPoints(px, pz, rot){ return corners(px, pz, rot).map(function(q){ return MP.x(q[0]).toFixed(1) + "," + MP.y(q[1]).toFixed(1); }).join(" "); }
+function lab(m, x, z, t, cls){ var w = t.length * 7.3 + 18; return '<g transform="translate(' + m.x(x).toFixed(1) + ',' + m.y(z).toFixed(1) + ')"><rect y="-12" width="' + w + '" height="24" rx="12" class="lb ' + (cls || "") + '"/><text x="9" y="4.5" class="lt ' + (cls || "") + '">' + t + '</text></g>'; }
+function planOverlay(f, movable, m){
+  MP = m;
+  var c = soundAt(ST.px, ST.pz, ST.rot), r = r55(), cs = corners(ST.px, ST.pz, ST.rot), top = cs.reduce(function(a, q){ return q[0] > a[0] ? q : a; }), bot = cs.reduce(function(a, q){ return q[1] > a[1] ? q : a; });
+  function ell(id, rad){ return '<ellipse id="' + id + '" cx="' + m.x(c[0]) + '" cy="' + m.y(c[1]) + '" rx="' + rad * m.K + '" ry="' + rad * m.K * SE + '" fill="none" stroke="#7d3a6c" stroke-width="1.6" stroke-dasharray="4 5"/>'; }
+  var o = '<svg class="ov" viewBox="0 0 ' + W3 + ' ' + H3 + '" preserveAspectRatio="xMidYMid slice">' +
+    '<defs><pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="9" stroke="#b5534a" stroke-width="2.2" stroke-opacity=".55"/></pattern></defs>' +
+    '<rect x="0" y="' + m.y(-73) + '" width="' + W3 + '" height="' + (m.y(-59) - m.y(-73)) + '" fill="url(#hatch)"/>' +
+    WETLANDS.map(function(w){ return '<ellipse cx="' + m.x(w[0]) + '" cy="' + m.y(w[1]) + '" rx="' + w[2] * m.K + '" ry="' + w[3] * m.K * SE + '" fill="none" stroke="#2f6f6a" stroke-width="2" stroke-dasharray="6 5"/>'; }).join("") +
+    '<polygon points="' + [[PARCEL.x0, PARCEL.z0], [PARCEL.x1, PARCEL.z0], [PARCEL.x1, PARCEL.z1], [PARCEL.x0, PARCEL.z1]].map(function(q){ return m.x(q[0]) + "," + m.y(q[1]); }).join(" ") + '" fill="none" stroke="#1c2a28" stroke-width="2.2" stroke-dasharray="10 7"/>' +
+    '<g id="mv">' + ell("ov55", r) + ell("ov45", r * 3.16) +
+    '<polygon id="fp" points="' + fpPoints(ST.px, ST.pz, ST.rot) + '"' + (movable ? ' class="drag" tabindex="0" role="button" aria-label="Data center. Drag it, or use the arrow keys, to move it inside the parcel."' : '') + '/>' +
+    lab(m, top[0] + 6, top[1] - 4, "Data center", "dk") +
+    (movable ? '<g id="rh" class="drag" transform="translate(' + m.x(ST.px).toFixed(1) + ',' + (m.y(bot[1]) + 30).toFixed(1) + ')" role="slider" tabindex="0" aria-label="Turn the building" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="' + ST.rot + '"><circle r="17"/><text y="6" text-anchor="middle">↻</text><text id="rhv" x="24" y="5">' + ST.rot + '°</text></g>' : '') + '</g>' +
+    lab(m, c[0] + r * .72, c[1] - r * .72, "55 dBA", "s") + lab(m, c[0] + r * 3.16 * .72, c[1] + r * 3.16 * .6, "45 dBA", "s") +
+    lab(m, PARCEL.x0 + 4, PARCEL.z1 - 9, "Parcel") + lab(m, -150, -108, "River") + lab(m, -20, -134, "Wetlands · protected", "c") + lab(m, -150, -66, "Rail corridor · keep clear", "c") +
+    lab(m, 40, -90, "Power line") + lab(m, -212, 96, "Road") + lab(m, 176, 70, "Park") + lab(m, -236, 122, "Homes") +
+    (ST.e === "E2" ? lab(m, -70, -352, "Remote solar · " + pct(share()) + " of annual use", "e") : ST.e === "E3" ? lab(m, 30, -356, "Remote wind · " + pct(share()) + " of annual use", "e") : ST.e === "E4" ? lab(m, 168, -30, "Microreactors · " + pct(share()) + " funded", "e") : "") + '</svg>';
+  f.querySelector("canvas").insertAdjacentHTML("afterend", o);
+}
+function moveLive(px, pz, rot){
+  var mv = document.getElementById("mv"); if (!mv) return;
+  mv.setAttribute("transform", "translate(" + ((px - ST.px) * MP.K).toFixed(1) + "," + ((pz - ST.pz) * MP.K * SE).toFixed(1) + ")");
+  document.getElementById("fp").setAttribute("points", fpPoints(ST.px, ST.pz, rot)); var c = soundAt(ST.px, ST.pz, rot);
+  ["ov55", "ov45"].forEach(function(id){ var el = document.getElementById(id); el.setAttribute("cx", MP.x(c[0])); el.setAttribute("cy", MP.y(c[1])); });
+  var v = document.getElementById("rhv"); if (v) v.textContent = rot + "°"; var ro = $("rot"); if (ro){ ro.value = rot; $("rotv").textContent = rot + "°"; }
+}
+
+// ---------- what the brief asks each screen to show ----------
+var NOTES = {
+  sentiment:["Community voices", "Clustered community notes", "Layered geographic map"],
+  see:["Neighborhood view", "Local impact views of the chosen packages", "Homes, roads, utilities, water and environmental constraints", "River and wetlands, rail corridor, sound contours at 55 and 45 dBA"],
+  design:["1 Design and urban integration", "Compare physical arrangements on the agreed parcel", "Show homes, roads, utilities, water and environmental constraints", "Allow changes within the site"],
+  technology:["2 Technologies and impact mitigation", "Four cooling and heat-management packages", "They do not change the site layout", "Four alternative packages, T1 to T4"],
+  energy:["3 Energy generation and infrastructure", "Four energy supply options", "Solar and wind sized against annual use", "Show the remote generation area and its communities"],
+  benefits:["4 Community benefits", "Four benefit modules, B1 to B4", "The offer: 20% of profits, or $10M upfront + $0.5M a year", "The community decides how to allocate it"]
+};
+var SHOW = {
+  design:["Impacts to show", "Cost", "Views, noise, land coverage", "Water and energy consumption"],
+  technology:["Impacts to show", "Annual electricity and peak demand", "Water and sound", "Lifecycle cost"],
+  energy:["Impacts to show", "Cost and matching share", "Area required", "The % of load the budget can develop"],
+  benefits:["Impact and delivery measures", "B1 projected annual grants, and who benefits", "B2 income under utilization and expansion cases", "B3 payments or retrofits for the most affected · B4 construction and permanent jobs"]
+};
+var TODO = {
+  D1:["Cost"], D2:["Relocation, access and landscape costs"], D3:["Construction cost", "Noise paths"], D4:["Cost", "Delivered heat", "Jobs and activity", "Traffic", "Operating subsidy", "Delivery risk"],
+  technology:["Cost of each package", "Lifecycle cost"], energy:["Effect on energy costs"], benefits:["Who benefits from the grants", "Income by utilization case", "Construction job-years and permanent jobs"]
+};
+function todoHTML(){ var l = ST.ch === "design" ? TODO[ST.d] : TODO[ST.ch]; return '<div class="todo">The brief also asks for' + l.map(function(x){ return '<span>' + x + '</span>'; }).join("") + '</div>'; }
+// The measure wall's radar: 0 to 100 on every axis, more is better. The dashed shape is the conventional campus with nothing spent.
+var RAX = ["Quiet", "Views", "Open land", "Water saved", "Energy saved", "Clean power", "Amenities", "Community income", "Budget left"];
+function radarNow(){
+  var t = TECH[ST.t], d = DESIGN[ST.d], m = funds(), gwh = t.gwh * d.el, water = t.water * d.wa, L = 55 - 20 * Math.log10(nearestHome() / r55()), b = ST.b, left = Math.max(0, m.left);
+  return [(55 - L) / 20 * 100, 100 - d.seen * .8, 100 - d.cover * 3, (1 - water / 55) * 100, (201.5 - gwh) / 60 * 100, m.share * 100,
+    20 + (ST.d === "D4" ? 50 : 0) + (ST.t === "T4" ? 12 : 0) + (b.B1 ? 6 : 0) + (b.B4 ? 5 : 0),
+    10 + (b.B1 ? 18 : 0) + (b.B2 ? 18 : 0) + (b.B3 ? 10 : 0) + (b.B4 ? 12 : 0) + (ST.t === "T4" ? 12 : 0) + (ST.d === "D4" ? 5 : 0) + left * 2,
+    left / UPFRONT * 100].map(function(x){ return Math.max(3, Math.min(100, x)); });
+}
+function radarBase(){ var keep = ST; ST = {d:"D1", t:"T1", e:"E1", b:{B1:false, B2:false, B3:false, B4:false}, ch:"design", topic:"all", px:0, pz:0, rot:0}; try { return radarNow(); } finally { ST = keep; } }
+function radarFor(page, k){
+  var keep = ST, tmp = JSON.parse(JSON.stringify(ST)); if (PAGES[page].multi) tmp.b[k] = true; else tmp[PAGES[page].key] = k;
+  ST = tmp; try { var q = clampPose(tmp.px, tmp.pz, tmp.rot); tmp.px = q.px; tmp.pz = q.pz; return radarNow(); } finally { ST = keep; }
+}
+var RSHOWN = null, ranim = 0;
+function radarSVG(vals, goal, base, big){
+  var W = big ? 760 : 240, H = big ? 560 : 180, cx = W / 2, cy = big ? 282 : 90, R = big ? 205 : 78, n = RAX.length;
+  var o = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + RAX.map(function(a, i){ return a + " " + Math.round(goal[i]); }).join(", ") + '">';
+  function pt(i, v){ var a = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + Math.cos(a) * R * v / 100, cy + Math.sin(a) * R * v / 100]; }
+  function poly(v){ return v.map(function(x, i){ var q = pt(i, x); return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" "); }
+  (big ? [25, 50, 75, 100] : [50, 100]).forEach(function(r){ o += '<polygon points="' + poly(RAX.map(function(){ return r; })) + '" fill="none" stroke="var(--line)"/>'; });
+  for (var i = 0; i < n; i++){ var q = pt(i, 100); o += '<line x1="' + cx + '" y1="' + cy + '" x2="' + q[0].toFixed(1) + '" y2="' + q[1].toFixed(1) + '" stroke="var(--line)"/>'; }
+  o += '<polygon points="' + poly(vals) + '" fill="var(--accent)" fill-opacity=".3" stroke="var(--accent)" stroke-width="' + (big ? 3.5 : 2.2) + '" stroke-linejoin="round"/>';
+  o += '<polygon points="' + poly(base) + '" fill="none" stroke="var(--muted)" stroke-width="' + (big ? 1.8 : 1.2) + '" stroke-dasharray="' + (big ? "6 6" : "3 4") + '"/>';
+  if (big){
+    vals.forEach(function(v, i){ var q = pt(i, v); o += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="5.5" fill="var(--accent)"/>'; });
+    RAX.forEach(function(a, i){
+      var q = pt(i, 112), dx = q[0] - cx, d = Math.round(goal[i] - base[i]), mark = d === 0 ? "" : ' <tspan class="' + (d > 0 ? "up" : "down") + '">' + (d > 0 ? "▲" : "▼") + '</tspan>';
+      o += '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + 5).toFixed(1) + '" text-anchor="' + (Math.abs(dx) < 12 ? "middle" : dx > 0 ? "start" : "end") + '">' + a + mark + '</text>';
+    });
+    o += '<line x1="18" y1="' + (H - 16) + '" x2="52" y2="' + (H - 16) + '" stroke="var(--muted)" stroke-width="1.8" stroke-dasharray="6 6"/><text class="key" x="60" y="' + (H - 11) + '">Conventional campus, nothing spent</text>';
+  }
+  return o + '</svg>';
+}
+function drawRadar(vals, goal, base){ var el = $("radar"); if (el) el.innerHTML = radarSVG(vals, goal, base, true); }
+function animateRadar(){
+  var to = radarNow(), base = radarBase(); cancelAnimationFrame(ranim);
+  if (!$("radar") || !RSHOWN || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)){ RSHOWN = to; drawRadar(to, to, base); return; }
+  var from = RSHOWN.slice(), t0 = null;
+  (function step(ts){ if (t0 === null) t0 = ts; var k = Math.min(1, (ts - t0) / 450), e = 1 - Math.pow(1 - k, 3); RSHOWN = from.map(function(v, i){ return v + (to[i] - v) * e; }); drawRadar(RSHOWN, to, base); if (k < 1) ranim = requestAnimationFrame(step); })(performance.now());
+}
+var NOTES_ON = false;   // the brief notes are kept in the code but switched off
+function noteHTML(n){ return NOTES_ON ? '<div class="note"><b>From the brief</b><strong>' + n[0] + '</strong><ul>' + n.slice(1).map(function(x){ return '<li>' + x + '</li>'; }).join("") + '</ul></div>' : ""; }
+
+// ---------- screens ----------
+// Four screens, one story. Scenario Editor: decide (the table). Sentiment map: listen; it stays the original DataScope screen and opens there.
+// Neighborhood view: see. Live analysis: measure.
+var SENTIMENT = "https://cityscope.media.mit.edu/DataScope/", VIEWS = [["editor", "Scenario Editor"], ["sentiment", "Sentiment map"], ["view", "Neighborhood view"], ["analysis", "Live analysis"], ["all", "All"]], VIEW = "all";
+function tile(k, v, d, frac){ return '<div class="tile"><span class="k">' + k + '</span><span class="v">' + v + '</span><span class="d">' + d + '</span><div class="meter"><i style="width:' + Math.max(0, Math.min(1, frac)) * 100 + '%"></i></div></div>'; }
+function delta(now, ref, lowerIsBetter){ if (Math.abs(now - ref) < 1e-9) return "At reference"; var p = (now - ref) / ref * 100; return '<em' + ((p < 0) === !!lowerIsBetter ? '' : ' class="bad"') + '>' + (p > 0 ? "+" : "−") + Math.abs(p).toFixed(1) + '%</em>'; }
+function tiles(page){
+  var t = TECH[ST.t], r = TECH.T1, m = funds(), sh = m.share, en = ENERGY[ST.e], d = DESIGN[ST.d], gwh = t.gwh * d.el, water = t.water * d.wa;
+  var park = d.db + (t.db - 47.4);
+  if (page === "design") return tile("Equipment sound", park.toFixed(1) + " <small>dBA</small>", Math.abs(park - 47.4) < .05 ? "At reference, at the park" : '<em' + (park < 47.4 ? '' : ' class="bad"') + '>' + (park > 47.4 ? "+" : "−") + Math.abs(park - 47.4).toFixed(1) + ' dB</em> at John Riel Memorial Park', park / 56) +
+    tile("Building in view", d.seen + " <small>%</small>", d.seen === 100 ? "At reference" : '<em>−' + (100 - d.seen) + ' points</em> from the park', d.seen / 100) +
+    tile("Site coverage", d.cover + " <small>%</small>", d.cover === 12 ? "At reference" : '<em class="bad">+' + (d.cover - 12) + ' points</em> of the parcel', d.cover / 22) +
+    tile("Electricity", gwh.toFixed(1) + " <small>GWh/yr</small>", delta(gwh, t.gwh, true), gwh / 201.5) +
+    tile("Cooling water", water.toFixed(1) + " <small>M gal/yr</small>", delta(water, t.water, true), water / 55);
+  if (page === "technology") return tile("Electricity", gwh.toFixed(1) + " <small>GWh/yr</small>", delta(t.gwh, r.gwh, true), gwh / 201.5) +
+    tile("Peak demand", t.mw.toFixed(1) + " <small>MW</small>", delta(t.mw, r.mw, true), t.mw / 29.1) +
+    tile("Cooling water", water.toFixed(1) + " <small>M gal/yr</small>", delta(t.water, r.water, true), water / 55) +
+    tile("Equipment sound", t.db.toFixed(1) + " <small>dBA</small>", t.db === r.db ? "At reference" : '<em' + (t.db < r.db ? '' : ' class="bad"') + '>' + (t.db > r.db ? "+" : "−") + Math.abs(t.db - r.db).toFixed(1) + ' dB</em>', t.db / 52.7) +
+    tile(ST.t === "T4" ? "Heat delivered" : "Lifecycle cost", "<small>Not set yet</small>", ST.t === "T4" ? "Bill savings, avoided heating" : "To come from the developer", 0);
+  if (page === "energy") return tile("Annual use", gwh.toFixed(1) + " <small>GWh/yr</small>", ST.d + " with " + ST.t, gwh / 201.5) +
+    tile("Matched by the offer", en ? pct(sh) : "0%", en ? (m.e > 0 ? money(m.e) + " left for " + en.what : "Nothing left upfront") : "All power from the grid", sh / .1) +
+    tile("Cost to match all", en ? (en.cost >= 1000 ? "$1B" : "$" + en.cost + "M") : "—", en ? "Against " + (m.e > 0 ? money(m.e) : "$0") + " available" : "No new generation", en ? en.cost / 1000 : 0) +
+    tile("Land to match all", en ? en.land.replace(" sq mi", " <small>sq mi</small>") : "—", ST.e === "E4" ? "Separate facility on the site" : en ? "Remote, with its own neighbors" : "None", ST.e === "E2" ? .2 : ST.e === "E3" ? .8 : 0) +
+    tile("Still from the grid", (gwh * (1 - sh)).toFixed(1) + " <small>GWh/yr</small>", ST.e === "E4" ? "Zero grid impact only at full build" : "Grid and balancing retained", 1 - sh);
+  var on = modules(), each = on.length ? YEARLY / on.length : 0, up = Math.max(0, m.left);
+  return tile("For benefits", (up ? money(up) + " " : "") + "<small>" + (up ? "+ " : "") + "$0.5M/yr</small>", up ? "Upfront money not spent elsewhere" : "The upfront $10M is spent", up / UPFRONT) +
+    tile("B1 Annual grants", ST.b.B1 ? money(each + up * .04) : "—", ST.b.B1 ? (up ? "4% of " + money(up) + ", plus its yearly share" : "Its yearly share") : "Not chosen", ST.b.B1 ? (each + up * .04) / .9 : 0) +
+    tile("B2 Into equity", ST.b.B2 ? money(each) + " <small>/yr</small>" : "—", ST.b.B2 ? "Income varies with utilization" : "Not chosen", ST.b.B2 ? each / YEARLY : 0) +
+    tile("B3 Homes protected", ST.b.B3 ? Math.floor(each * 1000 / 8) + " <small>/yr</small>" : "—", ST.b.B3 ? "Retrofits for the most affected" : "Not chosen", ST.b.B3 ? each / YEARLY : 0) +
+    tile("B4 Training places", ST.b.B4 ? Math.floor(each * 1000 / 15) + " <small>/yr</small>" : "—", ST.b.B4 ? "Construction and permanent jobs apart" : "Not chosen", ST.b.B4 ? each / YEARLY : 0);
+}
+function sayLine(page){
+  if (page === "design") return {D1:"The conventional campus, as proposed.", D2:"The building moves back, behind setbacks, berms and planting.", D3:"Noisy equipment sits in a yard behind zigzag sound walls.", D4:"A walkable cluster of pool, spa, community rooms and cafes uses the waste heat."}[ST.d];
+  if (page === "technology") return {T1:"Conventional cooling: the reference for every other package.", T2:"Almost no cooling water. More power on hot days and louder fans.", T3:"Less electricity and water than the baseline, and quieter.", T4:"Server heat is recovered and sold to nearby customers."}[ST.t];
+  if (page === "energy"){ var en = ENERGY[ST.e], m = funds(); if (!en) return "All power comes from the grid.";
+    if (m.e <= 0) return "Nothing is left upfront for " + en.what + ".";
+    return ST.e === "E4" ? "Six microreactors would cost about $1B. The " + money(m.e) + " left covers " + pct(m.share) + "." : "The " + money(m.e) + " left buys " + en.what + " for " + pct(m.share) + " of annual use. Matching all of it takes about $" + en.cost + "M."; }
+  var on = modules(); return on.length ? "$0.5M a year, shared across " + on.length + (on.length === 1 ? " benefit." : " benefits.") : "No benefit chosen yet.";
+}
+function optValue(page, k){
+  var m = funds();
+  if (page === "design" || page === "technology") return COST[k] ? money(COST[k]) : "Baseline";
+  if (page === "energy") return ENERGY[k] ? "Matches " + pct(Math.max(0, m.rest) / ENERGY[k].cost) : "Baseline";
+  var on = modules(), each = on.length ? YEARLY / on.length : 0, up = Math.max(0, m.left);
+  if (!ST.b[k]) return "";
+  return k === "B1" ? money(each + up * .04) + "/yr" : k === "B2" ? money(each) + "/yr" : k === "B3" ? Math.floor(each * 1000 / 8) + " homes/yr" : Math.floor(each * 1000 / 15) + " places/yr";
+}
+function offerHTML(){
+  var m = funds(), used = [["Design", m.d, "var(--accent)"], ["Technology", m.t, "#4d6f8f"], ["Energy", m.e, "var(--warn)"]], total = Math.max(UPFRONT, m.d + m.t + m.e), over = m.rest < 0;
+  return '<div class="card offerbar"><div class="offer"><small>The offer to the community · taxes come on top</small><b>$10M upfront + $0.5M a year</b><small>or 20% of the profits</small></div>' +
+    '<div class="mid"><div class="bar">' + used.map(function(u){ return '<i style="width:' + (u[1] / total * 100) + '%;background:' + u[2] + '"></i>'; }).join("") + '</div>' +
+    '<div class="legend">' + used.map(function(u){ return '<span style="--c:' + u[2] + '">' + u[0] + ' ' + (u[1] ? money(u[1]) : "$0") + '</span>'; }).join("") + '<span style="--c:var(--muted)">Benefits ' + (m.left > 0 ? money(m.left) + " + " : "") + '$0.5M a year</span></div></div>' +
+    '<div class="fit' + (over ? " over" : "") + '"><span class="pill">' + (over ? "Over the offer" : "Feasible") + '</span><b>' + (over ? "−" + money(-m.rest) : (m.left > 0 ? money(m.left) : "$0") + " left") + '</b></div></div>';
+}
+function chosenName(key){ var P = PAGES[{d:"design", t:"technology", e:"energy"}[key]]; return P.opts.filter(function(o){ return o[0] === ST[key]; })[0]; }
+function ominiHTML(){
+  var m = funds(), used = [[m.d, "var(--accent)"], [m.t, "#4d6f8f"], [m.e, "var(--warn)"]], total = Math.max(UPFRONT, m.d + m.t + m.e), over = m.rest < 0;
+  return '<span class="omini"><span>$10M upfront + $0.5M a year</span><span class="bar">' + used.map(function(u){ return '<i style="width:' + (u[0] / total * 100) + '%;background:' + u[1] + '"></i>'; }).join("") + '</span>' +
+    '<span class="pill' + (over ? " over" : "") + '">' + (over ? "Over the offer by " + money(-m.rest) : "Feasible · " + (m.left > 0 ? money(m.left) : "$0") + " left") + '</span></span>';
+}
+function editorHTML(bare){
+  var P = PAGES[ST.ch];
+  return '<div class="card stage"><img src="live/neighborhood.jpg" alt="The Neighborhood view of the original Scenario Editor: the data center, the Ecorse River, the rail corridor, John Riel Memorial Park and the Arno Ave homes"><div class="card alts">' +
+    '<div class="steps">' + CH.map(function(c, i){ return '<button type="button" data-ch="' + c + '" aria-pressed="' + (c === ST.ch) + '"><b>' + (i + 1) + '</b>' + (c === "benefits" ? "Benefits" : PAGES[c].n) + '</button>'; }).join("") + '</div>' +
+    '<h2>' + P.title + '</h2><p>' + P.lead + '</p>' +
+    P.opts.map(function(op){ var on = P.multi ? ST.b[op[0]] : ST[P.key] === op[0];
+      return '<label class="opt"><input type="' + (P.multi ? "checkbox" : "radio") + '" name="opt" id="opt-' + op[0] + '" value="' + op[0] + '"' + (on ? " checked" : "") + '><span><span class="code">' + op[0] + '</span><span class="nm">' + op[1] + '</span><span class="sub">' + op[2] + '</span><span class="end"><span class="val">' + optValue(ST.ch, op[0]) + '</span><span class="dot"></span></span></span></label>'; }).join("") +
+    '</div></div><div class="card live" aria-live="polite"><div class="hd">Live analysis' + ominiHTML() + '</div><div class="tiles">' + tiles(ST.ch) + '</div></div>';
+}
+function sentimentHTML(bare){
+  return '<div class="card stage"><img src="live/sentiment.jpg" alt="The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list">' +
+    (bare ? "" : '<a class="openlive" href="' + SENTIMENT + '">Open the live Sentiment map</a>') + '</div>';
+}
+function viewHTML(bare){ return '<div class="card stage" data-view="paint">' + (bare ? "" : noteHTML(NOTES.see)) + '<div class="chap">' + (CH.indexOf(ST.ch) + 1) + ' ' + PAGES[ST.ch].n + '</div><div class="say" aria-live="polite">' + sayLine(ST.ch) + '</div></div>'; }
+function analysisHTML(bare){
+  var b = modules(), base = radarBase();
+  return '<div class="card measure" aria-live="polite"><div class="hd">Live analysis · ' + PAGES[ST.ch].n + '<span class="pill">Illustrative figures</span></div>' +
+    '<div class="chosen">' + ["d","t","e"].map(function(k){ var o = chosenName(k); return '<span' + (PAGES[ST.ch].key === k ? ' class="now"' : '') + '><b>' + o[0] + '</b>' + o[1] + '</span>'; }).join("") +
+    '<span' + (ST.ch === "benefits" ? ' class="now"' : '') + '><b>' + (b.length ? b.join(" ") : "B") + '</b>' + (b.length ? "Benefits" : "No benefit yet") + '</span></div>' +
+    '<div class="mbody"><div class="radar" id="radar"></div><div class="smalls">' + PAGES[ST.ch].opts.map(function(op){ var on = PAGES[ST.ch].multi ? ST.b[op[0]] : ST[PAGES[ST.ch].key] === op[0], v = radarFor(ST.ch, op[0]);
+      return '<div class="sm' + (on ? " on" : "") + '"><div class="t"><b>' + op[0] + '</b><span>' + op[1] + '</span><em>' + optValue(ST.ch, op[0]) + '</em></div><div class="r">' + radarSVG(v, v, base, false) + '</div></div>'; }).join("") + '</div></div>' + todoHTML() + offerHTML() + '</div>';
+}
+function render(){
+  var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:analysisHTML};
+  $("views").innerHTML = VIEWS.map(function(v){ return '<a class="tab" href="#' + v[0] + '"' + (v[0] === VIEW ? ' aria-current="page"' : '') + '>' + v[1] + '</a>'; }).join("");
+  function mini(k){ return '<div class="mini' + (k === "analysis" ? " dark" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
+  document.body.classList.toggle("dark", VIEW === "analysis");
+  if (VIEW !== "all") main.innerHTML = H[VIEW]();
+  else main.innerHTML = '<div class="room"><div class="walls">' +
+      '<div class="scr wl"><span class="lab">Left wall · Sentiment map</span>' + mini("sentiment") + '</div>' +
+      '<div class="scr"><span class="lab">Center wall · Neighborhood view</span>' + mini("view") + '</div>' +
+      '<div class="scr wr"><span class="lab">Right wall · Live analysis</span>' + mini("analysis") + '</div></div>' +
+      (NOTES_ON ? '<div class="notes3">' + noteHTML(NOTES.sentiment) + noteHTML(NOTES.see) + noteHTML(SHOW[ST.ch]) + '</div>' : '') +
+      '<div class="under">' + noteHTML(NOTES[ST.ch]) + '<div class="scr tb"><span class="lab">Table · Scenario Editor</span>' + mini("editor") + '</div></div></div>';
+  main.querySelectorAll(".stage[data-view]").forEach(function(f){ drawScene(f, f.getAttribute("data-view")); });
+  fit(); animateRadar(); if (keep && $(keep)) $(keep).focus();
+}
+function fit(){ document.querySelectorAll(".mini").forEach(function(el){ el.style.setProperty("--k", el.parentNode.clientWidth / 1600); }); }
+window.addEventListener("resize", fit);
+
+// ---------- one state for every screen ----------
+// Screens driven by the same browser stay in step through a broadcast channel and saved state.
+var chan = null; try { chan = new BroadcastChannel("dcscope"); chan.onmessage = function(ev){ adopt(ev.data); }; } catch(e){}
+function adopt(raw){
+  try { var o = JSON.parse(raw); if (!o) return;
+    if (/^D[1-4]$/.test(o.d)) ST.d = o.d; if (/^T[1-4]$/.test(o.t)) ST.t = o.t; if (/^E[1-4]$/.test(o.e)) ST.e = o.e;
+    if (o.b) ["B1","B2","B3","B4"].forEach(function(k){ ST.b[k] = !!o.b[k]; });
+    if (PAGES[o.ch]) ST.ch = o.ch;
+    if (o.topic === "all" || PAGES[o.topic]) ST.topic = o.topic;
+    if (isFinite(o.px) && isFinite(o.pz) && isFinite(o.rot)) setPose(+o.px, +o.pz, +o.rot);
+  } catch(e){ return; }
+  render();
+}
+function tell(){ var raw = JSON.stringify(ST); try { localStorage.setItem("dcscope-v5", raw); } catch(e){} if (chan) try { chan.postMessage(raw); } catch(e){} }
+window.addEventListener("storage", function(ev){ if (ev.key === "dcscope-v5" && ev.newValue) adopt(ev.newValue); });
+$("main").addEventListener("change", function(ev){
+  if (ev.target.id === "rot"){ setPose(ST.px, ST.pz, +ev.target.value); render(); tell(); return; }
+  var v = ev.target.value, P = PAGES[ST.ch]; if (!v || ev.target.name !== "opt") return;
+  if (P.multi) ST.b[v] = ev.target.checked; else ST[P.key] = v;
+  if (v === "D1") setPose(0, 0, 0); else if (v === "D2" && !ST.px && !ST.pz && !ST.rot) setPose(10, -12, 10); else setPose(ST.px, ST.pz, ST.rot);
+  render(); tell();
+});
+function setPose(px, pz, rot){ var q = clampPose(px, pz, rot); ST.px = Math.round(q.px); ST.pz = Math.round(q.pz); ST.rot = Math.round(q.rot); }
+$("main").addEventListener("input", function(ev){ if (ev.target.id !== "rot") return; var q = clampPose(ST.px, ST.pz, +ev.target.value); moveLive(q.px, q.pz, q.rot); });
+var drag = null;
+function toWorld(svg, ev){ var pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; var q = pt.matrixTransform(svg.getScreenCTM().inverse()); return MP.inv(q.x, q.y); }
+$("main").addEventListener("pointerdown", function(ev){
+  var t = ev.target.closest ? ev.target.closest("#fp.drag, #rh.drag") : null; if (!t) return;
+  drag = t.id === "rh" ? {rot:true, x0:ev.clientX, rot0:ST.rot, now:null} : {svg:t.ownerSVGElement, start:toWorld(t.ownerSVGElement, ev), now:null};
+  try { t.setPointerCapture(ev.pointerId); } catch(e){} ev.preventDefault();
+});
+$("main").addEventListener("pointermove", function(ev){
+  if (!drag) return;
+  if (drag.rot) drag.now = clampPose(ST.px, ST.pz, Math.round(drag.rot0 + (ev.clientX - drag.x0) / 7));
+  else { var w = toWorld(drag.svg, ev); drag.now = clampPose(ST.px + w[0] - drag.start[0], ST.pz + w[1] - drag.start[1], ST.rot); }
+  moveLive(drag.now.px, drag.now.pz, drag.now.rot);
+});
+function drop(){ if (!drag) return; var n = drag.now; drag = null; if (!n) return; setPose(n.px, n.pz, n.rot); render(); tell(); }
+$("main").addEventListener("pointerup", drop); $("main").addEventListener("pointercancel", drop);
+$("main").addEventListener("keydown", function(ev){
+  var d = {ArrowLeft:[-4, 0], ArrowRight:[4, 0], ArrowUp:[0, -4], ArrowDown:[0, 4]}[ev.key]; if (!d) return;
+  if (ev.target.id === "fp"){ ev.preventDefault(); setPose(ST.px + d[0], ST.pz + d[1], ST.rot); render(); tell(); }
+  else if (ev.target.id === "rh" && d[0]){ ev.preventDefault(); setPose(ST.px, ST.pz, ST.rot + d[0] / 4); render(); tell(); }
+});
+$("main").addEventListener("click", function(ev){ var t = ev.target.closest ? ev.target.closest("[data-ch]") : null; if (!t) return; ST.ch = t.getAttribute("data-ch"); render(); tell(); });
+function route(){ var h = (location.hash || "").replace("#", ""); VIEW = "all"; VIEWS.forEach(function(v){ if (v[0] === h) VIEW = h; }); render(); }
+window.addEventListener("hashchange", route);
+try { var saved = localStorage.getItem("dcscope-v5"); if (saved) adopt(saved); } catch(e){}
+route();
+})();
+</script>
+</body>
+</html>
