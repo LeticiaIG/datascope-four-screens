@@ -191,6 +191,9 @@ body.grey{background:var(--bg)}
 .budget{position:absolute;left:.9rem;bottom:.9rem;background:var(--surface);border-radius:999px;padding:.45rem .9rem;box-shadow:0 2px 10px rgba(20,40,34,.14)}
 .budget .omini{margin:0}
 a.lab{text-decoration:none}
+.rw{position:absolute;right:.5rem;top:.5rem;z-index:2;display:flex;gap:2px;background:#1c2a28;border-radius:999px;padding:2px}
+.rw button{font:inherit;font-size:.72rem;font-weight:700;color:#cfd8d4;background:none;border:0;border-radius:999px;padding:.2rem .6rem;cursor:pointer}
+.rw button[aria-pressed="true"]{background:#fbfdfc;color:#1c2a28}
 .chosen button{font:inherit;font-size:.95rem;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:.3rem .9rem;color:var(--muted);background:none;cursor:pointer}
 .chosen button.now{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
 label.sm{position:relative;cursor:pointer}
@@ -346,7 +349,7 @@ var DESIGN = { D1:{db:47.4, seen:100, cover:12, el:1, wa:1}, D2:{db:44.4, seen:4
 var ENERGY = { E2:{cost:275, land:"1.5 sq mi", what:"solar"}, E3:{cost:150, land:"5–11 sq mi", what:"wind"}, E4:{cost:1000, land:"On-site", what:"microreactors"} };
 var UPFRONT = 10, YEARLY = .5;
 var CH = ["design", "technology", "energy", "benefits"];
-var ST = {d:"D1", t:"T1", e:"E1", b:{B1:true, B2:false, B3:false, B4:false}, ch:"design", topic:"all", px:0, pz:0, rot:0};
+var ST = {d:"D1", t:"T1", e:"E1", b:{B1:true, B2:false, B3:false, B4:false}, ch:"design", topic:"all", px:0, pz:0, rot:0, rw:"analysis"};   // rw: what the right wall shows in the room view
 // The site, in metres: x runs east, z runs south. One list feeds the 3D model, the plan's labels and the measurements.
 var PARCEL = {x0:-156, x1:156, z0:-54, z1:50};
 var RIVER = [[-560, -96], [-340, -130], [-190, -104], [-60, -142], [70, -108], [200, -144], [340, -112], [560, -152]];
@@ -1001,13 +1004,14 @@ function metricsHTML(bare){
 function render(){
   var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:analysisHTML, metrics:metricsHTML};
   $("views").innerHTML = VIEWS.map(function(v){ return '<a class="tab" href="#' + v[0] + '"' + (v[0] === VIEW ? ' aria-current="page"' : '') + '>' + v[1] + '</a>'; }).join("");
-  function mini(k){ return '<div class="mini' + (k === "analysis" ? " grey" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
+  function mini(k){ return '<div class="mini' + (k === "analysis" || k === "metrics" ? " grey" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
   document.body.classList.toggle("grey", VIEW === "analysis" || VIEW === "metrics");
   if (VIEW !== "all") main.innerHTML = H[VIEW]();
   else main.innerHTML = '<div class="room"><div class="walls">' +
       '<div class="scr wl"><a class="lab" href="#sentiment">Left wall · Sentiment map</a>' + mini("sentiment") + '</div>' +
       '<div class="scr"><a class="lab" href="#view">Center wall · Site layout</a>' + mini("view") + '</div>' +
-      '<div class="scr wr"><a class="lab" href="#analysis">Right wall · Live analysis</a>' + mini("analysis") + '</div></div>' +
+      '<div class="scr wr"><a class="lab" href="#' + ST.rw + '">Right wall · Live analysis</a>' +
+        '<span class="rw" role="group" aria-label="Right wall"><button type="button" data-rw="analysis" aria-pressed="' + (ST.rw === "analysis") + '">With images</button><button type="button" data-rw="metrics" aria-pressed="' + (ST.rw === "metrics") + '">Metrics only</button></span>' + mini(ST.rw) + '</div></div>' +
       (NOTES_ON ? '<div class="notes3">' + noteHTML(NOTES.sentiment) + noteHTML(NOTES.see) + noteHTML(SHOW[ST.ch]) + '</div>' : '') +
       '<div class="under">' + noteHTML(NOTES[ST.ch]) + '<div class="scr tb"><a class="lab" href="#editor">Table · Scenario Editor</a>' + mini("editor") + '</div></div></div>';
   main.querySelectorAll(".stage[data-view]").forEach(function(f){ if (f.getAttribute("data-view") !== "geo") drawScene(f, f.getAttribute("data-view")); });
@@ -1027,6 +1031,7 @@ function adopt(raw){
     if (o.b) ["B1","B2","B3","B4"].forEach(function(k){ ST.b[k] = !!o.b[k]; });
     if (PAGES[o.ch]) ST.ch = o.ch;
     if (o.topic === "all" || PAGES[o.topic]) ST.topic = o.topic;
+    if (o.rw === "analysis" || o.rw === "metrics") ST.rw = o.rw;
     if (isFinite(o.px) && isFinite(o.pz) && isFinite(o.rot)) setPose(+o.px, +o.pz, +o.rot);
   } catch(e){ return; }
   render();
@@ -1079,6 +1084,8 @@ $("main").addEventListener("wheel", function(ev){
 }, {passive:false});
 $("main").addEventListener("click", function(ev){
   var z = ev.target.closest ? ev.target.closest("[data-zoom]") : null;
+  var rw = ev.target.closest ? ev.target.closest("[data-rw]") : null;
+  if (rw){ ST.rw = rw.getAttribute("data-rw"); render(); tell(); return; }
   var bb = ev.target.closest ? ev.target.closest("[data-base]") : null;
   if (bb && GEO.map){ useBase(GEO.base === "map" ? "satellite" : "map"); bb.textContent = GEO.base === "map" ? "Satellite" : "Map"; return; }
   if (z && GEO.map && z.closest('.stage[data-view="geo"]')){ var hz = z.getAttribute("data-zoom"); if (hz === "reset") GEO.map.setView(SITE.center, 16); else GEO.map.setZoom(GEO.map.getZoom() + (hz === "in" ? 1 : -1)); return; }
