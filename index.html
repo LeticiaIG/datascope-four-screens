@@ -669,8 +669,8 @@ function analysisHTML(bare){
 function render(){
   var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:analysisHTML};
   $("views").innerHTML = VIEWS.map(function(v){ return '<a class="tab" href="#' + v[0] + '"' + (v[0] === VIEW ? ' aria-current="page"' : '') + '>' + v[1] + '</a>'; }).join("");
-  function mini(k){ return '<div class="mini' + (k === "analysis" ? " dark" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
-  document.body.classList.toggle("dark", VIEW === "analysis");
+  function mini(k){ return '<div class="mini"><div class="main">' + H[k](true) + '</div></div>'; }
+  document.body.classList.remove("dark");
   if (VIEW !== "all") main.innerHTML = H[VIEW]();
   else main.innerHTML = '<div class="room"><div class="walls">' +
       '<div class="scr wl"><span class="lab">Left wall · Sentiment map</span>' + mini("sentiment") + '</div>' +
