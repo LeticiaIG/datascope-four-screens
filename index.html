@@ -901,7 +901,7 @@ function analysisHTML(bare){
   var m = funds(), over = m.rest < 0, P = PAGES[ST.ch], base = radarBase();
   return '<div class="outcome"><div class="card stage" data-view="tall"><div class="say" aria-live="polite">' + sayLine(ST.ch) + '</div>' +
     '<div class="card pick"><div class="steps">' + CH.map(function(c, i){ return '<button type="button" data-ch="' + c + '" aria-pressed="' + (c === ST.ch) + '"><b>' + (i + 1) + '</b>' + (c === "benefits" ? "Benefits" : PAGES[c].n) + '</button>'; }).join("") + '</div></div></div>' +
-    '<div class="card imp" aria-live="polite"><div class="hd">Impacts<span class="pill">Illustrative figures</span></div><div class="radar mid" id="radar"></div><div class="kpis">' + tiles(ST.ch) + '</div></div>' +
+    '<div class="card imp" aria-live="polite"><div class="hd">Impacts</div><div class="radar mid" id="radar"></div><div class="kpis">' + tiles(ST.ch) + '</div></div>' +
     '<div class="scen">' + P.opts.map(function(op){ var on = P.multi ? ST.b[op[0]] : ST[P.key] === op[0], v = radarFor(ST.ch, op[0]);
       return '<label class="sc' + (on ? " on" : "") + '"><input type="' + (P.multi ? "checkbox" : "radio") + '" name="' + (P.multi ? "ben" : "pick") + '" id="sc-' + op[0] + '" value="' + op[0] + '"' + (on ? " checked" : "") + ' aria-label="' + op[0] + " " + op[1] + '"><div class="thumb" data-alt="' + op[0] + '"></div><div class="t"><b>' + op[0] + '</b><em>' + optValue(ST.ch, op[0]) + '</em><span>' + op[1] + '</span></div><div class="r">' + radarSVG(v, v, base, false) + '</div></label>'; }).join("") + '</div>' +
     '<div class="card ben" aria-live="polite"><div class="hd">Community benefits<span class="pill' + (over ? " over" : "") + '">' + (over ? "Over the offer by " + money(-m.rest) : "Feasible · " + (m.left > 0 ? money(m.left) : "$0") + " left") + '</span></div>' + ["B1","B2","B3","B4"].map(benRow).join("") + '</div></div>';
@@ -916,7 +916,7 @@ function drawThumbs(list, tok){
 // The extra page: only the measures. The big radar, one small radar per alternative of the chapter (click one to choose it), the key figures and the offer.
 function metricsHTML(bare){
   var b = modules(), base = radarBase(), P = PAGES[ST.ch];
-  return '<div class="card measure" aria-live="polite"><div class="hd">Live analysis · ' + P.n + '<span class="pill">Illustrative figures</span></div>' +
+  return '<div class="card measure" aria-live="polite"><div class="hd">Live analysis · ' + P.n + '</div>' +
     '<div class="chosen">' + ["d","t","e"].map(function(k){ var o = chosenName(k), c = {d:"design", t:"technology", e:"energy"}[k]; return '<button type="button" data-ch="' + c + '"' + (ST.ch === c ? ' class="now"' : '') + '><b>' + o[0] + '</b>' + o[1] + '</button>'; }).join("") +
     '<button type="button" data-ch="benefits"' + (ST.ch === "benefits" ? ' class="now"' : '') + '><b>' + (b.length ? b.join(" ") : "B") + '</b>' + (b.length ? "Benefits" : "No benefit yet") + '</button></div>' +
     '<div class="mbody"><div class="radar" id="radar" data-size="big"></div><div class="smalls">' + P.opts.map(function(op){ var on = P.multi ? ST.b[op[0]] : ST[P.key] === op[0], v = radarFor(ST.ch, op[0]);
