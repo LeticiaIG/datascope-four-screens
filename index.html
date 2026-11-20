@@ -202,6 +202,7 @@ label.sm:has(input:focus-visible){outline:2px solid var(--accent);outline-offset
 /* the table map: a real map of the place, the intervention drawn on it */
 .geomap{position:absolute;inset:0;z-index:0;background:#d9e2de}
 .leaflet-container{font-family:var(--font)}
+.greytiles{filter:grayscale(1) contrast(.8) brightness(1.12)}
 .stage[data-view="geo"] .alts,.stage[data-view="geo"] .budget,.stage[data-view="geo"] .zoomc{z-index:2}
 .stage[data-view="geo"] .zoomc{bottom:2.3rem}
 .zoomc button.wide{width:auto;padding:0 .8rem;font-size:.85rem}
@@ -629,7 +630,7 @@ function geoInit(stage){
   function far(){ el.classList.toggle("far", map.getZoom() < 16.75); } map.on("zoomend", far); far();
   map.attributionControl.setPrefix(false);
   GEO.tiles = {
-    map:L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {subdomains:"abcd", maxNativeZoom:20, maxZoom:20, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>'}),
+    map:L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {className:"greytiles", maxNativeZoom:19, maxZoom:20, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
     satellite:L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {maxNativeZoom:19, maxZoom:20, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"})
   };
   var ok = 0, bad = 0;   // where the tiles cannot load at all, the drawn map takes over
