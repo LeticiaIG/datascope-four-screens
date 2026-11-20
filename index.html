@@ -187,6 +187,9 @@ label.sm:has(input:focus-visible){outline:2px solid var(--accent);outline-offset
 .krow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0 1.4rem;border:1px solid var(--line);border-radius:14px;padding:.7rem 1.1rem}
 .measure .krow .tile .v{font-size:1.9rem}
 .agents{pointer-events:none}
+.stage[data-view="map"]{cursor:grab;touch-action:none}
+.zoomc{position:absolute;right:.9rem;bottom:.9rem;display:flex;gap:4px;background:var(--surface);border-radius:12px;padding:4px;box-shadow:0 2px 10px rgba(20,40,34,.14)}
+.zoomc button{font:inherit;font-size:1.15rem;font-weight:700;line-height:1;width:2.3rem;height:2.3rem;border:0;border-radius:9px;background:var(--sunk);color:var(--ink);cursor:pointer}
 .omini{margin-left:auto;display:flex;align-items:center;gap:.8rem;font-size:.85rem;font-weight:600;color:var(--muted)}
 .omini .bar{width:12rem;height:.55rem}
 .omini .pill{margin:0}
@@ -394,9 +397,9 @@ function build3D(o, share, r55, pose){
   var h = function(k){ return o.indexOf(k) >= 0; }, g = new THREE.Scene(), R = rng(11), i, j;
   g.background = CLEAN ? G3.flat : G3.sky; g.fog = CLEAN ? null : new THREE.Fog("#dfe6e2", 560, 2100);
   var ROAD = CLEAN ? "!#cdc2c4" : "#b9b6ad", MAUVE = CLEAN ? "!#b0609a" : "#b0609a";
-  g.add(new THREE.HemisphereLight("#cfe2f2", "#8f8763", .56));
-  var sun = new THREE.DirectionalLight("#fff0d2", .66); sun.position.set(-190, 210, 150); sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048); var sc = sun.shadow.camera; sc.left = -340; sc.right = 340; sc.top = 340; sc.bottom = -340; sc.near = 1; sc.far = 900; sun.shadow.bias = -.0006; g.add(sun);
+  g.add(new THREE.HemisphereLight("#cfe2f2", CLEAN ? "#b9c2bd" : "#8f8763", CLEAN ? .86 : .56));
+  var sun = new THREE.DirectionalLight("#fff0d2", CLEAN ? .34 : .66); sun.position.set(-190, 210, 150); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048); var sc = sun.shadow.camera; var SR = CLEAN ? 780 : 340; sc.left = -SR; sc.right = SR; sc.top = SR; sc.bottom = -SR; sc.near = 1; sc.far = 900; sun.shadow.bias = -.0006; g.add(sun);
   var ground = put(g, new THREE.PlaneGeometry(6000, 6000), CLEAN ? "!#d4deda" : "#9db884", 0, 0, 0); ground.rotation.x = -Math.PI / 2; ground.castShadow = false;
   for (i = 0; i < 26; i++) ball(g, 60, (R() - .5) * 900, -.5, (R() - .6) * 700, ["#adc28c", "#8fae78", "#a3bb80", "#bcc894"][i % 4], 1 + R(), .012, .5 + R() * .6).castShadow = false;
   for (i = 0; i < 46; i++) ball(g, 34 + R() * 26, -1300 + i * 58 + R() * 30, 6, -940 - R() * 200, ["#5d7f68", "#6f8f72", "#567763"][i % 3], 1.5, .8, 1);
@@ -464,6 +467,19 @@ function build3D(o, share, r55, pose){
   HOMES.forEach(function(hm){ house(g, hm[0], hm[1], cols[nh++ % 5], h("house") && Math.hypot(hm[0] - sx, hm[1] - sz) < r45); });
   box(g, 460, .2, 7, 8, .12, 153, ROAD).castShadow = false; box(g, 460, .2, 7, 8, .12, 179, ROAD).castShadow = false;
   [-96, 8, 112].forEach(function(cxs){ box(g, 7, .2, 84, cxs, .13, 166, ROAD).castShadow = false; });
+  if (CLEAN){   // on the plan map the neighborhood carries on around the three rows the sound is measured at
+    var cR = rng(29);
+    var hrow = function(x0, x1, z){ for (var x = x0; x <= x1; x += 26) if (cR() > .14) house(g, x, z, cols[0], false); };
+    [218, 244, 270, 296, 322, 348, 374].forEach(function(z){ hrow(-200, 216, z); });
+    [140, 166, 192, 218, 244, 270, 296, 322, 348, 374].forEach(function(z){ hrow(-538, -252, z); hrow(300, 612, z); });
+    [205, 231, 257, 283, 309, 335, 361].forEach(function(z){ box(g, 460, .2, 7, 8, .12, z, ROAD).castShadow = false; });
+    [153, 179, 205, 231, 257, 283, 309, 335, 361].forEach(function(z){ box(g, 312, .2, 7, -395, .12, z, ROAD).castShadow = false; box(g, 338, .2, 7, 456, .12, z, ROAD).castShadow = false; });
+    [-96, 8, 112].forEach(function(x){ box(g, 7, .2, 180, x, .13, 298, ROAD).castShadow = false; });
+    [-486, -356, 378, 534].forEach(function(x){ box(g, 7, .2, 262, x, .13, 257, ROAD).castShadow = false; });
+    box(g, 9, .2, 270, -170, .1, 265, ROAD).castShadow = false; box(g, 9, .2, 300, -225, .1, 250, ROAD).castShadow = false; box(g, 9, .2, 300, 270, .1, 250, ROAD).castShadow = false;
+    box(g, 1300, .2, 11, 30, .1, 400, ROAD).castShadow = false;
+    for (i = 0; i < 70; i++) tree(g, -640 + cR() * 1340, 0, 120 + cR() * 290, .7 + cR() * .4, cR);
+  }
   if (h("jobs")){ box(g, 30, 8.5, 17, -66, 4.25, 108, "#c9825f"); box(g, 32, 1, 19, -66, 9, 108, "#6d5a4e"); for (i = 0; i < 5; i++) box(g, 3.6, 3.6, .4, -76 + i * 5.2, 4.6, 116.7, "#9db4bb"); }
   if (h("endow")){
     for (i = 0; i < 4; i++) cyl(g, .5, .5, 6, 150 + (i % 2) * 9, 3, 86 + Math.floor(i / 2) * 9, "#efe9dc", 6);
@@ -528,24 +544,33 @@ function sceneOptions(){
 function r55(){ return 60 * Math.pow(10, ((DESIGN[ST.d].db - 47.4) + (TECH[ST.t].db - 47.4)) / 20); }
 // Two kinds of picture from the same model: "paint" is the brushed neighborhood view for the wall; "map" is the clean tilted map you touch.
 var SE = 1, WM = 1600, HM = 900;   // the table map is a plan: straight down, north up
-var FRAMES = { design:{cx:60, cz:28, hw:400}, technology:{cx:60, cz:28, hw:400}, benefits:{cx:60, cz:28, hw:400}, energy:{cx:60, cz:-56, hw:640} };
+var FRAMES = { design:{cx:60, cz:70, hw:580}, technology:{cx:60, cz:70, hw:580}, benefits:{cx:60, cz:70, hw:580}, energy:{cx:60, cz:-40, hw:700} };
+var MAPV = null;   // the map view once someone has zoomed or moved it: {cx, cz, hw}
+function curFrame(){ return MAPV || FRAMES[ST.ch]; }
+function redrawMap(){ document.querySelectorAll('.stage[data-view="map"]').forEach(function(f){ f.querySelectorAll("canvas, svg.ov").forEach(function(n){ n.parentNode.removeChild(n); }); drawScene(f, "map"); }); }
+function zoomMap(k, sx, sy){   // k below 1 zooms in; (sx, sy) is the point of the picture that stays put
+  var fr = curFrame(), w = mapper(fr).inv(sx, sy), hw = Math.max(170, Math.min(1150, fr.hw * k)), K = WM / (2 * hw);
+  MAPV = {cx:w[0] - (sx - WM / 2) / K, cz:w[1] - (sy - HM / 2) / K, hw:hw}; redrawMap();
+}
 function mapCam(fr){ var hh = fr.hw * HM / WM, c = new THREE.OrthographicCamera(-fr.hw, fr.hw, hh, -hh, 1, 5000); c.up.set(0, 0, -1); c.position.set(fr.cx, 1500, fr.cz); c.lookAt(fr.cx, 0, fr.cz); return c; }
 function mapper(fr){ var K = WM / (2 * fr.hw); return {K:K, x:function(x){ return WM / 2 + (x - fr.cx) * K; }, y:function(z){ return HM / 2 + (z - fr.cz) * K; }, inv:function(px, py){ return [(px - WM / 2) / K + fr.cx, (py - HM / 2) / K + fr.cz]; }}; }
-var ORDER = [];
+var ORDER = [], LASTMAP = null;
 var WT = 1120, HT = 900, TALLK = {design:1.08, technology:1.3, energy:1.35, benefits:1.5};   // the right wall shows the painting in a taller frame
 function painting(kind, key, tall){
   var o = sceneOptions(), sh = share(), rr = r55(), k = kind + (tall ? "T" : "") + "|" + key + "|" + o.join(",") + "|" + Math.round(sh * 200) + "|" + Math.round(rr) + "|" + [ST.px, ST.pz, ST.rot].join(",");
+  var fr = curFrame(); if (kind === "map"){ k += "|" + [fr.cx, fr.cz, fr.hw].map(Math.round).join(","); if (LASTMAP && LASTMAP.k === k) return LASTMAP.out; }
   if (PAINTED[k]) return PAINTED[k];
   if (!init3D()) return null;
   try {
     CLEAN = kind === "map"; var g = build3D(o, sh, rr, ST), out;
-    if (CLEAN){ var mp = mapper(FRAMES[key]); G3.r.setSize(WM, HM, false);
-      try { G3.r.render(g, mapCam(FRAMES[key])); out = document.createElement("canvas"); out.width = WM; out.height = HM; out.getContext("2d").drawImage(G3.cv, 0, 0); } finally { G3.r.setSize(W3, H3, false); }
+    if (CLEAN){ var mp = mapper(fr); G3.r.setSize(WM, HM, false);
+      try { G3.r.render(g, mapCam(fr)); out = document.createElement("canvas"); out.width = WM; out.height = HM; out.getContext("2d").drawImage(G3.cv, 0, 0); } finally { G3.r.setSize(W3, H3, false); }
       out.walks = walkLines(function(x, z){ return [mp.x(x), mp.y(z), mp.K]; }, 8); }
     else if (tall){ var c0 = G3.cams[key], c = c0.clone(); c.aspect = WT / HT; c.fov = 2 * Math.atan(Math.tan(c0.fov * Math.PI / 360) * TALLK[key]) * 180 / Math.PI; c.updateProjectionMatrix();
       G3.r.setSize(WT, HT, false); try { G3.r.render(g, c); out = brush(G3.cv, WT, HT); } finally { G3.r.setSize(W3, H3, false); } out.walks = walkLines(projector(c, WT, HT), 3); }
     else { G3.r.render(g, G3.cams[key]); out = brush(G3.cv); out.walks = walkLines(projector(G3.cams[key], W3, H3), 3); }
-    CLEAN = false; g.traverse(function(m){ if (m.geometry) m.geometry.dispose(); });
+    var wasMap = CLEAN; CLEAN = false; g.traverse(function(m){ if (m.geometry) m.geometry.dispose(); });
+    if (wasMap){ LASTMAP = {k:k, out:out}; return out; }
     ORDER.push(k); if (ORDER.length > 28) delete PAINTED[ORDER.shift()];
     return (PAINTED[k] = out);
   } catch(e){ CLEAN = false; if (window.console) console.warn("3D view failed", e); return null; }
@@ -594,11 +619,11 @@ function drawScene(f, view){
   cv.setAttribute("role", "img"); cv.setAttribute("aria-label", (view !== "map" ? "Painted view of the neighborhood and the site with " : "Map of the site with ") + [ST.d, ST.t, ST.e].concat(modules()).join(", "));
   f.insertBefore(cv, f.firstChild);
   var ag = document.createElement("canvas"); ag.className = "agents"; ag.width = src.width; ag.height = src.height; ag._walks = src.walks; ag._plan = view === "map"; ag.setAttribute("aria-hidden", "true"); f.insertBefore(ag, cv.nextSibling);
-  if (view === "map") planOverlay(f, f.hasAttribute("data-move"), mapper(FRAMES[ST.ch]));
+  if (view === "map") planOverlay(f, f.hasAttribute("data-move"), mapper(curFrame()));
 }
 
 // ---------- the map you touch: labelled layers, and changes inside the parcel ----------
-var MP = mapper(FRAMES.design);
+var MP = mapper(FRAMES.design), pan = null, zraf = 0, zacc = 1, zpt = null;
 function fpPoints(px, pz, rot){ return corners(px, pz, rot).map(function(q){ return MP.x(q[0]).toFixed(1) + "," + MP.y(q[1]).toFixed(1); }).join(" "); }
 function lab(m, x, z, t, cls){ var w = t.length * 7.3 + 18; return '<g transform="translate(' + m.x(x).toFixed(1) + ',' + m.y(z).toFixed(1) + ')"><rect y="-12" width="' + w + '" height="24" rx="12" class="lb ' + (cls || "") + '"/><text x="9" y="4.5" class="lt ' + (cls || "") + '">' + t + '</text></g>'; }
 function planOverlay(f, movable, m){
@@ -618,7 +643,7 @@ function planOverlay(f, movable, m){
     lab(m, PARCEL.x0 + 4, PARCEL.z1 - 9, "Parcel") + lab(m, -150, -108, "River") + lab(m, -20, -134, "Wetlands · protected", "c") + lab(m, -150, -66, "Rail corridor · keep clear", "c") +
     lab(m, 40, -90, "Power line") + lab(m, -212, 96, "Road") + lab(m, 176, 70, "Park") + lab(m, -236, 122, "Homes") +
     (ST.e === "E2" ? lab(m, -70, -352, "Remote solar · " + pct(share()) + " of annual use", "e") : ST.e === "E3" ? lab(m, 30, -356, "Remote wind · " + pct(share()) + " of annual use", "e") : ST.e === "E4" ? lab(m, 168, -30, "Microreactors · " + pct(share()) + " funded", "e") : "") + '</svg>';
-  f.querySelector("canvas").insertAdjacentHTML("afterend", o);
+  (f.querySelector("canvas.agents") || f.querySelector("canvas")).insertAdjacentHTML("afterend", o);
 }
 function moveLive(px, pz, rot){
   var mv = document.getElementById("mv"); if (!mv) return;
@@ -759,7 +784,8 @@ function editorHTML(bare){
     '<h2>' + P.title + '</h2><p>' + P.lead + '</p>' +
     P.opts.map(function(op){ var on = P.multi ? ST.b[op[0]] : ST[P.key] === op[0];
       return '<label class="opt"><input type="' + (P.multi ? "checkbox" : "radio") + '" name="opt" id="opt-' + op[0] + '" value="' + op[0] + '"' + (on ? " checked" : "") + '><span><span class="code">' + op[0] + '</span><span class="nm">' + op[1] + '</span><span class="sub">' + op[2] + '</span><span class="end"><span class="val">' + optValue(ST.ch, op[0]) + '</span><span class="dot"></span></span></span></label>'; }).join("") +
-    '</div><div class="budget" aria-live="polite">' + ominiHTML() + '</div></div>';
+    '</div><div class="budget" aria-live="polite">' + ominiHTML() + '</div>' +
+    '<div class="zoomc"><button type="button" data-zoom="out" aria-label="Zoom out">−</button><button type="button" data-zoom="in" aria-label="Zoom in">+</button><button type="button" data-zoom="reset" aria-label="Reset the map view">⤢</button></div></div>';
 }
 function sentimentHTML(bare){
   return '<div class="card stage"><img src="live/sentiment.jpg" alt="The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list">' +
@@ -839,24 +865,40 @@ $("main").addEventListener("input", function(ev){ if (ev.target.id !== "rot") re
 var drag = null;
 function toWorld(svg, ev){ var pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; var q = pt.matrixTransform(svg.getScreenCTM().inverse()); return MP.inv(q.x, q.y); }
 $("main").addEventListener("pointerdown", function(ev){
-  var t = ev.target.closest ? ev.target.closest("#fp.drag, #rh.drag") : null; if (!t) return;
+  var t = ev.target.closest ? ev.target.closest("#fp.drag, #rh.drag") : null;
+  if (!t){ var f = ev.target.closest ? ev.target.closest('.stage[data-view="map"]') : null; if (!f || ev.target.closest(".alts, .budget, .zoomc")) return;
+    pan = {f:f, x0:ev.clientX, y0:ev.clientY, k:f.getBoundingClientRect().width / f.offsetWidth || 1, dx:0, dy:0}; try { f.setPointerCapture(ev.pointerId); } catch(e){} return; }
   drag = t.id === "rh" ? {rot:true, x0:ev.clientX, rot0:ST.rot, now:null} : {svg:t.ownerSVGElement, start:toWorld(t.ownerSVGElement, ev), now:null};
   try { t.setPointerCapture(ev.pointerId); } catch(e){} ev.preventDefault();
 });
 $("main").addEventListener("pointermove", function(ev){
+  if (pan){ pan.dx = (ev.clientX - pan.x0) / pan.k; pan.dy = (ev.clientY - pan.y0) / pan.k; pan.f.querySelectorAll("canvas, svg.ov").forEach(function(n){ n.style.transform = "translate(" + pan.dx + "px," + pan.dy + "px)"; }); return; }
   if (!drag) return;
   if (drag.rot) drag.now = clampPose(ST.px, ST.pz, Math.round(drag.rot0 + (ev.clientX - drag.x0) / 7));
   else { var w = toWorld(drag.svg, ev); drag.now = clampPose(ST.px + w[0] - drag.start[0], ST.pz + w[1] - drag.start[1], ST.rot); }
   moveLive(drag.now.px, drag.now.pz, drag.now.rot);
 });
-function drop(){ if (!drag) return; var n = drag.now; drag = null; if (!n) return; setPose(n.px, n.pz, n.rot); render(); tell(); }
+function drop(){
+  if (pan){ var p = pan; pan = null; if (Math.abs(p.dx) + Math.abs(p.dy) < 3){ p.f.querySelectorAll("canvas, svg.ov").forEach(function(n){ n.style.transform = ""; }); return; }
+    var fr = curFrame(), sc = Math.max(p.f.offsetWidth / WM, p.f.offsetHeight / HM) * WM / (2 * fr.hw); MAPV = {cx:fr.cx - p.dx / sc, cz:fr.cz - p.dy / sc, hw:fr.hw}; redrawMap(); return; }
+  if (!drag) return; var n = drag.now; drag = null; if (!n) return; setPose(n.px, n.pz, n.rot); render(); tell(); }
 $("main").addEventListener("pointerup", drop); $("main").addEventListener("pointercancel", drop);
 $("main").addEventListener("keydown", function(ev){
   var d = {ArrowLeft:[-4, 0], ArrowRight:[4, 0], ArrowUp:[0, -4], ArrowDown:[0, 4]}[ev.key]; if (!d) return;
   if (ev.target.id === "fp"){ ev.preventDefault(); setPose(ST.px + d[0], ST.pz + d[1], ST.rot); render(); tell(); }
   else if (ev.target.id === "rh" && d[0]){ ev.preventDefault(); setPose(ST.px, ST.pz, ST.rot + d[0] / 4); render(); tell(); }
 });
-$("main").addEventListener("click", function(ev){ var t = ev.target.closest ? ev.target.closest("[data-ch]") : null; if (!t) return; ST.ch = t.getAttribute("data-ch"); render(); tell(); });
+$("main").addEventListener("wheel", function(ev){
+  var f = ev.target.closest ? ev.target.closest('.stage[data-view="map"]') : null; if (!f || ev.target.closest(".alts")) return;
+  var svg = f.querySelector("svg.ov"); if (!svg) return; ev.preventDefault();
+  var pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; var q = pt.matrixTransform(svg.getScreenCTM().inverse());
+  zacc *= Math.exp(ev.deltaY * .0016); zpt = [q.x, q.y];
+  if (!zraf) zraf = requestAnimationFrame(function(){ zraf = 0; var k = zacc; zacc = 1; zoomMap(k, zpt[0], zpt[1]); });
+}, {passive:false});
+$("main").addEventListener("click", function(ev){
+  var z = ev.target.closest ? ev.target.closest("[data-zoom]") : null;
+  if (z){ var how = z.getAttribute("data-zoom"); if (how === "reset"){ MAPV = null; redrawMap(); } else zoomMap(how === "in" ? .72 : 1 / .72, WM / 2, HM / 2); return; }
+  var t = ev.target.closest ? ev.target.closest("[data-ch]") : null; if (!t) return; ST.ch = t.getAttribute("data-ch"); render(); tell(); });
 function route(){ var h = (location.hash || "").replace("#", ""); VIEW = "all"; VIEWS.forEach(function(v){ if (v[0] === h) VIEW = h; }); render(); }
 window.addEventListener("hashchange", route);
 try { var saved = localStorage.getItem("dcscope-v5"); if (saved) adopt(saved); } catch(e){}
