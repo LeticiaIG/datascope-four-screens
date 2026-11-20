@@ -716,6 +716,7 @@ function drawScene(f, view){
   var cv = document.createElement("canvas"); cv.width = src.width; cv.height = src.height; cv.getContext("2d").drawImage(src, 0, 0);
   cv.setAttribute("role", "img"); cv.setAttribute("aria-label", (view !== "map" ? "Painted view of the neighborhood and the site with " : "Map of the site with ") + [ST.d, ST.t, ST.e].concat(modules()).join(", "));
   f.insertBefore(cv, f.firstChild);
+  if (view !== "map") return;   // no walking people on the painted picture
   var ag = document.createElement("canvas"); ag.className = "agents"; ag.width = src.width; ag.height = src.height; ag._walks = src.walks; ag._plan = view === "map"; ag.setAttribute("aria-hidden", "true"); f.insertBefore(ag, cv.nextSibling);
   if (view === "map") planOverlay(f, f.hasAttribute("data-move"), mapper(curFrame()));
 }
