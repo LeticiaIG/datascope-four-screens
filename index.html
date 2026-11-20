@@ -200,17 +200,19 @@ label.sm:has(input:focus-visible){outline:2px solid var(--accent);outline-offset
 .measure .krow .tile .v{font-size:1.9rem}
 .agents{pointer-events:none}
 /* the table map: a real map of the place, the intervention drawn on it */
-.geomap{position:absolute;inset:0;z-index:0;background:#d9e2de}
+.geomap{position:absolute;inset:0;z-index:0;background-color:#edf1ee;background-image:linear-gradient(#3f54591f 1px,transparent 1px),linear-gradient(90deg,#3f54591f 1px,transparent 1px);background-size:52px 52px}
+.stage[data-view="geo"] .leaflet-bottom.leaflet-left{margin-bottom:3.8rem;margin-left:.5rem}
 .leaflet-container{font-family:var(--font)}
 .greytiles{filter:grayscale(1) contrast(.8) brightness(1.12)}
 .stage[data-view="geo"] .alts,.stage[data-view="geo"] .budget,.stage[data-view="geo"] .zoomc{z-index:2}
 .stage[data-view="geo"] .zoomc{bottom:2.3rem}
 .zoomc button.wide{width:auto;padding:0 .8rem;font-size:.85rem}
-.leaflet-tooltip.glab{background:#fbfdfc;border:0;border-radius:999px;box-shadow:0 1px 4px rgba(20,40,34,.28);padding:.12rem .6rem;font-family:var(--font);font-size:.78rem;font-weight:700;color:#1c2a28;white-space:nowrap}
+.leaflet-tooltip.glab{background:#f8fbf7eb;border:1px solid #b9cec466;border-radius:5px;box-shadow:none;padding:2px 6px;font-family:var(--font);font-size:11.5px;font-weight:600;line-height:1.2;color:#1c2a28;white-space:nowrap}
 .leaflet-tooltip.glab::before{display:none}
-.leaflet-tooltip.glab.dk{background:#1c2a28;color:#fff}
-.leaflet-tooltip.glab.s{background:#f3e8f0;color:#7d3a6c}
-.leaflet-tooltip.glab.e{background:#fbeeea;color:#9a3f36}
+.leaflet-tooltip.glab.dk{background:#fbfdfc;border:1px solid #6bc6b5;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:700;box-shadow:0 2px 7px #26413922}
+.leaflet-tooltip.glab.s{background:#fbfdfc;border-color:#c9a9c2;color:#7d3a6c}
+.leaflet-tooltip.glab.e{background:#fbfdfc;border-color:#d9b3ac;color:#9a3f36}
+.leaflet-tooltip.glab.w{background:none;border:0;font-style:italic;font-weight:500}
 .geomap.far .glab.near{display:none}
 .gfp{cursor:grab;touch-action:none}
 .grot{display:flex;align-items:center;justify-content:center;background:#1c2a28;color:#fff;border-radius:50%;font-size:18px;font-weight:700;cursor:ew-resize;touch-action:none;box-shadow:0 1px 4px rgba(0,0,0,.3)}
@@ -621,6 +623,70 @@ function noiseAt(px, pz, rot){ var p = local(ST.d === "D3" ? -6.5 * MSC - 61 : 0
 function inParcel(cs){   // every corner of the footprint inside the study parcel
   return cs.every(function(q){ var inside = false, b = SITE.boundary; for (var i = 0, j = b.length - 1; i < b.length; j = i++) if ((b[i][0] > q[0]) !== (b[j][0] > q[0]) && q[1] < (b[j][1] - b[i][1]) * (q[0] - b[i][0]) / (b[j][0] - b[i][0]) + b[i][1]) inside = !inside; return inside; });
 }
+// The road, rail, park and building outlines below are the generalized ones the original draws on its Map overview
+// (dist/studio/constraints.js and model-data.js in CityScope/DataScope): exhibit coordinates, turned into meters from the site center.
+function EX(q){ return [(q[0] - 289.4) * 2.09, (q[1] - 390) * 2.13]; }
+function shifted(points, d){ return points.map(function(q, i){ var a = points[Math.max(0, i - 1)], b = points[Math.min(i + 1, points.length - 1)], dx = b[0] - a[0], dz = b[1] - a[1], len = Math.hypot(dx, dz) || 1; return [q[0] - dz / len * d, q[1] + dx / len * d]; }); }
+function strips(line, w){ var l = shifted(line, -w / 2), r = shifted(line, w / 2); return line.slice(1).map(function(_, i){ return [l[i], l[i + 1], r[i + 1], r[i]]; }); }
+function rect4(c, w, h, a){ var cs = Math.cos(a), sn = Math.sin(a); return [[-w, -h], [w, -h], [w, h], [-w, h]].map(function(q){ return [c[0] + q[0] * cs - q[1] * sn, c[1] + q[0] * sn + q[1] * cs]; }); }
+function area2(p){ var s = 0; for (var i = 0; i < p.length; i++){ var a = p[i], b = p[(i + 1) % p.length]; s += a[0] * b[1] - b[0] * a[1]; } return s / 2; }
+function clipTo(subject, convex){
+  var res = subject, side = area2(convex) >= 0 ? 1 : -1;
+  function cr(a, b, q){ return (b[0] - a[0]) * (q[1] - a[1]) - (b[1] - a[1]) * (q[0] - a[0]); }
+  for (var i = 0; i < convex.length && res.length; i++){
+    var c = convex[i], d = convex[(i + 1) % convex.length], inp = res, a = inp[inp.length - 1], sa = cr(c, d, a) * side; res = [];
+    for (var j = 0; j < inp.length; j++){ var b = inp[j], sb = cr(c, d, b) * side; if ((sa >= 0) !== (sb >= 0)){ var t = sa / (sa - sb); res.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); } if (sb >= 0) res.push(b); a = b; sa = sb; }
+  }
+  return res;
+}
+function contextShapes(){
+  var fw = shifted([[-135, 467], [42, 357], [151, 289], [245, 221], [324, 136], [404, 36], [469, -65]].map(EX), 4);
+  var railN = [[-180, 476], [23, 404], [148, 364], [274, 329], [391, 296], [589, 237], [803, 165], [994, 102]].map(EX), railE = [[142, 728], [230, 570], [309, 434], [391, 296], [440, 218], [487, 133], [524, 24], [557, -80]].map(EX);
+  var ent = [[-67, 774], [66, 634], [155, 508], [184, 462], [207, 411], [239, 355], [247, 347]].map(EX), park = [[394, 345], [441, 317], [408, 382], [365, 455], [332, 453], [352, 416]].map(EX);
+  var ind = [[184, 505, 58, 59, .51], [148, 535, 42, 102, .5], [76, 522, 105, 143, .46], [59, 439, 33, 48, .48], [636, 179, 176, 56, .31], [673, 266, 42, 105, .45], [530, 106, 85, 82, .38], [581, 77, 44, 53, .32], [17, 608, 132, 126, .43], [519, -11, 119, 70, .34], [804, 49, 46, 61, .35]];
+  var com = [[455, 86, 49, 65, -.38], [479.9, 96.1, 45, 38, -.38], [653, 343, 43, 25, .36]];
+  function st(q){ return rect4(EX([q[0], q[1]]), q[2] / 2, q[3] / 2, -q[4]); }
+  var eo = EX([454, 325]), wo = EX([-108, 180]), streets = [], i, u, v;
+  function grid(o, c, sn, a, b){ return [o[0] + a * c - b * sn, o[1] + a * sn + b * c]; }
+  function east(a, b){ return grid(eo, .856, .517, a, b); } function west(a, b){ return grid(wo, .864, .504, a, b); }
+  for (i = 0; i < 20; i++) streets = streets.concat(strips([east(i < 9 ? -4 : -240, i * 74), east(1100, i * 74)], i < 9 ? 6.5 : 6.6));
+  for (i = 0; i < 7; i++) streets = streets.concat(strips([east(i * 177, -4), east(i * 177, 1380)], i === 3 ? 10 : 6.9));
+  var mask = [[-500, 230], [-200, -200], [470, -120], [326, 70], [183, 179], [71, 241], [-100, 344]].map(EX);
+  function ws(a, b, w){ strips([a, b], w).forEach(function(q){ var c = clipTo(mask, q); if (c.length >= 3) streets.push(c); }); }
+  for (u = 0; u < 1180; u += 165) ws(west(u, -900), west(u, 470), 7);
+  for (v = -850; v < 520; v += 70) ws(west(-800, v), west(1250, v), 6.5);
+  return [["#ae645b", streets], ["#ae645b", strips(railN, 14.2).concat(strips(railE, 14.2))], ["#ae645b", strips(shifted(fw, -15), 17.1).concat(strips(shifted(fw, 15), 17.1))], ["#ae645b", strips(ent, 9)],
+    ["#4d8c70", [park]], ["#92746a", ind.map(st)], ["#9c813e", com.map(st)]];
+}
+// Wetlands, parks and flood areas come straight from their public inventories, as in the original (dist/environment.js).
+var ENV = [["#8176ae", "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28", "SFHA_TF='T' OR ZONE_SUBTY='0.2 PCT ANNUAL CHANCE FLOOD HAZARD'", "OBJECTID,FLD_ZONE,ZONE_SUBTY,SFHA_TF"],
+  ["#51866b", "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/PADUS_Protection_Status_by_GAP_Status_Code/FeatureServer/0", "1=1", "OBJECTID,Unit_Nm,GAP_Sts,DesTp_Desc,MngNm_Desc,Category"],
+  ["#4a94a1", "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/0", "WETLAND_TYPE <> 'Riverine'", "OBJECTID,ATTRIBUTE,WETLAND_TYPE,ACRES"]];
+function loadEnv(map){
+  ENV.forEach(function(e){
+    var q = new URLSearchParams({f:"geojson", where:e[2], geometry:"-83.225,42.259,-83.189,42.279", geometryType:"esriGeometryEnvelope", inSR:"4326", outSR:"4326", spatialRel:"esriSpatialRelIntersects", outFields:e[3], returnGeometry:"true", geometryPrecision:"6", maxAllowableOffset:"0.00001", resultRecordCount:"1000"});
+    fetch(e[1] + "/query?" + q).then(function(r){ if (!r.ok) throw new Error("source"); return r.json(); }).then(function(d){
+      if (!d || !Array.isArray(d.features)) return;
+      L.geoJSON(d, {pane:"context", interactive:false, filter:function(f){ return f.geometry && /Polygon/.test(f.geometry.type); }, style:{color:e[0], weight:1.1, opacity:.74, fillColor:e[0], fillOpacity:.24}}).addTo(map);
+    }).catch(function(){});
+  });
+}
+function loadScript(src){ return new Promise(function(res, rej){ var el = document.createElement("script"); el.src = src; el.onload = res; el.onerror = rej; document.head.appendChild(el); }); }
+// The light map of the original: OpenFreeMap's positron style with its ground, green and water recolored. Until it is ready, and where it cannot load, the grey street map stays.
+function lightBase(){
+  var css = document.createElement("link"); css.rel = "stylesheet"; css.href = "vendor/maplibre-gl.css"; document.head.appendChild(css);
+  Promise.all([loadScript("vendor/maplibre-gl.js").then(function(){ return loadScript("vendor/leaflet-maplibre-gl.js"); }), fetch("https://tiles.openfreemap.org/styles/positron").then(function(r){ if (!r.ok) throw new Error("style"); return r.json(); })]).then(function(v){
+    var style = v[1];
+    style.layers.forEach(function(l){ if (!l.paint) return; if (l.type === "background") l.paint["background-color"] = "#edf1ee"; if (l.type === "fill" && /park|grass|wood/i.test(l.id)) l.paint["fill-color"] = "#dce8de"; if (l.type === "fill" && /^water$|waterway/i.test(l.id)) l.paint["fill-color"] = "#c5dce3"; });
+    GEO.vector = L.maplibreGL({style:style, interactive:false, pane:"tilePane", padding:.15, updateInterval:16, attributionControl:{customAttribution:'© <a href="https://openmaptiles.org/">OpenMapTiles</a> · <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://openfreemap.org/">OpenFreeMap</a>'}});
+    if (GEO.base === "map") useBase("map");
+  }).catch(function(e){ if (window.console) console.warn("Light map unavailable", e); });
+}
+function useBase(name){
+  var map = GEO.map; [GEO.tiles.map, GEO.tiles.satellite, GEO.tint, GEO.vector].forEach(function(l){ if (l && map.hasLayer(l)) map.removeLayer(l); });
+  GEO.base = name;
+  if (name === "satellite") GEO.tiles.satellite.addTo(map); else if (GEO.vector) GEO.vector.addTo(map); else { GEO.tiles.map.addTo(map); GEO.tint.addTo(map); }
+}
 function geoOK(){ return !!window.L && !GEO.failed; }
 function glab(latlng, text, cls, dir){ return L.tooltip({permanent:true, direction:dir || "center", className:"glab " + (cls || ""), interactive:false}).setLatLng(latlng).setContent(text); }
 function geoInit(stage){
@@ -639,7 +705,11 @@ function geoInit(stage){
   // the light map takes the grey-green of the other screens: a wash laid over the tiles, under everything drawn
   var tp = map.createPane("tint"); tp.style.zIndex = 250; tp.style.mixBlendMode = "multiply"; tp.style.pointerEvents = "none";
   GEO.tint = L.rectangle([[-80, -179], [80, 179]], {pane:"tint", stroke:false, fillColor:"#d9e2de", fillOpacity:1, interactive:false}).addTo(map);
-  L.polyline(SITE.river, {color:"#6fa3c4", weight:7, opacity:.45, interactive:false}).addTo(map); glab(SITE.river[9], "Ecorse River").addTo(map);
+  var cp = map.createPane("context"); cp.style.zIndex = 350; cp.style.pointerEvents = "none";
+  contextShapes().forEach(function(c){ L.polygon(c[1].map(function(poly){ return [poly.map(function(q){ return ll(q[0], q[1]); })]; }), {pane:"context", color:c[0], weight:1, opacity:.74, fillColor:c[0], fillOpacity:.24, interactive:false}).addTo(map); });
+  L.polyline(SITE.river, {pane:"context", color:"#497e94", weight:5, opacity:.5, interactive:false}).addTo(map); glab(SITE.river[9], "Ecorse River", "w").addTo(map);
+  L.control.scale({metric:false, position:"bottomleft"}).addTo(map);
+  loadEnv(map); lightBase();
   L.polygon(SITE.boundary, {color:"#1c2a28", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(map); glab(SITE.boundary[1], "Approximate study parcel", "", "left").addTo(map);
   SITE.places.forEach(function(q){ L.circleMarker([q[1], q[2]], {radius:5, color:"#fbfdfc", weight:2, fillColor:"#3b7a66", fillOpacity:1, interactive:false}).addTo(map); glab([q[1], q[2]], q[0], "", "right").addTo(map); });
   GEO.live = L.layerGroup().addTo(map);
@@ -1010,7 +1080,7 @@ $("main").addEventListener("wheel", function(ev){
 $("main").addEventListener("click", function(ev){
   var z = ev.target.closest ? ev.target.closest("[data-zoom]") : null;
   var bb = ev.target.closest ? ev.target.closest("[data-base]") : null;
-  if (bb && GEO.map){ GEO.map.removeLayer(GEO.tiles[GEO.base]); GEO.base = GEO.base === "map" ? "satellite" : "map"; GEO.tiles[GEO.base].addTo(GEO.map); if (GEO.base === "map") GEO.tint.addTo(GEO.map); else GEO.map.removeLayer(GEO.tint); bb.textContent = GEO.base === "map" ? "Satellite" : "Map"; return; }
+  if (bb && GEO.map){ useBase(GEO.base === "map" ? "satellite" : "map"); bb.textContent = GEO.base === "map" ? "Satellite" : "Map"; return; }
   if (z && GEO.map && z.closest('.stage[data-view="geo"]')){ var hz = z.getAttribute("data-zoom"); if (hz === "reset") GEO.map.setView(SITE.center, 16); else GEO.map.setZoom(GEO.map.getZoom() + (hz === "in" ? 1 : -1)); return; }
   if (z){ var how = z.getAttribute("data-zoom"); if (how === "reset"){ MAPV = null; redrawMap(); } else zoomMap(how === "in" ? .72 : 1 / .72, WM / 2, HM / 2); return; }
   var t = ev.target.closest ? ev.target.closest("[data-ch]") : null; if (!t) return; ST.ch = t.getAttribute("data-ch"); render(); tell(); });
