@@ -971,7 +971,7 @@ function editorHTML(bare){
 var LIVE = false;   // true once the original DataScope answers; until then, and where it cannot be framed, the pictures are shown
 function embedHTML(img, alt, title){ return '<div class="card stage embed"><img src="' + img + '" alt="' + alt + '">' + (LIVE ? '<iframe src="' + SENTIMENT + '" title="' + title + '" allow="fullscreen"></iframe>' : '') + '</div>'; }
 function sentimentHTML(bare){ return embedHTML("live/sentiment.jpg", "The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list", "The original DataScope. Choose Sentiment map in its bar"); }
-function viewHTML(bare){ return embedHTML("live/center.jpg", "Photo of the center wall: the original Scenario Editor in Site layout, with the data center, its 55 dBA contour, the design alternatives and the live analysis", "The original DataScope Scenario Editor, Site layout"); }
+function viewHTML(bare){ return embedHTML("live/center.jpg", "The original Scenario Editor in Site layout: the data center on the proposed site with its 55 dBA contour, the view menu and the design alternatives", "The original DataScope Scenario Editor, Site layout"); }
 function benRow(k){
   var m = funds(), on = modules(), each = on.length ? YEARLY / on.length : 0, up = Math.max(0, m.left), o = PAGES.benefits.opts.filter(function(x){ return x[0] === k; })[0], is = ST.b[k];
   var v = !is ? "Not funded" : k === "B1" ? money(each + up * .04) + " in grants a year" : k === "B2" ? money(each) + " a year into equity" : k === "B3" ? Math.floor(each * 1000 / 8) + " homes protected a year" : Math.floor(each * 1000 / 15) + " training places a year";
