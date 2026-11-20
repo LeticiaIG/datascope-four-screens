@@ -191,6 +191,10 @@ body.grey{background:var(--bg)}
 .budget{position:absolute;left:.9rem;bottom:.9rem;background:var(--surface);border-radius:999px;padding:.45rem .9rem;box-shadow:0 2px 10px rgba(20,40,34,.14)}
 .budget .omini{margin:0}
 a.lab{text-decoration:none}
+.stage.embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#dfe8e3}
+body.embed .top{display:none}
+.back{display:none;position:fixed;left:12px;bottom:12px;z-index:30;width:2.6rem;height:2.6rem;border-radius:50%;background:#1c2a28;color:#fff;align-items:center;justify-content:center;font-size:1.25rem;text-decoration:none;box-shadow:0 4px 14px rgba(20,40,34,.3)}
+body.embed .back{display:flex}
 .rw{position:absolute;right:.5rem;top:.5rem;z-index:2;display:flex;gap:2px;background:#1c2a28;border-radius:999px;padding:2px}
 .rw button{font:inherit;font-size:.72rem;font-weight:700;color:#cfd8d4;background:none;border:0;border-radius:999px;padding:.2rem .6rem;cursor:pointer}
 .rw button[aria-pressed="true"]{background:#fbfdfc;color:#1c2a28}
@@ -305,6 +309,7 @@ label.sm:has(input:focus-visible){outline:2px solid var(--accent);outline-offset
     <a class="brand" href="#all">DataScope.</a>
     <nav class="tabs" aria-label="Screens" id="views"></nav>
   </div>
+  <a class="back" href="#all" aria-label="All screens" title="All screens">⊞</a>
   <div class="main" id="main"></div>
 </div>
 
@@ -962,14 +967,10 @@ function editorHTML(bare){
     '</div><div class="budget" aria-live="polite">' + ominiHTML() + '</div>' +
     '<div class="zoomc"><button type="button" data-zoom="out" aria-label="Zoom out">−</button><button type="button" data-zoom="in" aria-label="Zoom in">+</button><button type="button" data-zoom="reset" aria-label="Reset the map view">⤢</button>' + (geoOK() ? '<button type="button" class="wide" data-base>' + (GEO.base === "map" ? "Satellite" : "Map") + '</button>' : '') + '</div></div>';
 }
-function sentimentHTML(bare){
-  return '<div class="card stage"><img src="live/sentiment.jpg" alt="The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list">' +
-    (bare ? "" : '<a class="openlive" href="' + SENTIMENT + '">Open the live Sentiment map</a>') + '</div>';
-}
-function viewHTML(bare){
-  return '<div class="card stage"><img src="live/center.jpg" alt="Photo of the center wall: the original Scenario Editor in Site layout, with the data center, its 55 dBA contour, the design alternatives and the live analysis">' +
-    (bare ? "" : '<a class="openlive" href="' + SENTIMENT + '">Open the live Scenario Editor</a>') + '</div>';
-}
+var LIVE = false;   // true once the original DataScope answers; until then, and where it cannot be framed, the pictures are shown
+function embedHTML(img, alt, title){ return '<div class="card stage embed"><img src="' + img + '" alt="' + alt + '">' + (LIVE ? '<iframe src="' + SENTIMENT + '" title="' + title + '" allow="fullscreen"></iframe>' : '') + '</div>'; }
+function sentimentHTML(bare){ return embedHTML("live/sentiment.jpg", "The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list", "The original DataScope. Choose Sentiment map in its bar"); }
+function viewHTML(bare){ return embedHTML("live/center.jpg", "Photo of the center wall: the original Scenario Editor in Site layout, with the data center, its 55 dBA contour, the design alternatives and the live analysis", "The original DataScope Scenario Editor, Site layout"); }
 function benRow(k){
   var m = funds(), on = modules(), each = on.length ? YEARLY / on.length : 0, up = Math.max(0, m.left), o = PAGES.benefits.opts.filter(function(x){ return x[0] === k; })[0], is = ST.b[k];
   var v = !is ? "Not funded" : k === "B1" ? money(each + up * .04) + " in grants a year" : k === "B2" ? money(each) + " a year into equity" : k === "B3" ? Math.floor(each * 1000 / 8) + " homes protected a year" : Math.floor(each * 1000 / 15) + " training places a year";
@@ -1005,15 +1006,20 @@ function render(){
   var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:analysisHTML, metrics:metricsHTML};
   $("views").innerHTML = VIEWS.map(function(v){ return '<a class="tab" href="#' + v[0] + '"' + (v[0] === VIEW ? ' aria-current="page"' : '') + '>' + v[1] + '</a>'; }).join("");
   function mini(k){ return '<div class="mini' + (k === "analysis" || k === "metrics" ? " grey" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
-  document.body.classList.toggle("grey", VIEW === "analysis" || VIEW === "metrics");
-  if (VIEW !== "all") main.innerHTML = H[VIEW]();
+  var own = VIEW === "sentiment" || VIEW === "view", shown = main.getAttribute("data-shown");
+  document.body.classList.toggle("grey", VIEW === "analysis" || VIEW === "metrics"); document.body.classList.toggle("embed", own && LIVE);
+  if (own && shown === VIEW) return;   // the embedded original keeps running; nothing on it follows the choices made here
+  function right(){ return '<a class="lab" href="#' + ST.rw + '">Right wall · Live analysis</a>' +
+    '<span class="rw" role="group" aria-label="Right wall"><button type="button" data-rw="analysis" aria-pressed="' + (ST.rw === "analysis") + '">With images</button><button type="button" data-rw="metrics" aria-pressed="' + (ST.rw === "metrics") + '">Metrics only</button></span>' + mini(ST.rw); }
+  function table(){ return '<a class="lab" href="#editor">Table · Scenario Editor</a>' + mini("editor"); }
+  if (VIEW === "all" && shown === "all" && main.querySelector(".scr.wr")){ main.querySelector(".scr.wr").innerHTML = right(); main.querySelector(".scr.tb").innerHTML = table(); }   // the two embedded screens are left alone, so they do not reload
+  else if (VIEW !== "all") main.innerHTML = H[VIEW]();
   else main.innerHTML = '<div class="room"><div class="walls">' +
       '<div class="scr wl"><a class="lab" href="#sentiment">Left wall · Sentiment map</a>' + mini("sentiment") + '</div>' +
       '<div class="scr"><a class="lab" href="#view">Center wall · Site layout</a>' + mini("view") + '</div>' +
-      '<div class="scr wr"><a class="lab" href="#' + ST.rw + '">Right wall · Live analysis</a>' +
-        '<span class="rw" role="group" aria-label="Right wall"><button type="button" data-rw="analysis" aria-pressed="' + (ST.rw === "analysis") + '">With images</button><button type="button" data-rw="metrics" aria-pressed="' + (ST.rw === "metrics") + '">Metrics only</button></span>' + mini(ST.rw) + '</div></div>' +
-      (NOTES_ON ? '<div class="notes3">' + noteHTML(NOTES.sentiment) + noteHTML(NOTES.see) + noteHTML(SHOW[ST.ch]) + '</div>' : '') +
-      '<div class="under">' + noteHTML(NOTES[ST.ch]) + '<div class="scr tb"><a class="lab" href="#editor">Table · Scenario Editor</a>' + mini("editor") + '</div></div></div>';
+      '<div class="scr wr">' + right() + '</div></div>' +
+      '<div class="under"><div class="scr tb">' + table() + '</div></div></div>';
+  main.setAttribute("data-shown", VIEW);
   main.querySelectorAll(".stage[data-view]").forEach(function(f){ if (f.getAttribute("data-view") !== "geo") drawScene(f, f.getAttribute("data-view")); });
   var gs = main.querySelector('.stage[data-view="geo"]'); if (gs){ try { geoInit(gs); gs.insertBefore(GEO.el, gs.firstChild); GEO.map.invalidateSize(false); geoDraw(); } catch(e){ if (window.console) console.warn("Map failed", e); GEO.failed = true; return render(); } }
   var tok = ++TOK, th = [].slice.call(main.querySelectorAll(".thumb[data-alt]")); if (th.length) setTimeout(function(){ drawThumbs(th, tok); }, 0);
@@ -1095,6 +1101,7 @@ function route(){ var h = (location.hash || "").replace("#", ""); VIEW = "all"; 
 window.addEventListener("hashchange", route);
 try { var saved = localStorage.getItem("dcscope-v5"); if (saved) adopt(saved); } catch(e){}
 route();
+try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
 })();
 </script>
 </body>
