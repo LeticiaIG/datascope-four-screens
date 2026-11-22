@@ -191,6 +191,19 @@ body.grey{background:var(--bg)}
 .budget{position:absolute;left:.9rem;bottom:.9rem;background:var(--surface);border-radius:999px;padding:.45rem .9rem;box-shadow:0 2px 10px rgba(20,40,34,.14)}
 .budget .omini{margin:0}
 a.lab{text-decoration:none}
+.sites{display:flex;gap:2px;background:var(--sunk);border-radius:999px;padding:2px;flex:0 0 auto}
+.sites button{font:inherit;font-size:.82rem;font-weight:700;color:var(--muted);background:none;border:0;border-radius:999px;padding:.3rem .7rem;cursor:pointer}
+.sites button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.record{flex:1 1 auto;min-height:0;border:0;border-radius:0;padding:5rem 2.4rem 2rem;display:flex;flex-direction:column;gap:1.6rem}
+.record .hd{font-size:1.5rem}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.4rem 2.4rem}
+.fact{border-top:2px solid var(--ink);padding-top:.7rem;display:flex;flex-direction:column;gap:.2rem}
+.fact b{font-size:3.4rem;font-weight:700;line-height:1;letter-spacing:-.01em}
+.fact span{font-size:1.1rem;font-weight:600;color:var(--muted)}
+.asks{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .6rem}
+.asks span{font-size:1rem;font-weight:700;margin-right:.4rem}
+.asks em{font-style:normal;font-size:1rem;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:.3rem .9rem}
+.record .none{margin:auto 0 0;font-size:.95rem;font-weight:600;color:var(--muted)}
 .stage.embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#dfe8e3;opacity:0;transition:opacity .4s}
 .stage.embed iframe.on{opacity:1}
 body.embed .top{display:none}
@@ -309,6 +322,7 @@ label.sm:has(input:focus-visible){outline:2px solid var(--accent);outline-offset
   <div class="card top">
     <a class="brand" href="#all">DataScope.</a>
     <nav class="tabs" aria-label="Screens" id="views"></nav>
+    <span class="sites" id="sites" role="group" aria-label="Case study"></span>
   </div>
   <a class="back" href="#all" aria-label="All screens" title="All screens">⊞</a>
   <div class="main" id="main"></div>
@@ -355,7 +369,7 @@ var DESIGN = { D1:{db:47.4, seen:100, cover:12, el:1, wa:1}, D2:{db:44.4, seen:4
 var ENERGY = { E2:{cost:275, land:"1.5 sq mi", what:"solar"}, E3:{cost:150, land:"5–11 sq mi", what:"wind"}, E4:{cost:1000, land:"On-site", what:"microreactors"} };
 var UPFRONT = 10, YEARLY = .5;
 var CH = ["design", "technology", "energy", "benefits"];
-var ST = {d:"D1", t:"T1", e:"E1", b:{B1:true, B2:false, B3:false, B4:false}, ch:"design", topic:"all", px:0, pz:0, rot:0, rw:"analysis"};   // rw: what the right wall shows in the room view
+var ST = {d:"D1", t:"T1", e:"E1", b:{B1:true, B2:false, B3:false, B4:false}, ch:"design", topic:"all", px:0, pz:0, rot:0, rw:"analysis", site:"mi"};   // site: mi = Allen Park, Michigan; tx = College Station, Texas   // rw: what the right wall shows in the room view
 // The site, in metres: x runs east, z runs south. One list feeds the 3D model, the plan's labels and the measurements.
 var PARCEL = {x0:-156, x1:156, z0:-54, z1:50};
 var RIVER = [[-560, -96], [-340, -130], [-190, -104], [-60, -142], [70, -108], [200, -144], [340, -112], [560, -152]];
@@ -617,12 +631,21 @@ function painting(kind, key, size){
 // ---------- the table map: a real map of the place, with the intervention drawn on it ----------
 // The site center, the approximate study parcel, the river bends and the landmark points are those of the original DataScope
 // (dist/geography.js in CityScope/DataScope), which gives their sources. Tiles load from their providers, as in the original.
-var SITE = { center:[42.26862, -83.20767],
+var SITES = {
+  mi:{ name:"Michigan", zoom:16, bbox:"-83.225,42.259,-83.189,42.279", context:true, near:"the park", receptor:"John Riel Memorial Park", boundaryLabel:"Approximate study parcel", riverLabel:"Ecorse River", center:[42.26862, -83.20767],
   boundary:[[42.26955, -83.20844], [42.27037, -83.20504], [42.26687, -83.20802], [42.26733, -83.20902], [42.26723, -83.20947], [42.26722, -83.20983], [42.26713, -83.21007], [42.26716, -83.21047]],
   river:[[42.2743, -83.2192], [42.2738, -83.2172], [42.2746, -83.215], [42.2744, -83.2136], [42.2741, -83.2126], [42.2732, -83.211], [42.2723, -83.2117], [42.2717, -83.2116], [42.2714, -83.2104], [42.2726, -83.2081], [42.2716, -83.2067], [42.271, -83.2064], [42.2712, -83.2058], [42.2707, -83.2052], [42.2719, -83.2039], [42.2725, -83.2038], [42.2726, -83.2033], [42.2724, -83.2018], [42.2717, -83.2008], [42.2701, -83.1997], [42.2695, -83.1981], [42.2705, -83.1964], [42.2714, -83.1952]],
-  places:[["John Riel Memorial Park", 42.26855, -83.20563], ["Arno Ave homes", 42.2678, -83.2041], ["Melvindale High School", 42.27421, -83.2034], ["Maple Heights", 42.26933, -83.1985]] };
-var GEO = {map:null, el:null, failed:false, base:"map", tiles:null, live:null, fp:null}, MSC = 2 / 3, MY = 111320, MX = MY * Math.cos(SITE.center[0] * Math.PI / 180);
-function ll(e, s){ return [SITE.center[0] - s / MY, SITE.center[1] + e / MX]; }   // meters east and south of the site center
+  places:[["John Riel Memorial Park", 42.26855, -83.20563], ["Arno Ave homes", 42.2678, -83.2041], ["Melvindale High School", 42.27421, -83.2034], ["Maple Heights", 42.26933, -83.1985]] },
+  // College Station, Texas: about 200 acres of city land in the Midtown Business Park, at Midtown Drive and Corporate Parkway, which the city council declined to sell
+  // for a 600 MW data center on 11 September 2025. The tract's outline is not drawn: only the crossing the press reports and a circle of the same area, to give its size.
+  tx:{ name:"Texas", zoom:15.5, bbox:"-96.292,30.553,-96.238,30.588", context:false, near:"the nearest neighbors", receptor:"the nearest neighbors", center:[30.5707219, -96.2647921], acres:200,
+    areaLabel:"Midtown Business Park · about 200 acres · position approximate",
+    places:[["Midtown Dr & Corporate Pkwy", 30.5707219, -96.2647921], ["Costco", 30.5670472, -96.2633507], ["The Langford · retirement community", 30.5717751, -96.2689578], ["Pebble Creek Elementary School", 30.5582426, -96.2492936], ["ILTexas College Station K-8", 30.578181, -96.285006]] }
+};
+function S(){ return SITES[ST.site] || SITES.mi; }
+var GEO = {map:null, el:null, failed:false, base:"map", tiles:null, live:null, fp:null, site:null, layer:null}, SAT = {map:null, el:null, live:null, site:null}, MSC = 2 / 3, MY = 111320;
+function MXs(){ return MY * Math.cos(S().center[0] * Math.PI / 180); }
+function ll(e, s){ var c = S().center; return [c[0] - s / MY, c[1] + e / MXs()]; }   // meters east and south of the site center
 // The footprint at its real size, 90 m by 46.45 m (45,000 sq ft), with the equipment yard added for D3. Moves and turns follow the table's pose.
 function bldg(px, pz, rot){
   var cx = -6.5 * MSC, cz = -10 * MSC, x0 = cx - 45 - (ST.d === "D3" ? 32 : 0), x1 = cx + 45, z0 = cz - 23.225, z1 = cz + 23.225;
@@ -630,7 +653,8 @@ function bldg(px, pz, rot){
 }
 function noiseAt(px, pz, rot){ var p = local(ST.d === "D3" ? -6.5 * MSC - 61 : 0, -10 * MSC, px * MSC, pz * MSC, rot); return p; }
 function inParcel(cs){   // every corner of the footprint inside the study parcel
-  return cs.every(function(q){ var inside = false, b = SITE.boundary; for (var i = 0, j = b.length - 1; i < b.length; j = i++) if ((b[i][0] > q[0]) !== (b[j][0] > q[0]) && q[1] < (b[j][1] - b[i][1]) * (q[0] - b[i][0]) / (b[j][0] - b[i][0]) + b[i][1]) inside = !inside; return inside; });
+  var b = S().boundary; if (!b) return true;
+  return cs.every(function(q){ var inside = false; for (var i = 0, j = b.length - 1; i < b.length; j = i++) if ((b[i][0] > q[0]) !== (b[j][0] > q[0]) && q[1] < (b[j][1] - b[i][1]) * (q[0] - b[i][0]) / (b[j][0] - b[i][0]) + b[i][1]) inside = !inside; return inside; });
 }
 // The road, rail, park and building outlines below are the generalized ones the original draws on its Map overview
 // (dist/studio/constraints.js and model-data.js in CityScope/DataScope): exhibit coordinates, turned into meters from the site center.
@@ -671,12 +695,12 @@ function contextShapes(){
 var ENV = [["#8176ae", "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28", "SFHA_TF='T' OR ZONE_SUBTY='0.2 PCT ANNUAL CHANCE FLOOD HAZARD'", "OBJECTID,FLD_ZONE,ZONE_SUBTY,SFHA_TF"],
   ["#51866b", "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/PADUS_Protection_Status_by_GAP_Status_Code/FeatureServer/0", "1=1", "OBJECTID,Unit_Nm,GAP_Sts,DesTp_Desc,MngNm_Desc,Category"],
   ["#4a94a1", "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/0", "WETLAND_TYPE <> 'Riverine'", "OBJECTID,ATTRIBUTE,WETLAND_TYPE,ACRES"]];
-function loadEnv(map){
+function loadEnv(g, bbox){
   ENV.forEach(function(e){
-    var q = new URLSearchParams({f:"geojson", where:e[2], geometry:"-83.225,42.259,-83.189,42.279", geometryType:"esriGeometryEnvelope", inSR:"4326", outSR:"4326", spatialRel:"esriSpatialRelIntersects", outFields:e[3], returnGeometry:"true", geometryPrecision:"6", maxAllowableOffset:"0.00001", resultRecordCount:"1000"});
+    var q = new URLSearchParams({f:"geojson", where:e[2], geometry:bbox, geometryType:"esriGeometryEnvelope", inSR:"4326", outSR:"4326", spatialRel:"esriSpatialRelIntersects", outFields:e[3], returnGeometry:"true", geometryPrecision:"6", maxAllowableOffset:"0.00001", resultRecordCount:"1000"});
     fetch(e[1] + "/query?" + q).then(function(r){ if (!r.ok) throw new Error("source"); return r.json(); }).then(function(d){
-      if (!d || !Array.isArray(d.features)) return;
-      L.geoJSON(d, {pane:"context", interactive:false, filter:function(f){ return f.geometry && /Polygon/.test(f.geometry.type); }, style:{color:e[0], weight:1.1, opacity:.74, fillColor:e[0], fillOpacity:.24}}).addTo(map);
+      if (!d || !Array.isArray(d.features) || GEO.layer !== g) return;
+      L.geoJSON(d, {pane:"context", interactive:false, filter:function(f){ return f.geometry && /Polygon/.test(f.geometry.type); }, style:{color:e[0], weight:1.1, opacity:.74, fillColor:e[0], fillOpacity:.24}}).addTo(g);
     }).catch(function(){});
   });
 }
@@ -701,8 +725,8 @@ function glab(latlng, text, cls, dir){ return L.tooltip({permanent:true, directi
 function geoInit(stage){
   if (GEO.map) return;
   var el = GEO.el = document.createElement("div"); el.className = "geomap"; stage.insertBefore(el, stage.firstChild);   // in the page first, so the map can measure it
-  var map = GEO.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(SITE.center, 16); el.style.position = "";
-  function far(){ el.classList.toggle("far", map.getZoom() < 16.75); } map.on("zoomend", far); far();
+  var map = GEO.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(S().center, S().zoom); el.style.position = "";
+  function far(){ el.classList.toggle("far", map.getZoom() < 16.75); if (GEO.live && GEO.fp) geoDraw(); } map.on("zoomend", far); far();
   map.attributionControl.setPrefix(false);
   GEO.tiles = {
     map:L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {className:"greytiles", maxNativeZoom:19, maxZoom:20, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
@@ -715,13 +739,37 @@ function geoInit(stage){
   var tp = map.createPane("tint"); tp.style.zIndex = 250; tp.style.mixBlendMode = "multiply"; tp.style.pointerEvents = "none";
   GEO.tint = L.rectangle([[-80, -179], [80, 179]], {pane:"tint", stroke:false, fillColor:"#d9e2de", fillOpacity:1, interactive:false}).addTo(map);
   var cp = map.createPane("context"); cp.style.zIndex = 350; cp.style.pointerEvents = "none";
-  contextShapes().forEach(function(c){ L.polygon(c[1].map(function(poly){ return [poly.map(function(q){ return ll(q[0], q[1]); })]; }), {pane:"context", color:c[0], weight:1, opacity:.74, fillColor:c[0], fillOpacity:.24, interactive:false}).addTo(map); });
-  L.polyline(SITE.river, {pane:"context", color:"#497e94", weight:5, opacity:.5, interactive:false}).addTo(map); glab(SITE.river[9], "Ecorse River", "w").addTo(map);
   L.control.scale({metric:false, position:"bottomleft"}).addTo(map);
-  loadEnv(map); lightBase();
-  L.polygon(SITE.boundary, {color:"#1c2a28", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(map); glab(SITE.boundary[1], "Approximate study parcel", "", "left").addTo(map);
-  SITE.places.forEach(function(q){ L.circleMarker([q[1], q[2]], {radius:5, color:"#fbfdfc", weight:2, fillColor:"#3b7a66", fillOpacity:1, interactive:false}).addTo(map); glab([q[1], q[2]], q[0], "", "right").addTo(map); });
+  lightBase();
   GEO.live = L.layerGroup().addTo(map);
+}
+function acresCircle(s){ return L.circle(s.center, {radius:Math.sqrt(s.acres * 4046.86 / Math.PI), color:"#1c2a28", weight:2, dashArray:"9 7", fill:false, interactive:false}); }
+// What belongs to the site: its outlines, its landmarks and its wetlands, parks and flood areas. Redrawn when the case study changes.
+function geoSite(){
+  if (GEO.site === ST.site) return; GEO.site = ST.site;
+  var s = S(), map = GEO.map; if (GEO.layer) map.removeLayer(GEO.layer); var g = GEO.layer = L.layerGroup().addTo(map);
+  if (s.context) contextShapes().forEach(function(c){ L.polygon(c[1].map(function(poly){ return [poly.map(function(q){ return ll(q[0], q[1]); })]; }), {pane:"context", color:c[0], weight:1, opacity:.74, fillColor:c[0], fillOpacity:.24, interactive:false}).addTo(g); });
+  if (s.river){ L.polyline(s.river, {pane:"context", color:"#497e94", weight:5, opacity:.5, interactive:false}).addTo(g); glab(s.river[9], s.riverLabel, "w").addTo(g); }
+  if (s.boundary){ L.polygon(s.boundary, {color:"#1c2a28", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(g); glab(s.boundary[1], s.boundaryLabel, "", "left").addTo(g); }
+  if (s.acres){ var c = acresCircle(s).addTo(g), r = c.getRadius(); glab([s.center[0] + r / MY, s.center[1]], s.areaLabel, "", "top").addTo(g); }
+  s.places.forEach(function(q){ L.circleMarker([q[1], q[2]], {radius:5, color:"#fbfdfc", weight:2, fillColor:"#3b7a66", fillOpacity:1, interactive:false}).addTo(g); glab([q[1], q[2]], q[0], "", "right").addTo(g); });
+  loadEnv(g, s.bbox); map.setView(s.center, s.zoom, {animate:false});
+}
+// The center wall of a site that has no original tool to show: the aerial photo of the place, with the building on it.
+function satDraw(stage){
+  var s = S();
+  if (!SAT.map){ var el = SAT.el = document.createElement("div"); el.className = "geomap"; stage.insertBefore(el, stage.firstChild);
+    SAT.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(s.center, 16); el.style.position = ""; SAT.map.attributionControl.setPrefix(false);
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {maxNativeZoom:19, maxZoom:20, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"}).addTo(SAT.map);
+    L.control.scale({metric:false, position:"bottomleft"}).addTo(SAT.map); SAT.live = L.layerGroup().addTo(SAT.map); }
+  else stage.insertBefore(SAT.el, stage.firstChild);
+  SAT.map.invalidateSize(false); if (SAT.site !== ST.site){ SAT.site = ST.site; SAT.map.setView(s.center, 16, {animate:false}); }
+  var g = SAT.live, cs = bldg(ST.px, ST.pz, ST.rot); g.clearLayers();
+  if (s.acres) acresCircle(s).setStyle({color:"#fbfdfc"}).addTo(g);
+  if (s.boundary) L.polygon(s.boundary, {color:"#fbfdfc", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(g);
+  L.polygon(cs, {color:"#1c2a28", weight:2.6, fillColor:"#fbfdfc", fillOpacity:.75, interactive:false}).addTo(g);
+  glab([Math.max(cs[0][0], cs[1][0]), (cs[0][1] + cs[1][1]) / 2], "Data center", "dk", "top").addTo(g);
+  s.places.forEach(function(q){ L.circleMarker([q[1], q[2]], {radius:5, color:"#fbfdfc", weight:2, fillColor:"#3b7a66", fillOpacity:1, interactive:false}).addTo(g); glab([q[1], q[2]], q[0], "", "right").addTo(g); });
 }
 function geoDraw(){
   var g = GEO.live, c = noiseAt(ST.px, ST.pz, ST.rot), r = r55() * MSC, cs; g.clearLayers();
@@ -733,7 +781,8 @@ function geoDraw(){
   cs = bldg(ST.px, ST.pz, ST.rot);
   GEO.fp = L.polygon(cs, {color:"#1c2a28", weight:2.6, fillColor:"#fbfdfc", fillOpacity:.6, className:"gfp", bubblingMouseEvents:false}).addTo(g);
   glab([Math.max(cs[0][0], cs[1][0]), (cs[0][1] + cs[1][1]) / 2], "Data center", "dk", "top").addTo(g);
-  var south = cs.reduce(function(a, q){ return q[0] < a[0] ? q : a; }), mid = [south[0] - 16 / MY, (cs[0][1] + cs[2][1]) / 2];
+  var south = cs.reduce(function(a, q){ return q[0] < a[0] ? q : a; }), hp = GEO.map.latLngToContainerPoint([south[0], (cs[0][1] + cs[2][1]) / 2]); hp.y += 30;   // the handle keeps clear of the building at any zoom
+  var mid = GEO.map.containerPointToLatLng(hp);
   GEO.rh = L.marker(mid, {icon:L.divIcon({className:"grot", html:"↻", iconSize:[32, 32]}), keyboard:false, title:"Turn the building"}).addTo(g);
   var a = GEO.fp.getElement(), b = GEO.rh.getElement();
   if (a){ L.DomEvent.disableClickPropagation(a); a.addEventListener("pointerdown", geoDrag("move")); }
@@ -744,7 +793,7 @@ function geoDrag(kind){ return function(ev){
   var map = GEO.map, a = map.mouseEventToLatLng(ev), p0 = {px:ST.px, pz:ST.pz, rot:ST.rot}, x0 = ev.clientX, now = null; map.dragging.disable();
   function mv(e){
     var to; if (kind === "rot") to = clampPose(p0.px, p0.pz, Math.round(p0.rot + (e.clientX - x0) / 7));
-    else { var b = map.mouseEventToLatLng(e); to = clampPose(p0.px + (b.lng - a.lng) * MX / MSC, p0.pz + (a.lat - b.lat) * MY / MSC, p0.rot); }
+    else { var b = map.mouseEventToLatLng(e); to = clampPose(p0.px + (b.lng - a.lng) * MXs() / MSC, p0.pz + (a.lat - b.lat) * MY / MSC, p0.rot); }
     if (!inParcel(bldg(to.px, to.pz, to.rot))) return;   // the building stays inside the parcel
     now = to; GEO.fp.setLatLngs(bldg(now.px, now.pz, now.rot));
   }
@@ -907,8 +956,8 @@ function delta(now, ref, lowerIsBetter){ if (Math.abs(now - ref) < 1e-9) return 
 function tiles(page){
   var t = TECH[ST.t], r = TECH.T1, m = funds(), sh = m.share, en = ENERGY[ST.e], d = DESIGN[ST.d], gwh = t.gwh * d.el, water = t.water * d.wa;
   var park = d.db + (t.db - 47.4);
-  if (page === "design") return tile("Equipment sound", park.toFixed(1) + " <small>dBA</small>", Math.abs(park - 47.4) < .05 ? "At reference, at the park" : '<em' + (park < 47.4 ? '' : ' class="bad"') + '>' + (park > 47.4 ? "+" : "−") + Math.abs(park - 47.4).toFixed(1) + ' dB</em> at John Riel Memorial Park', park / 56) +
-    tile("Building in view", d.seen + " <small>%</small>", d.seen === 100 ? "At reference" : '<em>−' + (100 - d.seen) + ' points</em> from the park', d.seen / 100) +
+  if (page === "design") return tile("Equipment sound", park.toFixed(1) + " <small>dBA</small>", Math.abs(park - 47.4) < .05 ? "At reference, at " + S().near : '<em' + (park < 47.4 ? '' : ' class="bad"') + '>' + (park > 47.4 ? "+" : "−") + Math.abs(park - 47.4).toFixed(1) + ' dB</em> at ' + S().receptor, park / 56) +
+    tile("Building in view", d.seen + " <small>%</small>", d.seen === 100 ? "At reference" : '<em>−' + (100 - d.seen) + ' points</em> from ' + S().near, d.seen / 100) +
     tile("Site coverage", d.cover + " <small>%</small>", d.cover === 12 ? "At reference" : '<em class="bad">+' + (d.cover - 12) + ' points</em> of the parcel', d.cover / 22) +
     tile("Electricity", gwh.toFixed(1) + " <small>GWh/yr</small>", delta(gwh, t.gwh, true), gwh / 201.5) +
     tile("Cooling water", water.toFixed(1) + " <small>M gal/yr</small>", delta(water, t.water, true), water / 55);
@@ -970,8 +1019,15 @@ function editorHTML(bare){
 }
 var LIVE = false;   // true once the original DataScope answers; until then, and where it cannot be framed, the pictures are shown
 function embedHTML(img, alt, title){ return '<div class="card stage embed"><img src="' + img + '" alt="' + alt + '">' + (LIVE ? '<iframe src="' + SENTIMENT + '" title="' + title + '" allow="fullscreen"></iframe>' : '') + '</div>'; }
-function sentimentHTML(bare){ return embedHTML("live/sentiment.jpg", "The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list", "The original DataScope. Choose Sentiment map in its bar"); }
-function viewHTML(bare){ return embedHTML("live/center.jpg", "The original Scenario Editor in Site layout: the data center on the proposed site with its 55 dBA contour, the view menu and the design alternatives", "The original DataScope Scenario Editor, Site layout"); }
+// What is on the public record about the College Station proposal (KBTX, KXXV and the city council agenda of 11 September 2025).
+function recordHTML(){
+  return '<div class="card record"><div class="hd">College Station, Texas · Midtown Business Park</div><div class="facts">' +
+    [["About 200", "acres of city land, at Midtown Drive and Corporate Parkway"], ["600 MW", "data center proposed by Priority Power Management"], ["$30M", "offered for the land, $150,000 an acre"], ["Rejected", "unanimously by the city council, 11 September 2025"]].map(function(f){ return '<div class="fact"><b>' + f[0] + '</b><span>' + f[1] + '</span></div>'; }).join("") +
+    '</div><div class="asks"><span>What residents raised</span>' + ["Noise", "Power and water use", "Vulnerable neighbors nearby", "Too little time and say"].map(function(t){ return '<em>' + t + '</em>'; }).join("") + '</div>' +
+    '<p class="none">No sentiment map for this site yet.</p></div>';
+}
+function sentimentHTML(bare){ if (ST.site !== "mi") return recordHTML(); return embedHTML("live/sentiment.jpg", "The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list", "The original DataScope. Choose Sentiment map in its bar"); }
+function viewHTML(bare){ if (ST.site !== "mi") return '<div class="card stage" data-view="sat"></div>'; return embedHTML("live/center.jpg", "The original Scenario Editor in Site layout: the data center on the proposed site with its 55 dBA contour, the view menu and the design alternatives", "The original DataScope Scenario Editor, Site layout"); }
 function benRow(k){
   var m = funds(), on = modules(), each = on.length ? YEARLY / on.length : 0, up = Math.max(0, m.left), o = PAGES.benefits.opts.filter(function(x){ return x[0] === k; })[0], is = ST.b[k];
   var v = !is ? "Not funded" : k === "B1" ? money(each + up * .04) + " in grants a year" : k === "B2" ? money(each) + " a year into equity" : k === "B3" ? Math.floor(each * 1000 / 8) + " homes protected a year" : Math.floor(each * 1000 / 15) + " training places a year";
@@ -1007,23 +1063,25 @@ function render(){
   var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:analysisHTML, metrics:metricsHTML};
   $("views").innerHTML = VIEWS.map(function(v){ return '<a class="tab" href="#' + v[0] + '"' + (v[0] === VIEW ? ' aria-current="page"' : '') + '>' + v[1] + '</a>'; }).join("");
   function mini(k){ return '<div class="mini' + (k === "analysis" || k === "metrics" ? " grey" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
-  var own = VIEW === "sentiment" || VIEW === "view", shown = main.getAttribute("data-shown");
+  var own = (VIEW === "sentiment" || VIEW === "view") && ST.site === "mi", shown = main.getAttribute("data-shown"), key = VIEW + "|" + ST.site;
+  $("sites").innerHTML = ["mi", "tx"].map(function(k){ return '<button type="button" data-site="' + k + '" aria-pressed="' + (ST.site === k) + '">' + SITES[k].name + '</button>'; }).join("");
   document.body.classList.toggle("grey", VIEW === "analysis" || VIEW === "metrics"); document.body.classList.toggle("embed", own && LIVE);
-  if (own && shown === VIEW) return;   // the embedded original keeps running; nothing on it follows the choices made here
+  if (own && shown === key) return;   // the embedded original keeps running; nothing on it follows the choices made here
   function right(){ return '<a class="lab" href="#' + ST.rw + '">Right wall · Live analysis</a>' +
     '<span class="rw" role="group" aria-label="Right wall"><button type="button" data-rw="analysis" aria-pressed="' + (ST.rw === "analysis") + '">With images</button><button type="button" data-rw="metrics" aria-pressed="' + (ST.rw === "metrics") + '">Metrics only</button></span>' + mini(ST.rw); }
   function table(){ return '<a class="lab" href="#editor">Table · Scenario Editor</a>' + mini("editor"); }
-  if (VIEW === "all" && shown === "all" && main.querySelector(".scr.wr")){ main.querySelector(".scr.wr").innerHTML = right(); main.querySelector(".scr.tb").innerHTML = table(); }   // the two embedded screens are left alone, so they do not reload
+  if (VIEW === "all" && shown === key && ST.site === "mi" && main.querySelector(".scr.wr")){ main.querySelector(".scr.wr").innerHTML = right(); main.querySelector(".scr.tb").innerHTML = table(); }   // the two embedded screens are left alone, so they do not reload
   else if (VIEW !== "all") main.innerHTML = H[VIEW]();
   else main.innerHTML = '<div class="room"><div class="walls">' +
-      '<div class="scr wl"><a class="lab" href="#sentiment">Left wall · Sentiment map</a>' + mini("sentiment") + '</div>' +
+      '<div class="scr wl"><a class="lab" href="#sentiment">Left wall · ' + (ST.site === "mi" ? "Sentiment map" : "Public record") + '</a>' + mini("sentiment") + '</div>' +
       '<div class="scr"><a class="lab" href="#view">Center wall · Site layout</a>' + mini("view") + '</div>' +
       '<div class="scr wr">' + right() + '</div></div>' +
       '<div class="under"><div class="scr tb">' + table() + '</div></div></div>';
-  main.setAttribute("data-shown", VIEW);
+  main.setAttribute("data-shown", key);
   [].forEach.call(main.querySelectorAll(".stage.embed iframe:not([data-w])"), function(f){ f.setAttribute("data-w", "1"); f.addEventListener("load", function(){ f.classList.add("on"); }); });   // the picture shows until the original has loaded
-  main.querySelectorAll(".stage[data-view]").forEach(function(f){ if (f.getAttribute("data-view") !== "geo") drawScene(f, f.getAttribute("data-view")); });
-  var gs = main.querySelector('.stage[data-view="geo"]'); if (gs){ try { geoInit(gs); gs.insertBefore(GEO.el, gs.firstChild); GEO.map.invalidateSize(false); geoDraw(); } catch(e){ if (window.console) console.warn("Map failed", e); GEO.failed = true; return render(); } }
+  main.querySelectorAll(".stage[data-view]").forEach(function(f){ if (!/^(geo|sat)$/.test(f.getAttribute("data-view"))) drawScene(f, f.getAttribute("data-view")); });
+  var ss = main.querySelector('.stage[data-view="sat"]'); if (ss && window.L){ try { satDraw(ss); } catch(e){ if (window.console) console.warn("Aerial view failed", e); } }
+  var gs = main.querySelector('.stage[data-view="geo"]'); if (gs){ try { geoInit(gs); gs.insertBefore(GEO.el, gs.firstChild); GEO.map.invalidateSize(false); geoSite(); geoDraw(); } catch(e){ if (window.console) console.warn("Map failed", e); GEO.failed = true; return render(); } }
   var tok = ++TOK, th = [].slice.call(main.querySelectorAll(".thumb[data-alt]")); if (th.length) setTimeout(function(){ drawThumbs(th, tok); }, 0);
   fit(); animateRadar(); cancelAnimationFrame(agRaf); agRaf = requestAnimationFrame(drawAgents); if (keep && $(keep)) $(keep).focus();
 }
@@ -1040,6 +1098,7 @@ function adopt(raw){
     if (PAGES[o.ch]) ST.ch = o.ch;
     if (o.topic === "all" || PAGES[o.topic]) ST.topic = o.topic;
     if (o.rw === "analysis" || o.rw === "metrics") ST.rw = o.rw;
+    if (o.site === "mi" || o.site === "tx") ST.site = o.site;
     if (isFinite(o.px) && isFinite(o.pz) && isFinite(o.rot)) setPose(+o.px, +o.pz, +o.rot);
   } catch(e){ return; }
   render();
@@ -1090,18 +1149,23 @@ $("main").addEventListener("wheel", function(ev){
   zacc *= Math.exp(ev.deltaY * .0016); zpt = [q.x, q.y];
   if (!zraf) zraf = requestAnimationFrame(function(){ zraf = 0; var k = zacc; zacc = 1; zoomMap(k, zpt[0], zpt[1]); });
 }, {passive:false});
+document.addEventListener("click", function(ev){   // the case study switch sits in the header
+  var si = ev.target.closest ? ev.target.closest("[data-site]") : null; if (!si) return;
+  ST.site = si.getAttribute("data-site"); MAPV = null; render(); tell();
+});
 $("main").addEventListener("click", function(ev){
   var z = ev.target.closest ? ev.target.closest("[data-zoom]") : null;
   var rw = ev.target.closest ? ev.target.closest("[data-rw]") : null;
   if (rw){ ST.rw = rw.getAttribute("data-rw"); render(); tell(); return; }
   var bb = ev.target.closest ? ev.target.closest("[data-base]") : null;
   if (bb && GEO.map){ useBase(GEO.base === "map" ? "satellite" : "map"); bb.textContent = GEO.base === "map" ? "Satellite" : "Map"; return; }
-  if (z && GEO.map && z.closest('.stage[data-view="geo"]')){ var hz = z.getAttribute("data-zoom"); if (hz === "reset") GEO.map.setView(SITE.center, 16); else GEO.map.setZoom(GEO.map.getZoom() + (hz === "in" ? 1 : -1)); return; }
+  if (z && GEO.map && z.closest('.stage[data-view="geo"]')){ var hz = z.getAttribute("data-zoom"); if (hz === "reset") GEO.map.setView(S().center, S().zoom); else GEO.map.setZoom(GEO.map.getZoom() + (hz === "in" ? 1 : -1)); return; }
   if (z){ var how = z.getAttribute("data-zoom"); if (how === "reset"){ MAPV = null; redrawMap(); } else zoomMap(how === "in" ? .72 : 1 / .72, WM / 2, HM / 2); return; }
   var t = ev.target.closest ? ev.target.closest("[data-ch]") : null; if (!t) return; ST.ch = t.getAttribute("data-ch"); render(); tell(); });
 function route(){ var h = (location.hash || "").replace("#", ""); VIEW = "all"; VIEWS.forEach(function(v){ if (v[0] === h) VIEW = h; }); render(); }
 window.addEventListener("hashchange", route);
 try { var saved = localStorage.getItem("dcscope-v5"); if (saved) adopt(saved); } catch(e){}
+try { var qs = new URLSearchParams(location.search).get("site"); if (qs) ST.site = /^t/i.test(qs) ? "tx" : "mi"; } catch(e){}
 route();
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
 })();
