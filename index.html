@@ -1544,7 +1544,7 @@ function axoSync(){   // everything that follows the table: the blocks, the ring
   map.getSource("ring").setData(gj([poly(c45.map(function(p){ return ll(p[0], p[1]); }), {k:45}), poly(c55.map(function(p){ return ll(p[0], p[1]); }), {k:55})]));
   map.getSource("dc").setData(gj(dcBlocks()));
   AXO.marks.forEach(function(m){ m.remove(); }); AXO.marks = [amark([Math.max(cs[0][0], cs[1][0]), (cs[0][1] + cs[1][1]) / 2], "Data center", "dk", "bottom"),
-    amark(ll(c55[9][0], c55[9][1]), "55 dBA contour", "sn", "center"), amark(ll(c45[27][0], c45[27][1]), "45 dBA", "sn", "center")];
+    amark(ll(c55[45][0], c55[45][1]), "55 dBA contour", "sn", "center"), amark(ll(c45[27][0], c45[27][1]), "45 dBA", "sn", "center")];
   if (!AXO.you){ var d = document.createElement("div"); d.className = "you"; d.innerHTML = "<i></i><b>You</b>"; d.title = "Drag to stand somewhere else";
     AXO.you = new maplibregl.Marker({element:d, draggable:true, anchor:"bottom"}).setLngLat([0, 0]).addTo(map);
     AXO.you.on("drag", function(){ var p = AXO.you.getLngLat(), c0 = S().center; AXO.live = [(p.lng - c0[1]) * MXs(), (c0[0] - p.lat) * MY]; axoEar(); });
@@ -1560,7 +1560,7 @@ function loadBlocks(){
   fetchBlocks(S().bbox.split(",").map(Number), site);
 }
 function moreBlocks(){   // the view has moved: residents for the ground now in sight
-  var map = AXO.map; if (!ST.ag || AXO.busy || !AXO.per || map.getZoom() < 13.6 || AXO.agents.length > 2600) return;
+  var map = AXO.map; if (!ST.ag || AXO.busy || !AXO.per || map.getZoom() < 13.6 || AXO.agents.length > 5000) return;
   var b = map.getBounds(), bb = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()];
   if (AXO.boxes.some(function(c){ return bb[0] >= c[0] && bb[1] >= c[1] && bb[2] <= c[2] && bb[3] <= c[3]; })) return;
   var px = (bb[2] - bb[0]) * .15, py = (bb[3] - bb[1]) * .15; fetchBlocks([bb[0] - px, bb[1] - py, bb[2] + px, bb[3] + py], ST.site);
@@ -1574,7 +1574,7 @@ function fetchBlocks(bb, site){
     d.features.forEach(function(f){ var g = f.geometry, p = f.properties ? +f.properties.POP100 : 0, id = f.properties && f.properties.GEOID; if (!g || !(p > 0) || (id && AXO.seen[id])) return; var polys = g.type === "Polygon" ? [g.coordinates] : g.type === "MultiPolygon" ? g.coordinates : []; if (!polys.length) return;
       var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; polys.forEach(function(pl){ pl[0].forEach(function(q){ x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); }); });
       if (id) AXO.seen[id] = 1; blocks.push({p:p, polys:polys, box:[x0, y0, x1, y1]}); total += p; });
-    if (!AXO.per) AXO.per = Math.max(1, Math.ceil(total / 420));   // one dot stands for the same number of residents everywhere, set by the first area loaded
+    if (!AXO.per) AXO.per = Math.max(1, Math.ceil(total / 1500));   // one dot stands for the same number of residents everywhere, set by the first area loaded
     var per = AXO.per, R = rng(4242 + AXO.boxes.length), c0 = s.center, mx = MXs(); AXO.boxes.push(bb);
     blocks.forEach(function(b){ var n = Math.floor(b.p / per) + (R() < (b.p % per) / per ? 1 : 0);
       for (var k = 0; k < n; k++){ var pt = null; for (var t = 0; t < 40 && !pt; t++){ var q = [b.box[0] + R() * (b.box[2] - b.box[0]), b.box[1] + R() * (b.box[3] - b.box[1])];
@@ -1614,7 +1614,7 @@ function axoFrame(ts){
   var cv = AXO.ag, w = el.clientWidth, h = el.clientHeight; if (cv.width !== w || cv.height !== h){ cv.width = w; cv.height = h; }
   if (AXO.orbit && ts > AXO.hold && AXO.last && !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) map.setBearing(map.getBearing() + Math.min(.1, (ts - AXO.last) / 1000) * 1.6);   // the slow turn of the immersive view
   AXO.last = ts;
-  var c = cv.getContext("2d"), still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches, sec = still ? 0 : ts / 1000, sz = Math.max(3.3, Math.min(7.5, 3.4 * Math.pow(2, map.getZoom() - 15.7))); c.clearRect(0, 0, w, h);
+  var c = cv.getContext("2d"), still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches, sec = still ? 0 : ts / 1000, sz = Math.max(3, Math.min(7.5, 3.6 * Math.pow(2, map.getZoom() - 15.7))); c.clearRect(0, 0, w, h);
   if (ST.ag) for (var i = 0; i < AXO.agents.length; i++){
     var a = AXO.agents[i], u = a.ph + sec * a.sp, q = ll(a.e + Math.cos(u) * a.rad, a.s + Math.sin(u * 1.3) * a.rad * .6), p = map.project([q[1], q[0]]); if (p.x < -20 || p.y < -20 || p.x > w + 20 || p.y > h + 20) continue;
     var col = HEAR[a.cls < 0 ? 0 : a.cls][1], age = (ts - a.t0) / 1000;
@@ -1911,7 +1911,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261122-235145";
+var BUILD = "20261122-235645";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
