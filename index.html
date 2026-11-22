@@ -1505,14 +1505,13 @@ function axoStyle(light){
   function add(id, type, layer, paint, filter, more){ var o = {id:id, type:type, source:"omt", "source-layer":layer, paint:paint}; if (filter) o.filter = filter; for (var x in more || {}) o[x] = more[x]; st.layers.push(o); }
   var round = {layout:{"line-cap":"round", "line-join":"round"}}, line = ["==", ["geometry-type"], "LineString"];
   function wide(a, b, c){ return ["interpolate", ["exponential", 1.7], ["zoom"], 12, a, 15, b, 18, c]; }
-  add("green", "fill", "landcover", {"fill-color":"#cddfd5"}, ["in", ["get", "class"], ["literal", ["grass", "wood", "wetland"]]]);
+  add("green", "fill", "landcover", {"fill-color":["match", ["get", "class"], "wood", "#c3dbd0", "#d0e1d7"]}, ["in", ["get", "class"], ["literal", ["grass", "wood", "wetland"]]]);
   add("park", "fill", "park", {"fill-color":"#c8ddd0"});
   add("water", "fill", "water", {"fill-color":"#bcd3e2"});
   add("stream", "line", "waterway", {"line-color":"#a9c6da", "line-width":wide(1, 2, 6)}, null, round);
   add("road-small", "line", "transportation", {"line-color":"#edf2ef", "line-width":wide(.6, 3.5, 15)}, ["all", line, ["in", ["get", "class"], ["literal", ["minor", "service", "tertiary"]]]], round);
   add("road-big", "line", "transportation", {"line-color":"#f5f8f6", "line-width":wide(1.6, 7, 28)}, ["all", line, ["in", ["get", "class"], ["literal", ["motorway", "trunk", "primary", "secondary"]]]], round);
   add("rail", "line", "transportation", {"line-color":"#c9b9b4", "line-width":wide(.8, 2, 5)}, ["all", line, ["==", ["get", "class"], "rail"]]);
-  add("trees", "fill-extrusion", "landcover", {"fill-extrusion-color":"#7db3a8", "fill-extrusion-height":7, "fill-extrusion-opacity":.88}, ["==", ["get", "class"], "wood"], {minzoom:13});
   add("bld", "fill-extrusion", "building", {"fill-extrusion-color":"#b9c8d0", "fill-extrusion-height":["coalesce", ["get", "render_height"], 6], "fill-extrusion-base":["coalesce", ["get", "render_min_height"], 0], "fill-extrusion-opacity":1}, null, {minzoom:13});
   return st;
 }
@@ -1524,7 +1523,7 @@ function axoInit(stage, light){
   var ac = AXO.ag = document.createElement("canvas"); ac.className = "aagents"; ac.setAttribute("aria-hidden", "true"); map.getCanvasContainer().appendChild(ac);
   map.on("load", function(){
     map.addSource("site", {type:"geojson", data:gj([])}); map.addSource("ring", {type:"geojson", data:gj([])}); map.addSource("dc", {type:"geojson", data:gj([])});
-    var under = map.getLayer("trees") ? "trees" : undefined;   // flat things go under the raised ones
+    var under = map.getLayer("bld") ? "bld" : undefined;   // flat things go under the raised ones
     map.addLayer({id:"ring-fill", type:"fill", source:"ring", paint:{"fill-color":"#b0609a", "fill-opacity":["match", ["get", "k"], 55, .17, .07]}}, under);
     map.addLayer({id:"ring-line", type:"line", source:"ring", paint:{"line-color":"#7d3a6c", "line-width":1.8, "line-dasharray":[3, 3]}}, under);
     map.addLayer({id:"site-line", type:"line", source:"site", paint:{"line-color":"#1c2a28", "line-width":2.2, "line-dasharray":[5, 4]}}, under);
@@ -1912,7 +1911,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261122-234855";
+var BUILD = "20261122-235145";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
