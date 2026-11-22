@@ -206,11 +206,10 @@ a.lab{text-decoration:none}
 .stances input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
 .vadd textarea{font:inherit;font-size:.95rem;border:1px solid var(--line);border-radius:10px;padding:.55rem .6rem;resize:none;height:4.8rem;background:#fff;color:var(--ink)}
 .vrow{display:flex;align-items:stretch;gap:.5rem}
-.vpic{position:relative;flex:1 1 auto;display:flex;min-width:0}
-.vpic input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.vpic span{flex:1 1 auto;display:flex;align-items:center;justify-content:center;border:1px dashed #9aa7a3;border-radius:10px;padding:.5rem;font-size:.85rem;font-weight:700;color:var(--muted);background-size:cover;background-position:center;min-height:2.7rem}
-.vpic.has span{color:#fff;text-shadow:0 1px 4px #000;border-style:solid;min-height:5.6rem}
-.vpic input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.vprev{border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.vprev img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.vgen{flex:1 1 auto;font:inherit;font-weight:700;font-size:.9rem;border:1px solid var(--ink);border-radius:10px;padding:.55rem .6rem;background:#fff;color:var(--ink);cursor:pointer}
+.vgen:disabled{opacity:.4;cursor:default}
 .vgo{font:inherit;font-weight:700;font-size:.95rem;border:0;border-radius:10px;padding:.6rem 1.2rem;background:var(--ink);color:#fff;cursor:pointer}
 .vgo:disabled{opacity:.35;cursor:default}
 .vhint{margin:0;font-size:.76rem;font-weight:600;color:var(--muted)}
@@ -231,7 +230,9 @@ a.lab{text-decoration:none}
 .vpop .leaflet-popup-content{margin:8px}
 .vpop .vcard{border-top:0;border-right:0;border-bottom:0;border-radius:0}
 .vdraftw{background:none;border:0}
-.vdraft{display:block;width:26px;height:26px;margin:2px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#1c2a28;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);cursor:grab}
+.leaflet-tooltip.glab.pick{pointer-events:auto;cursor:pointer}
+.vdraft{display:flex;align-items:center;justify-content:center;width:26px;height:26px;margin:2px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#1c2a28;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);cursor:grab}
+.vdraft i{transform:rotate(45deg);font-style:normal;font-size:11px;font-weight:800;color:#fff;font-family:var(--font)}
 .stage.embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#dfe8e3;opacity:0;transition:opacity .4s}
 .stage.embed iframe.on{opacity:1}
 body.embed .top{display:none}
@@ -723,11 +724,11 @@ function contextShapes(){
 var ENV = [["#8176ae", "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28", "SFHA_TF='T' OR ZONE_SUBTY='0.2 PCT ANNUAL CHANCE FLOOD HAZARD'", "OBJECTID,FLD_ZONE,ZONE_SUBTY,SFHA_TF"],
   ["#51866b", "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/PADUS_Protection_Status_by_GAP_Status_Code/FeatureServer/0", "1=1", "OBJECTID,Unit_Nm,GAP_Sts,DesTp_Desc,MngNm_Desc,Category"],
   ["#4a94a1", "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/0", "WETLAND_TYPE <> 'Riverine'", "OBJECTID,ATTRIBUTE,WETLAND_TYPE,ACRES"]];
-function loadEnv(g, bbox){
+function loadEnv(g, bbox, alive){
   ENV.forEach(function(e){
     var q = new URLSearchParams({f:"geojson", where:e[2], geometry:bbox, geometryType:"esriGeometryEnvelope", inSR:"4326", outSR:"4326", spatialRel:"esriSpatialRelIntersects", outFields:e[3], returnGeometry:"true", geometryPrecision:"6", maxAllowableOffset:"0.00001", resultRecordCount:"1000"});
     fetch(e[1] + "/query?" + q).then(function(r){ if (!r.ok) throw new Error("source"); return r.json(); }).then(function(d){
-      if (!d || !Array.isArray(d.features) || GEO.layer !== g) return;
+      if (!d || !Array.isArray(d.features) || !alive()) return;
       L.geoJSON(d, {pane:"context", interactive:false, filter:function(f){ return f.geometry && /Polygon/.test(f.geometry.type); }, style:{color:e[0], weight:1.1, opacity:.74, fillColor:e[0], fillOpacity:.24}}).addTo(g);
     }).catch(function(){});
   });
@@ -785,7 +786,7 @@ function geoSite(){
   if (s.boundary){ L.polygon(s.boundary, {color:"#1c2a28", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(g); glab(s.boundary[1], s.boundaryLabel, "", "left").addTo(g); }
   if (s.acres){ var c = acresCircle(s).addTo(g), r = c.getRadius(); glab([s.center[0] + r / MY, s.center[1]], s.areaLabel, "", "top").addTo(g); }
   s.places.forEach(function(q){ L.circleMarker([q[1], q[2]], {radius:5, color:"#fbfdfc", weight:2, fillColor:"#3b7a66", fillOpacity:1, interactive:false}).addTo(g); glab([q[1], q[2]], q[0], "", "right").addTo(g); });
-  loadEnv(g, s.bbox); map.setView(s.center, s.zoom, {animate:false});
+  loadEnv(g, s.bbox, function(){ return GEO.layer === g; }); map.setView(s.center, s.zoom, {animate:false});
 }
 // The center wall of a site that has no original tool to show: the aerial photo of the place, with the building on it.
 function satDraw(stage){
@@ -1065,62 +1066,107 @@ var VOICES = { tx:[
   {s:"support", t:"The sale would bring the city about $30 million.", src:"Terms of the contract · KXXV", ll:[30.57277, -96.25808]},
   {s:"support", t:"The project is meant for AI computing, not Bitcoin mining.", src:"The company's CEO · KBTX", ll:[30.57124, -96.26016]}
 ] };
-var VO = {map:null, el:null, live:null, draft:null, site:null, img:null, armed:0};
+var VO = {map:null, el:null, live:null, layer:null, pts:[], dline:null, site:null, img:null, armed:0};   // pts: the marks the visitor has put on the map for the voice being written
+var MARKS = ["Tap the map to mark the place you mean, or several places to link them. No mark: your voice goes to the list only.", "One place marked. Tap another to link them, or tap a mark to remove it.", "Places linked. Tap a mark to remove it."];
 function visitors(){ try { var o = JSON.parse(localStorage.getItem("dcscope-voices") || "{}"); return o && Array.isArray(o[ST.site]) ? o[ST.site].filter(function(v){ return v && STANCE[v.s] && typeof v.t === "string"; }) : []; } catch(e){ return []; } }
 function saveVisitors(list){ var o = {}; try { o = JSON.parse(localStorage.getItem("dcscope-voices") || "{}") || {}; } catch(e){} o[ST.site] = list; localStorage.setItem("dcscope-voices", JSON.stringify(o)); }
 function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return {"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"}[c]; }); }
-function vcard(v){ var pic = typeof v.img === "string" && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(v.img) ? '<img src="' + v.img + '" alt="">' : '';
-  return '<div class="vcard" style="--c:' + STANCE[v.s][1] + '">' + pic + '<p>' + esc(v.t) + '</p><small>' + STANCE[v.s][0] + ' · ' + esc(v.src || "Visitor") + '</small></div>'; }
+function okPic(u){ return typeof u === "string" && (/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(u) || /^https:\/\/image\.pollinations\.ai\/prompt\/[A-Za-z0-9%\-_.~!*'()]+\?[A-Za-z0-9=&]+$/.test(u)); }
+function okLL(q){ return Array.isArray(q) && isFinite(q[0]) && isFinite(q[1]); }
+function ptsOf(v){ return (Array.isArray(v.pts) ? v.pts : [v.ll, v.ll2]).filter(okLL).map(function(q){ return [+q[0], +q[1]]; }); }
+function whereOf(v){ var q = ptsOf(v), n = v.names || []; if (!q.length) return "The whole project"; if (q.length === 1) return n[0] ? "At " + n[0] : "On the map";
+  return q.map(function(_, i){ return n[i] || (i ? "another place" : "One place"); }).join(" ↔ "); }
+function vcard(v){
+  return '<div class="vcard" style="--c:' + STANCE[v.s][1] + '">' + (okPic(v.img) ? '<img src="' + v.img + '" alt="">' : '') + '<p>' + esc(v.t) + '</p><small>' + STANCE[v.s][0] + ' · ' + esc(v.src || "Visitor · " + whereOf(v)) + '</small></div>'; }
 function voicesHTML(){
   return '<div class="card stage" data-view="voices"><form class="vadd" id="vadd" autocomplete="off"><h3>Add your voice</h3>' +
+    '<p class="vhint" id="vwhere">' + MARKS[Math.min(2, VO.pts.length)] + '</p>' +
     '<div class="stances" role="radiogroup" aria-label="Your position">' + Object.keys(STANCE).map(function(k){ return '<label style="--c:' + STANCE[k][1] + '"><input type="radio" name="vs" value="' + k + '"><span>' + STANCE[k][0] + '</span></label>'; }).join("") + '</div>' +
-    '<textarea name="vt" maxlength="160" placeholder="One sentence about this project" aria-label="Your sentence"></textarea>' +
-    '<div class="vrow"><label class="vpic" id="vpic"><input type="file" name="vi" accept="image/*" aria-label="Add a picture"><span>Add a picture</span></label><button class="vgo" type="submit" disabled>Add</button></div>' +
-    '<p class="vhint" id="vhint">Drag the pin to the place you mean. Saved on this device only.</p></form>' +
+    '<textarea name="vt" maxlength="160" placeholder="One sentence: your opinion" aria-label="Your sentence"></textarea>' +
+    '<div class="vprev" id="vprev" hidden><img alt="The picture drawn from your sentence"></div>' +
+    '<div class="vrow"><button class="vgen" type="button" data-vg disabled>Generate image</button><button class="vgo" type="submit" disabled>Add</button></div>' +
+    '<p class="vhint" id="vhint">The image is optional. To draw it, your sentence is sent to an image service; the rest stays on this device.</p></form>' +
     '<div class="vpanel"><div class="hd">Voices · ' + (ST.site === "tx" ? "College Station" : S().name) + '</div><div class="vbody" id="vbody"></div>' +
     '<div class="vfoot"><button type="button" data-vx="export">Export</button><button type="button" data-vx="clear">Clear visitors</button></div></div></div>';
 }
+function arc(a, b){   // a gentle curve between two places
+  var mx = (a[0] + b[0]) / 2 + (b[1] - a[1]) * .16, my = (a[1] + b[1]) / 2 - (b[0] - a[0]) * .16, pts = [];
+  for (var i = 0; i <= 24; i++){ var t = i / 24, u = 1 - t; pts.push([u * u * a[0] + 2 * u * t * mx + t * t * b[0], u * u * a[1] + 2 * u * t * my + t * t * b[1]]); } return pts; }
+function things(){ var s = S(); return s.places.concat([["the data center site", s.center[0], s.center[1]]]); }
+function near(latlng){ var p = VO.map.latLngToContainerPoint(latlng), best = null, bd = 26; things().forEach(function(q){ var d = p.distanceTo(VO.map.latLngToContainerPoint([q[1], q[2]])); if (d < bd){ bd = d; best = q; } }); return best; }
+function voTags(){   // number the marks, link them, say what to do next
+  VO.pts.forEach(function(o, i){ var el = o.m.getElement(); if (el) el.querySelector("i").textContent = VO.pts.length > 1 ? i + 1 : ""; });
+  if (VO.dline){ VO.map.removeLayer(VO.dline); VO.dline = null; }
+  if (VO.pts.length > 1){ var line = []; VO.pts.forEach(function(o, i){ if (!i) return; var a = VO.pts[i - 1].m.getLatLng(), b = o.m.getLatLng(); line = line.concat(arc([a.lat, a.lng], [b.lat, b.lng])); }); VO.dline = L.polyline(line, {color:"#1c2a28", weight:2.5, dashArray:"3 7", interactive:false}).addTo(VO.map); }
+  var w = $("vwhere"); if (w) w.textContent = MARKS[Math.min(2, VO.pts.length)];
+}
+function voMark(latlng, name){   // a tap puts a mark; a mark on a named place takes its name and its position
+  if (VO.pts.length >= 5) return; var o = {name:name || null};
+  if (!name){ var q = near(latlng); if (q){ latlng = [q[1], q[2]]; o.name = q[0].split(" · ")[0]; } }
+  o.m = L.marker(latlng, {draggable:true, zIndexOffset:500, title:"Drag to move, tap to remove", icon:L.divIcon({className:"vdraftw", html:'<span class="vdraft"><i></i></span>', iconSize:[30, 30], iconAnchor:[15, 30]})}).addTo(VO.map);
+  o.m.on("drag", voTags); o.m.on("dragend", function(){ var q = near(o.m.getLatLng()); if (q) o.m.setLatLng([q[1], q[2]]); o.name = q ? q[0].split(" · ")[0] : null; voTags(); });
+  o.m.on("click", function(){ VO.map.removeLayer(o.m); VO.pts = VO.pts.filter(function(x){ return x !== o; }); voTags(); });
+  VO.pts.push(o); voTags();
+}
+function voUnmark(){ VO.pts.forEach(function(o){ VO.map.removeLayer(o.m); }); VO.pts = []; voTags(); }
 function voDraw(stage){
   var s = S();
   if (!VO.map){ var el = VO.el = document.createElement("div"); el.className = "geomap"; stage.insertBefore(el, stage.firstChild);
     var map = VO.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(s.center, s.zoom); el.style.position = ""; map.attributionControl.setPrefix(false);
     VO.raster = greyTiles().addTo(map); VO.tint = tintOn(map);
     lightStyle().then(function(st){ lightLayer(st).addTo(map); map.removeLayer(VO.raster); map.removeLayer(VO.tint); }).catch(function(){});
+    var cp = map.createPane("context"); cp.style.zIndex = 350; cp.style.pointerEvents = "none";
     L.control.scale({metric:false, position:"bottomleft"}).addTo(map); VO.live = L.layerGroup().addTo(map);
-    map.on("click", function(e){ if (VO.draft) VO.draft.setLatLng(e.latlng); });
+    map.on("click", function(e){ voMark(e.latlng); });
   } else if (VO.el.parentNode !== stage) stage.insertBefore(VO.el, stage.firstChild);
   VO.map.invalidateSize(false);
-  if (VO.site !== ST.site){ VO.site = ST.site; VO.map.setView(s.center, s.zoom, {animate:false}); if (VO.draft){ VO.map.removeLayer(VO.draft); VO.draft = null; } }
-  if (!VO.draft) VO.draft = L.marker(s.center, {draggable:true, zIndexOffset:500, title:"Drag to the place you mean", icon:L.divIcon({className:"vdraftw", html:'<span class="vdraft"></span>', iconSize:[30, 30], iconAnchor:[15, 30]})}).addTo(VO.map);
+  if (VO.site !== ST.site){ VO.site = ST.site; VO.map.setView(s.center, s.zoom, {animate:false});
+    if (VO.layer) VO.map.removeLayer(VO.layer); var g = VO.layer = L.layerGroup().addTo(VO.map);   // the same ground as the table map: flood, wetlands, parks, the site and its landmarks
+    if (s.acres) acresCircle(s).addTo(g);
+    if (s.boundary) L.polygon(s.boundary, {color:"#1c2a28", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(g);
+    s.places.forEach(function(q){ L.circleMarker([q[1], q[2]], {radius:4, color:"#fbfdfc", weight:2, fillColor:"#5d6d69", fillOpacity:1, interactive:false}).addTo(g);
+      var el = glab([q[1], q[2]], q[0], "pick", "right").addTo(g).getElement();   // a named place can be tapped: the pin goes there and takes its name
+      if (el){ L.DomEvent.disableClickPropagation(el); el.addEventListener("click", function(){ voMark([q[1], q[2]], q[0].split(" · ")[0]); }); } });
+    loadEnv(g, s.bbox, function(){ return VO.layer === g; }); voUnmark(); }
   voRefresh();
 }
 function voRefresh(){
-  if (!VO.map) return; var g = VO.live, s = S(), mine = visitors().slice().reverse(), all = mine.concat(VOICES[ST.site] || []), n = {support:0, cond:0, concern:0}; g.clearLayers();
-  if (s.acres) acresCircle(s).addTo(g);
-  if (s.boundary) L.polygon(s.boundary, {color:"#1c2a28", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(g);
-  all.forEach(function(v){ n[v.s]++; if (!Array.isArray(v.ll) || !isFinite(v.ll[0]) || !isFinite(v.ll[1])) return;
-    L.circleMarker([+v.ll[0], +v.ll[1]], {radius:v.src ? 8 : 10, color:"#fbfdfc", weight:2.5, fillColor:STANCE[v.s][1], fillOpacity:.95}).bindPopup(vcard(v), {maxWidth:260, className:"vpop"}).addTo(g); });
+  if (!VO.map) return; var g = VO.live, mine = visitors().slice().reverse(), all = mine.concat(VOICES[ST.site] || []), n = {support:0, cond:0, concern:0}; g.clearLayers();
+  all.forEach(function(v){ n[v.s]++; var q = ptsOf(v); if (!q.length) return; var c = STANCE[v.s][1], pop = [vcard(v), {maxWidth:260, className:"vpop"}], line = [];
+    if (q.length > 1){ q.forEach(function(b, i){ if (i) line = line.concat(arc(q[i - 1], b)); }); L.polyline(line, {color:c, weight:4, opacity:.85}).bindPopup(pop[0], pop[1]).addTo(g); }
+    q.forEach(function(a){ L.circleMarker(a, {radius:q.length > 1 ? 7 : v.src ? 8 : 10, color:"#fbfdfc", weight:2.5, fillColor:c, fillOpacity:.95}).bindPopup(pop[0], pop[1]).addTo(g); }); });
   var body = $("vbody"); if (body) body.innerHTML = '<div class="vcount">' + Object.keys(STANCE).map(function(k){ return '<div style="--c:' + STANCE[k][1] + '"><b>' + n[k] + '</b><span>' + STANCE[k][0] + '</span></div>'; }).join("") + '</div><div class="vlist">' + all.map(vcard).join("") + '</div>';
 }
-function shrink(file, done){   // a picture small enough to keep many of them
-  var rd = new FileReader(); rd.onload = function(){ var im = new Image(); im.onload = function(){ var k = Math.min(1, 560 / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
-    c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); done(c.toDataURL("image/jpeg", .72)); }; im.onerror = function(){ done(null); }; im.src = rd.result; }; rd.onerror = function(){ done(null); }; rd.readAsDataURL(file);
+// The picture is drawn from the visitor's sentence by an open image service (Pollinations). Only the sentence is sent.
+function genURL(text, seed){ return "https://image.pollinations.ai/prompt/" + encodeURIComponent("Impressionist painting in soft sage green and teal tones, a neighborhood of a small Texas city beside the site of a proposed data center. " + text.replace(/[\r\n]+/g, " ") + " No text, no letters.") + "?width=768&height=432&nologo=true&seed=" + seed; }
+function generate(f, btn){
+  var text = f.vt.value.trim().slice(0, 160); if (!text) return; var url = genURL(text, Math.floor(Math.random() * 1e6)), hint = $("vhint"), done = false;
+  btn.disabled = true; btn.textContent = "Drawing…"; hint.textContent = "Drawing your picture. It can take half a minute.";
+  function end(pic, msg){ if (done) return; done = true; clearTimeout(tm); btn.disabled = !f.vt.value.trim(); btn.textContent = pic ? "Draw another" : "Generate image"; hint.textContent = msg;
+    if (pic){ VO.img = pic; var pv = $("vprev"); if (pv){ pv.hidden = false; pv.querySelector("img").src = pic; } } }
+  var tm = setTimeout(function(){ end(null, "The image service did not answer. Try again in a moment."); }, 70000);
+  function load(cors){ var im = new Image(); if (cors) im.crossOrigin = "anonymous";
+    im.onload = function(){ var pic = url; if (cors){ try { var c = document.createElement("canvas"); c.width = 640; c.height = 360; c.getContext("2d").drawImage(im, 0, 0, 640, 360); pic = c.toDataURL("image/jpeg", .78); } catch(e){ pic = url; } }
+      end(pic, "Drawn from your sentence. The rest stays on this device."); };
+    im.onerror = function(){ if (cors) load(false); else end(null, "The image service did not answer. Try again in a moment."); };
+    im.src = url; }
+  load(true);
 }
-function vready(f){ f.querySelector(".vgo").disabled = !(f.vs.value && f.vt.value.trim()); }
+function vready(f){ var t = f.vt.value.trim(); f.querySelector(".vgo").disabled = !(f.vs.value && t); var g = f.querySelector(".vgen"); if (g.textContent !== "Drawing…") g.disabled = !t; }
 document.addEventListener("input", function(ev){ var f = ev.target.closest ? ev.target.closest("#vadd") : null; if (f) vready(f); });
 document.addEventListener("change", function(ev){
   var f = ev.target.closest ? ev.target.closest("#vadd") : null; if (!f) return; vready(f);
-  if (ev.target.name === "vi" && ev.target.files && ev.target.files[0]) shrink(ev.target.files[0], function(url){ VO.img = url; var p = $("vpic"); if (p){ p.classList.toggle("has", !!url); p.querySelector("span").style.backgroundImage = url ? 'url("' + url + '")' : ""; p.querySelector("span").textContent = url ? "Change the picture" : "Add a picture"; } });
 });
 document.addEventListener("submit", function(ev){
   var f = ev.target; if (!f || f.id !== "vadd") return; ev.preventDefault(); var t = f.vt.value.trim().slice(0, 160); if (!f.vs.value || !t) return;
-  var at = VO.draft ? VO.draft.getLatLng() : null, list = visitors();
-  list.push({id:Date.now() + "-" + Math.floor(Math.random() * 1e6), s:f.vs.value, t:t, img:VO.img || null, ll:at ? [+at.lat.toFixed(6), +at.lng.toFixed(6)] : null, at:new Date().toISOString()});
+  var list = visitors();
+  list.push({id:Date.now() + "-" + Math.floor(Math.random() * 1e6), s:f.vs.value, t:t, img:VO.img || null, pts:VO.pts.map(function(o){ var q = o.m.getLatLng(); return [+q.lat.toFixed(6), +q.lng.toFixed(6)]; }), names:VO.pts.map(function(o){ return o.name; }), at:new Date().toISOString()});
   try { saveVisitors(list); } catch(e){ $("vhint").textContent = "This device is full. Export, then clear, and try again."; return; }
-  f.reset(); VO.img = null; var p = $("vpic"); p.classList.remove("has"); p.querySelector("span").style.backgroundImage = ""; p.querySelector("span").textContent = "Add a picture"; vready(f);
-  $("vhint").textContent = "Added. Drag the pin for the next one. Saved on this device only."; voRefresh();
+  f.vt.value = ""; [].forEach.call(f.querySelectorAll("input[name=vs]"), function(r){ r.checked = false; }); VO.img = null; var pv = $("vprev"); pv.hidden = true; pv.querySelector("img").removeAttribute("src"); f.querySelector(".vgen").textContent = "Generate image"; vready(f);
+  $("vhint").textContent = "Added. Thank you."; voUnmark(); voRefresh();
 });
 document.addEventListener("click", function(ev){
+  var gb = ev.target.closest ? ev.target.closest("[data-vg]") : null; if (gb){ generate(gb.closest("form"), gb); return; }
   var b = ev.target.closest ? ev.target.closest("[data-vx]") : null; if (!b) return; var list = visitors();
   if (b.getAttribute("data-vx") === "export"){ var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify({site:ST.site, exported:new Date().toISOString(), voices:list}, null, 1)], {type:"application/json"})); a.download = "voices-" + ST.site + ".json"; document.body.appendChild(a); a.click(); a.remove(); return; }
   if (!list.length){ b.textContent = "No visitors yet"; return; }
@@ -1271,7 +1317,7 @@ try { var saved = localStorage.getItem("dcscope-v5"); if (saved) adopt(saved); }
 try { var qs = new URLSearchParams(location.search).get("site"); if (qs) ST.site = /^t/i.test(qs) ? "tx" : "mi"; } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261122-224929";
+var BUILD = "20261122-225822";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
