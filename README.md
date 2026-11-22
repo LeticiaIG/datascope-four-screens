@@ -20,7 +20,7 @@ Screens opened in the same browser stay in step.
 The switch in the header (or `?site=texas` / `?site=michigan` in the address) changes the case study on every screen.
 
 - **Michigan** — Allen Park, the site of the original DataScope.
-- **Texas** — College Station: about 200 acres of city land in the Midtown Business Park, at Midtown Drive and Corporate Parkway, which the city council declined to sell for a 600 MW data center on 11 September 2025 (reported by KBTX and KXXV). The tract's outline is not drawn; the map shows the crossing the press reports and a circle of the same area, to give its size. Landmark positions come from Google Maps. With no original tool for this site, the left wall shows the public record and the center wall the aerial photo. The figures on the right wall are still those of the Michigan reference building (26 MW), not of the 600 MW proposal.
+- **Texas** — College Station: about 200 acres of city land in the Midtown Business Park, at Midtown Drive and Corporate Parkway, which the city council declined to sell for a 600 MW data center on 11 September 2025 (reported by KBTX and KXXV). The tract's outline is not drawn; the map shows the crossing the press reports and a circle of the same area, set on the undeveloped land beside it, to give its size. Landmark positions come from Google Maps. With no original tool for this site, the left wall shows the public record and the center wall the aerial photo. The figures on the right wall are still those of the Michigan reference building (26 MW), not of the 600 MW proposal.
 
 ## Run
 
