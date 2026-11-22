@@ -194,16 +194,44 @@ a.lab{text-decoration:none}
 .sites{display:flex;gap:2px;background:var(--sunk);border-radius:999px;padding:2px;flex:0 0 auto}
 .sites button{font:inherit;font-size:.82rem;font-weight:700;color:var(--muted);background:none;border:0;border-radius:999px;padding:.3rem .7rem;cursor:pointer}
 .sites button[aria-pressed="true"]{background:var(--ink);color:#fff}
-.record{flex:1 1 auto;min-height:0;border:0;border-radius:0;padding:5rem 2.4rem 2rem;display:flex;flex-direction:column;gap:1.6rem}
-.record .hd{font-size:1.5rem}
-.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.4rem 2.4rem}
-.fact{border-top:2px solid var(--ink);padding-top:.7rem;display:flex;flex-direction:column;gap:.2rem}
-.fact b{font-size:3.4rem;font-weight:700;line-height:1;letter-spacing:-.01em}
-.fact span{font-size:1.1rem;font-weight:600;color:var(--muted)}
-.asks{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .6rem}
-.asks span{font-size:1rem;font-weight:700;margin-right:.4rem}
-.asks em{font-style:normal;font-size:1rem;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:.3rem .9rem}
-.record .none{margin:auto 0 0;font-size:.95rem;font-weight:600;color:var(--muted)}
+.vadd,.vpanel{position:absolute;z-index:2;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 6px 22px rgba(20,40,34,.16)}
+.vadd{left:.9rem;top:4.6rem;width:21rem;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;margin:0}
+.vadd h3{margin:0;font-size:1.15rem}
+.stances{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.stances label{position:relative;display:flex}
+.stances input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.stances span{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.25rem;border:1px solid var(--line);border-radius:10px;padding:.45rem .2rem;font-size:.78rem;font-weight:700;text-align:center;line-height:1.1;background:#fff}
+.stances span::before{content:"";width:.7rem;height:.7rem;border-radius:50%;background:var(--c)}
+.stances input:checked + span{border-color:var(--c);box-shadow:0 0 0 1.5px var(--c)}
+.stances input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.vadd textarea{font:inherit;font-size:.95rem;border:1px solid var(--line);border-radius:10px;padding:.55rem .6rem;resize:none;height:4.8rem;background:#fff;color:var(--ink)}
+.vrow{display:flex;align-items:stretch;gap:.5rem}
+.vpic{position:relative;flex:1 1 auto;display:flex;min-width:0}
+.vpic input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.vpic span{flex:1 1 auto;display:flex;align-items:center;justify-content:center;border:1px dashed #9aa7a3;border-radius:10px;padding:.5rem;font-size:.85rem;font-weight:700;color:var(--muted);background-size:cover;background-position:center;min-height:2.7rem}
+.vpic.has span{color:#fff;text-shadow:0 1px 4px #000;border-style:solid;min-height:5.6rem}
+.vpic input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.vgo{font:inherit;font-weight:700;font-size:.95rem;border:0;border-radius:10px;padding:.6rem 1.2rem;background:var(--ink);color:#fff;cursor:pointer}
+.vgo:disabled{opacity:.35;cursor:default}
+.vhint{margin:0;font-size:.76rem;font-weight:600;color:var(--muted)}
+.vpanel{right:.9rem;top:4.6rem;bottom:.9rem;width:23rem;display:flex;flex-direction:column;overflow:hidden}
+.vpanel .hd{padding:.8rem .9rem .5rem;font-size:1.1rem}
+.vbody{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.vcount{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;padding:0 .9rem .7rem}
+.vcount div{border-top:3px solid var(--c);padding-top:.3rem}
+.vcount b{display:block;font-size:1.6rem;line-height:1}
+.vcount span{font-size:.72rem;font-weight:700;color:var(--muted)}
+.vlist{flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:.5rem;padding:0 .9rem .7rem}
+.vcard{flex:0 0 auto;border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;background:#fff;overflow:hidden;font-family:var(--font);color:var(--ink)}
+.vcard img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.vcard p{margin:0;padding:.5rem .65rem .2rem;font-size:.92rem;font-weight:600;line-height:1.3}
+.vcard small{display:block;padding:0 .65rem .5rem;font-size:.72rem;font-weight:600;color:var(--muted)}
+.vfoot{display:flex;gap:.5rem;padding:.5rem .9rem;border-top:1px solid var(--line)}
+.vfoot button{font:inherit;font-size:.78rem;font-weight:700;border:1px solid var(--line);border-radius:999px;background:none;padding:.25rem .7rem;cursor:pointer;color:var(--muted)}
+.vpop .leaflet-popup-content{margin:8px}
+.vpop .vcard{border-top:0;border-right:0;border-bottom:0;border-radius:0}
+.vdraftw{background:none;border:0}
+.vdraft{display:block;width:26px;height:26px;margin:2px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#1c2a28;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);cursor:grab}
 .stage.embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#dfe8e3;opacity:0;transition:opacity .4s}
 .stage.embed iframe.on{opacity:1}
 body.embed .top{display:none}
@@ -706,15 +734,19 @@ function loadEnv(g, bbox){
 }
 function loadScript(src){ return new Promise(function(res, rej){ var el = document.createElement("script"); el.src = src; el.onload = res; el.onerror = rej; document.head.appendChild(el); }); }
 // The light map of the original: OpenFreeMap's positron style with its ground, green and water recolored. Until it is ready, and where it cannot load, the grey street map stays.
-function lightBase(){
-  var css = document.createElement("link"); css.rel = "stylesheet"; css.href = "vendor/maplibre-gl.css"; document.head.appendChild(css);
-  Promise.all([loadScript("vendor/maplibre-gl.js").then(function(){ return loadScript("vendor/leaflet-maplibre-gl.js"); }), fetch("https://tiles.openfreemap.org/styles/positron").then(function(r){ if (!r.ok) throw new Error("style"); return r.json(); })]).then(function(v){
-    var style = v[1];
-    style.layers.forEach(function(l){ if (!l.paint) return; if (l.type === "background") l.paint["background-color"] = "#edf1ee"; if (l.type === "fill" && /park|grass|wood/i.test(l.id)) l.paint["fill-color"] = "#dce8de"; if (l.type === "fill" && /^water$|waterway/i.test(l.id)) l.paint["fill-color"] = "#c5dce3"; });
-    GEO.vector = L.maplibreGL({style:style, interactive:false, pane:"tilePane", padding:.15, updateInterval:16, attributionControl:{customAttribution:'© <a href="https://openmaptiles.org/">OpenMapTiles</a> · <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://openfreemap.org/">OpenFreeMap</a>'}});
-    if (GEO.base === "map") useBase("map");
-  }).catch(function(e){ if (window.console) console.warn("Light map unavailable", e); });
+var STYLEP = null;
+function lightStyle(){
+  if (!STYLEP){ var css = document.createElement("link"); css.rel = "stylesheet"; css.href = "vendor/maplibre-gl.css"; document.head.appendChild(css);
+    STYLEP = Promise.all([loadScript("vendor/maplibre-gl.js").then(function(){ return loadScript("vendor/leaflet-maplibre-gl.js"); }), fetch("https://tiles.openfreemap.org/styles/positron").then(function(r){ if (!r.ok) throw new Error("style"); return r.json(); })]).then(function(v){
+      var style = v[1];
+      style.layers.forEach(function(l){ if (!l.paint) return; if (l.type === "background") l.paint["background-color"] = "#edf1ee"; if (l.type === "fill" && /park|grass|wood/i.test(l.id)) l.paint["fill-color"] = "#dce8de"; if (l.type === "fill" && /^water$|waterway/i.test(l.id)) l.paint["fill-color"] = "#c5dce3"; });
+      return style; }); }
+  return STYLEP;
 }
+function lightLayer(style){ return L.maplibreGL({style:JSON.parse(JSON.stringify(style)), interactive:false, pane:"tilePane", padding:.15, updateInterval:16, attributionControl:{customAttribution:'© <a href="https://openmaptiles.org/">OpenMapTiles</a> · <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://openfreemap.org/">OpenFreeMap</a>'}}); }
+function greyTiles(){ return L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {className:"greytiles", maxNativeZoom:19, maxZoom:20, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}); }
+function tintOn(map){ var tp = map.createPane("tint"); tp.style.zIndex = 250; tp.style.mixBlendMode = "multiply"; tp.style.pointerEvents = "none"; return L.rectangle([[-80, -179], [80, 179]], {pane:"tint", stroke:false, fillColor:"#d9e2de", fillOpacity:1, interactive:false}).addTo(map); }
+function lightBase(){ lightStyle().then(function(st){ GEO.vector = lightLayer(st); if (GEO.base === "map") useBase("map"); }).catch(function(e){ if (window.console) console.warn("Light map unavailable", e); }); }
 function useBase(name){
   var map = GEO.map; [GEO.tiles.map, GEO.tiles.satellite, GEO.tint, GEO.vector].forEach(function(l){ if (l && map.hasLayer(l)) map.removeLayer(l); });
   GEO.base = name;
@@ -1019,14 +1051,84 @@ function editorHTML(bare){
 }
 var LIVE = false;   // true once the original DataScope answers; until then, and where it cannot be framed, the pictures are shown
 function embedHTML(img, alt, title){ return '<div class="card stage embed"><img src="' + img + '" alt="' + alt + '">' + (LIVE ? '<iframe src="' + SENTIMENT + '" title="' + title + '" allow="fullscreen"></iframe>' : '') + '</div>'; }
-// What is on the public record about the College Station proposal (KBTX, KXXV and the city council agenda of 11 September 2025).
-function recordHTML(){
-  return '<div class="card record"><div class="hd">College Station, Texas · Midtown Business Park</div><div class="facts">' +
-    [["About 200", "acres of city land, at Midtown Drive and Corporate Parkway"], ["600 MW", "data center proposed by Priority Power Management"], ["$30M", "offered for the land, $150,000 an acre"], ["Rejected", "unanimously by the city council, 11 September 2025"]].map(function(f){ return '<div class="fact"><b>' + f[0] + '</b><span>' + f[1] + '</span></div>'; }).join("") +
-    '</div><div class="asks"><span>What residents raised</span>' + ["Noise", "Power and water use", "Vulnerable neighbors nearby", "Too little time and say"].map(function(t){ return '<em>' + t + '</em>'; }).join("") + '</div>' +
-    '<p class="none">No sentiment map for this site yet.</p></div>';
+// ---------- voices: a sentiment map for a site that has none ----------
+// The first voices are positions reported in the press about the College Station proposal, each with its source, set around the site (not at anyone's home).
+// The window stays open for the people in the room: a position, one sentence, a picture if they wish, and a pin. What they leave is kept on this device only.
+var STANCE = {support:["Support", "#3b7a66"], cond:["With conditions", "#b07a12"], concern:["Concerned", "#b5534a"]};
+var VOICES = { tx:[
+  {s:"concern", t:"Care homes beside the site look after “the most vulnerable in our community.”", src:"Resident at the council meeting · BCS Chronicle", ll:[30.5717751, -96.2689578]},
+  {s:"concern", t:"The petition against the sale cites noise pollution and water use.", src:"Residents' petition · Chron", ll:[30.57223, -96.26517]},
+  {s:"concern", t:"The sale is being rushed, and the neighbors were not asked.", src:"Residents near Midtown · KBTX", ll:[30.5707219, -96.2647921]},
+  {s:"concern", t:"450 households bought into the Midtown plan; a data center could change it completely.", src:"Developer of Midtown · KBTX", ll:[30.56828, -96.26215]},
+  {s:"concern", t:"The business park as first platted would likely bring hundreds more jobs.", src:"A council member · TexAgs forum", ll:[30.57565, -96.25954]},
+  {s:"cond", t:"City staff recommended the sale, while listing power, water and noise as challenges.", src:"City of College Station · KBTX", ll:[30.57367, -96.26142]},
+  {s:"support", t:"The sale would bring the city about $30 million.", src:"Terms of the contract · KXXV", ll:[30.57277, -96.25808]},
+  {s:"support", t:"The project is meant for AI computing, not Bitcoin mining.", src:"The company's CEO · KBTX", ll:[30.57124, -96.26016]}
+] };
+var VO = {map:null, el:null, live:null, draft:null, site:null, img:null, armed:0};
+function visitors(){ try { var o = JSON.parse(localStorage.getItem("dcscope-voices") || "{}"); return o && Array.isArray(o[ST.site]) ? o[ST.site].filter(function(v){ return v && STANCE[v.s] && typeof v.t === "string"; }) : []; } catch(e){ return []; } }
+function saveVisitors(list){ var o = {}; try { o = JSON.parse(localStorage.getItem("dcscope-voices") || "{}") || {}; } catch(e){} o[ST.site] = list; localStorage.setItem("dcscope-voices", JSON.stringify(o)); }
+function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return {"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"}[c]; }); }
+function vcard(v){ var pic = typeof v.img === "string" && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(v.img) ? '<img src="' + v.img + '" alt="">' : '';
+  return '<div class="vcard" style="--c:' + STANCE[v.s][1] + '">' + pic + '<p>' + esc(v.t) + '</p><small>' + STANCE[v.s][0] + ' · ' + esc(v.src || "Visitor") + '</small></div>'; }
+function voicesHTML(){
+  return '<div class="card stage" data-view="voices"><form class="vadd" id="vadd" autocomplete="off"><h3>Add your voice</h3>' +
+    '<div class="stances" role="radiogroup" aria-label="Your position">' + Object.keys(STANCE).map(function(k){ return '<label style="--c:' + STANCE[k][1] + '"><input type="radio" name="vs" value="' + k + '"><span>' + STANCE[k][0] + '</span></label>'; }).join("") + '</div>' +
+    '<textarea name="vt" maxlength="160" placeholder="One sentence about this project" aria-label="Your sentence"></textarea>' +
+    '<div class="vrow"><label class="vpic" id="vpic"><input type="file" name="vi" accept="image/*" aria-label="Add a picture"><span>Add a picture</span></label><button class="vgo" type="submit" disabled>Add</button></div>' +
+    '<p class="vhint" id="vhint">Drag the pin to the place you mean. Saved on this device only.</p></form>' +
+    '<div class="vpanel"><div class="hd">Voices · ' + (ST.site === "tx" ? "College Station" : S().name) + '</div><div class="vbody" id="vbody"></div>' +
+    '<div class="vfoot"><button type="button" data-vx="export">Export</button><button type="button" data-vx="clear">Clear visitors</button></div></div></div>';
 }
-function sentimentHTML(bare){ if (ST.site !== "mi") return recordHTML(); return embedHTML("live/sentiment.jpg", "The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list", "The original DataScope. Choose Sentiment map in its bar"); }
+function voDraw(stage){
+  var s = S();
+  if (!VO.map){ var el = VO.el = document.createElement("div"); el.className = "geomap"; stage.insertBefore(el, stage.firstChild);
+    var map = VO.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(s.center, s.zoom); el.style.position = ""; map.attributionControl.setPrefix(false);
+    VO.raster = greyTiles().addTo(map); VO.tint = tintOn(map);
+    lightStyle().then(function(st){ lightLayer(st).addTo(map); map.removeLayer(VO.raster); map.removeLayer(VO.tint); }).catch(function(){});
+    L.control.scale({metric:false, position:"bottomleft"}).addTo(map); VO.live = L.layerGroup().addTo(map);
+    map.on("click", function(e){ if (VO.draft) VO.draft.setLatLng(e.latlng); });
+  } else if (VO.el.parentNode !== stage) stage.insertBefore(VO.el, stage.firstChild);
+  VO.map.invalidateSize(false);
+  if (VO.site !== ST.site){ VO.site = ST.site; VO.map.setView(s.center, s.zoom, {animate:false}); if (VO.draft){ VO.map.removeLayer(VO.draft); VO.draft = null; } }
+  if (!VO.draft) VO.draft = L.marker(s.center, {draggable:true, zIndexOffset:500, title:"Drag to the place you mean", icon:L.divIcon({className:"vdraftw", html:'<span class="vdraft"></span>', iconSize:[30, 30], iconAnchor:[15, 30]})}).addTo(VO.map);
+  voRefresh();
+}
+function voRefresh(){
+  if (!VO.map) return; var g = VO.live, s = S(), mine = visitors().slice().reverse(), all = mine.concat(VOICES[ST.site] || []), n = {support:0, cond:0, concern:0}; g.clearLayers();
+  if (s.acres) acresCircle(s).addTo(g);
+  if (s.boundary) L.polygon(s.boundary, {color:"#1c2a28", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(g);
+  all.forEach(function(v){ n[v.s]++; if (!Array.isArray(v.ll) || !isFinite(v.ll[0]) || !isFinite(v.ll[1])) return;
+    L.circleMarker([+v.ll[0], +v.ll[1]], {radius:v.src ? 8 : 10, color:"#fbfdfc", weight:2.5, fillColor:STANCE[v.s][1], fillOpacity:.95}).bindPopup(vcard(v), {maxWidth:260, className:"vpop"}).addTo(g); });
+  var body = $("vbody"); if (body) body.innerHTML = '<div class="vcount">' + Object.keys(STANCE).map(function(k){ return '<div style="--c:' + STANCE[k][1] + '"><b>' + n[k] + '</b><span>' + STANCE[k][0] + '</span></div>'; }).join("") + '</div><div class="vlist">' + all.map(vcard).join("") + '</div>';
+}
+function shrink(file, done){   // a picture small enough to keep many of them
+  var rd = new FileReader(); rd.onload = function(){ var im = new Image(); im.onload = function(){ var k = Math.min(1, 560 / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+    c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); done(c.toDataURL("image/jpeg", .72)); }; im.onerror = function(){ done(null); }; im.src = rd.result; }; rd.onerror = function(){ done(null); }; rd.readAsDataURL(file);
+}
+function vready(f){ f.querySelector(".vgo").disabled = !(f.vs.value && f.vt.value.trim()); }
+document.addEventListener("input", function(ev){ var f = ev.target.closest ? ev.target.closest("#vadd") : null; if (f) vready(f); });
+document.addEventListener("change", function(ev){
+  var f = ev.target.closest ? ev.target.closest("#vadd") : null; if (!f) return; vready(f);
+  if (ev.target.name === "vi" && ev.target.files && ev.target.files[0]) shrink(ev.target.files[0], function(url){ VO.img = url; var p = $("vpic"); if (p){ p.classList.toggle("has", !!url); p.querySelector("span").style.backgroundImage = url ? 'url("' + url + '")' : ""; p.querySelector("span").textContent = url ? "Change the picture" : "Add a picture"; } });
+});
+document.addEventListener("submit", function(ev){
+  var f = ev.target; if (!f || f.id !== "vadd") return; ev.preventDefault(); var t = f.vt.value.trim().slice(0, 160); if (!f.vs.value || !t) return;
+  var at = VO.draft ? VO.draft.getLatLng() : null, list = visitors();
+  list.push({id:Date.now() + "-" + Math.floor(Math.random() * 1e6), s:f.vs.value, t:t, img:VO.img || null, ll:at ? [+at.lat.toFixed(6), +at.lng.toFixed(6)] : null, at:new Date().toISOString()});
+  try { saveVisitors(list); } catch(e){ $("vhint").textContent = "This device is full. Export, then clear, and try again."; return; }
+  f.reset(); VO.img = null; var p = $("vpic"); p.classList.remove("has"); p.querySelector("span").style.backgroundImage = ""; p.querySelector("span").textContent = "Add a picture"; vready(f);
+  $("vhint").textContent = "Added. Drag the pin for the next one. Saved on this device only."; voRefresh();
+});
+document.addEventListener("click", function(ev){
+  var b = ev.target.closest ? ev.target.closest("[data-vx]") : null; if (!b) return; var list = visitors();
+  if (b.getAttribute("data-vx") === "export"){ var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify({site:ST.site, exported:new Date().toISOString(), voices:list}, null, 1)], {type:"application/json"})); a.download = "voices-" + ST.site + ".json"; document.body.appendChild(a); a.click(); a.remove(); return; }
+  if (!list.length){ b.textContent = "No visitors yet"; return; }
+  if (Date.now() - VO.armed > 4000){ VO.armed = Date.now(); b.textContent = "Clear " + list.length + "? Press again"; setTimeout(function(){ if (b.isConnected) b.textContent = "Clear visitors"; }, 4000); return; }
+  VO.armed = 0; saveVisitors([]); b.textContent = "Clear visitors"; voRefresh();
+});
+window.addEventListener("storage", function(ev){ if (ev.key === "dcscope-voices") voRefresh(); });
+function sentimentHTML(bare){ if (ST.site !== "mi") return voicesHTML(); return embedHTML("live/sentiment.jpg", "The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list", "The original DataScope. Choose Sentiment map in its bar"); }
 function viewHTML(bare){ if (ST.site !== "mi") return '<div class="card stage" data-view="sat"></div>'; return embedHTML("live/center.jpg", "The original Scenario Editor in Site layout: the data center on the proposed site with its 55 dBA contour, the view menu and the design alternatives", "The original DataScope Scenario Editor, Site layout"); }
 function benRow(k){
   var m = funds(), on = modules(), each = on.length ? YEARLY / on.length : 0, up = Math.max(0, m.left), o = PAGES.benefits.opts.filter(function(x){ return x[0] === k; })[0], is = ST.b[k];
@@ -1066,20 +1168,21 @@ function render(){
   var own = (VIEW === "sentiment" || VIEW === "view") && ST.site === "mi", shown = main.getAttribute("data-shown"), key = VIEW + "|" + ST.site;
   $("sites").innerHTML = ["mi", "tx"].map(function(k){ return '<button type="button" data-site="' + k + '" aria-pressed="' + (ST.site === k) + '">' + SITES[k].name + '</button>'; }).join("");
   document.body.classList.toggle("grey", VIEW === "analysis" || VIEW === "metrics"); document.body.classList.toggle("embed", own && LIVE);
-  if (own && shown === key) return;   // the embedded original keeps running; nothing on it follows the choices made here
+  if (shown === key && (own || VIEW === "sentiment")) return;   // the embedded original keeps running; nothing on it follows the choices made here
   function right(){ return '<a class="lab" href="#' + ST.rw + '">Right wall · Live analysis</a>' +
     '<span class="rw" role="group" aria-label="Right wall"><button type="button" data-rw="analysis" aria-pressed="' + (ST.rw === "analysis") + '">With images</button><button type="button" data-rw="metrics" aria-pressed="' + (ST.rw === "metrics") + '">Metrics only</button></span>' + mini(ST.rw); }
   function table(){ return '<a class="lab" href="#editor">Table · Scenario Editor</a>' + mini("editor"); }
-  if (VIEW === "all" && shown === key && ST.site === "mi" && main.querySelector(".scr.wr")){ main.querySelector(".scr.wr").innerHTML = right(); main.querySelector(".scr.tb").innerHTML = table(); }   // the two embedded screens are left alone, so they do not reload
+  if (VIEW === "all" && shown === key && main.querySelector(".scr.wr")){ main.querySelector(".scr.wr").innerHTML = right(); main.querySelector(".scr.tb").innerHTML = table(); }   // the two embedded screens are left alone, so they do not reload
   else if (VIEW !== "all") main.innerHTML = H[VIEW]();
   else main.innerHTML = '<div class="room"><div class="walls">' +
-      '<div class="scr wl"><a class="lab" href="#sentiment">Left wall · ' + (ST.site === "mi" ? "Sentiment map" : "Public record") + '</a>' + mini("sentiment") + '</div>' +
+      '<div class="scr wl"><a class="lab" href="#sentiment">Left wall · Sentiment map</a>' + mini("sentiment") + '</div>' +
       '<div class="scr"><a class="lab" href="#view">Center wall · Site layout</a>' + mini("view") + '</div>' +
       '<div class="scr wr">' + right() + '</div></div>' +
       '<div class="under"><div class="scr tb">' + table() + '</div></div></div>';
   main.setAttribute("data-shown", key);
   [].forEach.call(main.querySelectorAll(".stage.embed iframe:not([data-w])"), function(f){ f.setAttribute("data-w", "1"); f.addEventListener("load", function(){ f.classList.add("on"); }); });   // the picture shows until the original has loaded
-  main.querySelectorAll(".stage[data-view]").forEach(function(f){ if (!/^(geo|sat)$/.test(f.getAttribute("data-view"))) drawScene(f, f.getAttribute("data-view")); });
+  main.querySelectorAll(".stage[data-view]").forEach(function(f){ if (!/^(geo|sat|voices)$/.test(f.getAttribute("data-view"))) drawScene(f, f.getAttribute("data-view")); });
+  var vs = main.querySelector('.stage[data-view="voices"]'); if (vs && window.L){ try { voDraw(vs); } catch(e){ if (window.console) console.warn("Voices map failed", e); } }
   var ss = main.querySelector('.stage[data-view="sat"]'); if (ss && window.L){ try { satDraw(ss); } catch(e){ if (window.console) console.warn("Aerial view failed", e); } }
   var gs = main.querySelector('.stage[data-view="geo"]'); if (gs){ try { geoInit(gs); gs.insertBefore(GEO.el, gs.firstChild); GEO.map.invalidateSize(false); geoSite(); geoDraw(); } catch(e){ if (window.console) console.warn("Map failed", e); GEO.failed = true; return render(); } }
   var tok = ++TOK, th = [].slice.call(main.querySelectorAll(".thumb[data-alt]")); if (th.length) setTimeout(function(){ drawThumbs(th, tok); }, 0);
@@ -1168,7 +1271,7 @@ try { var saved = localStorage.getItem("dcscope-v5"); if (saved) adopt(saved); }
 try { var qs = new URLSearchParams(location.search).get("site"); if (qs) ST.site = /^t/i.test(qs) ? "tx" : "mi"; } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261122-224321";
+var BUILD = "20261122-224929";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
