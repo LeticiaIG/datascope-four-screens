@@ -13,9 +13,11 @@ Live: https://leticiaig.github.io/datascope-four-screens/
 | Extra | `#metrics` | The same reading without the picture: the wheel large, the three lists, the trace and the offer |
 | All | `#all` | The four screens laid out like the room. The right wall can switch between Live analysis with images and metrics only |
 
-For a case study that has no original DataScope (Texas), the left wall is a sentiment map of reported positions that stays open for the room, and the center wall is the real place in axonometric: aerial photo, OpenStreetMap buildings and the data center from the table, repainted with a brush once the view is still. Residents (2020 Census blocks, one dot for a fixed number of people) move as dots colored by what they would hear, and can be switched off. Sound can be switched on: it gets louder as you come closer and changes with the cooling package.
+For a case study that has no original DataScope (Texas), the left wall is a sentiment map of reported positions that stays open for the room, and the center wall is the real place in axonometric, drawn in the manner of the original's Site layout (pale ground, light roads, pastel blocks, the sound contour in mauve) but not cut around the site: the ground, roads and buildings are OpenStreetMap's and carry on in every direction. Residents (2020 Census blocks, one dot for a fixed number of people) move as dots colored by what they would hear, and can be switched off. A figure marks where you stand: drag it, or tap the ground, and the readout and the sound follow. **Immersive** fills the screen, hides the bar and turns the view slowly; H hides the panels.
 
-Screens opened in the same browser stay in step.
+On the Texas table, under Design, the heights of the D2 berm and the D3 walls can be set, and trees, walls and berms that are in none of the four designs can be added with two taps. They enter the sound where you stand and the residents' dots.
+
+A scenario can be given in the address: `?site=texas&pick=D2,T2,E1,B1,B4&ch=design`.
 
 ## Case studies
 
@@ -33,7 +35,7 @@ Only figures with a source are shown.
 - **The offer**: $10M upfront and $0.5M a year, or 20% of the profits, from the brief.
 - **Designs and benefits**: the brief describes them without measurements, so their direction is shown and their size is listed under "Not known yet". No costs are charged for designs or technologies.
 - **Words for sizes** use the same steps every time: a little (under 10%), clearly (10 to 30%), much (over 30%); for sound, under 3 dB, 3 to 8 dB, over 8 dB.
-- **Sound at a distance** (Texas rings, residents, listening): in the open, from the original's reference plant: 72.5 dBA at 15 m, 6 dB less for each doubling of distance, 0.0035 dB per metre to the air. Walls and buildings in between are not counted. The 600 MW switch is a what-if: 23 reference plants heard as one source (+14 dB).
+- **Sound where you stand** (Texas contours, residents, listening): the method the original names, ISO 9613-2, kept simple. The plant's two sources (rooftop units and west yard) have the levels the original gives for each cooling package at 15 m. Each loses 6 dB for each doubling of the distance and 0.0035 dB per metre to the air. A wall, a berm or a building in the line of sight takes off 10·lg(3 + 20·z/λ), at most 20 dB (z: the detour over the top; λ: 1.37 m, as in the original). Dense trees take off 1 dB for 10 to 20 m of them and 0.04 dB per metre beyond, the standard's values near 250 Hz, **quoted from memory and to be checked against the standard**. Ground, wind and the ends of a wall are not counted. Wall and berm heights are not in the brief: they are the ones set on the table. The 600 MW switch is a what-if: 23 reference plants heard as one source (+14 dB).
 - **Residents**: 2020 Census blocks (TIGERweb, field POP100).
 - The sound you hear is made in the browser. Its loudness follows the model; its color is an impression, not a recording.
 
