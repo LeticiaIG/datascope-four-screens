@@ -315,7 +315,9 @@ label.sm:has(input:focus-visible){outline:2px solid var(--accent);outline-offset
 .tabs button{font:inherit;font-weight:600;font-size:.9rem;color:var(--muted);border:0;background:none;border-radius:9px;padding:.4rem .8rem;cursor:pointer;white-space:nowrap}
 .tabs button[aria-pressed="true"]{color:var(--warn)}
 
-/* "All": the four screens as they stand in the room */
+/* "All": the four screens as they stand in the room, which is dark */
+body.room{background:#0a0c0b}
+body.room .scr{border-color:#2b3432;box-shadow:0 0 60px rgba(190,220,205,.13),0 18px 40px rgba(0,0,0,.6)}
 .room{flex:1 1 auto;min-height:0;padding:3.6rem 22px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7rem;perspective:2400px}
 .walls{display:flex;align-items:center;justify-content:center;width:100%;perspective:2000px}
 .scr{position:relative;display:block;flex:0 0 auto;width:32.5%;aspect-ratio:16/9;background:var(--bg);border:6px solid #1c2a28;border-radius:10px;overflow:hidden;box-shadow:0 14px 34px rgba(20,40,34,.28);text-decoration:none;color:inherit}
@@ -1762,7 +1764,7 @@ function render(){
   function mini(k){ return '<div class="mini' + (k === "analysis" || k === "metrics" ? " grey" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
   var own = (VIEW === "sentiment" || VIEW === "view") && ST.site === "mi", shown = main.getAttribute("data-shown"), key = VIEW + "|" + ST.site;
   $("sites").innerHTML = ["mi", "tx"].map(function(k){ return '<button type="button" data-site="' + k + '" aria-pressed="' + (ST.site === k) + '">' + SITES[k].name + '</button>'; }).join("");
-  document.body.classList.toggle("grey", VIEW === "analysis" || VIEW === "metrics"); document.body.classList.toggle("embed", own && LIVE);
+  document.body.classList.toggle("grey", VIEW === "analysis" || VIEW === "metrics"); document.body.classList.toggle("room", VIEW === "all"); document.body.classList.toggle("embed", own && LIVE);
   if (shown === key && (own || VIEW === "sentiment")) return;   // the embedded original keeps running; nothing on it follows the choices made here
   function right(){ return '<a class="lab" href="#' + ST.rw + '">Right wall · Live analysis</a>' +
     '<span class="rw" role="group" aria-label="Right wall"><button type="button" data-rw="analysis" aria-pressed="' + (ST.rw === "analysis") + '">With images</button><button type="button" data-rw="metrics" aria-pressed="' + (ST.rw === "metrics") + '">Metrics only</button></span>' + mini(ST.rw); }
@@ -1911,7 +1913,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261122-235645";
+var BUILD = "20261123-000003";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
