@@ -463,6 +463,42 @@ body.nopanels .akey,body.nopanels .stage[data-view="axo"] .zoomc{display:none}
 .alts p.vhint{font-size:.78rem;font-weight:600}
 .stage[data-view="geo"] .alts{max-height:calc(100% - 9.6rem);overflow:auto}
 
+/* closing a scenario: on the right wall, and back on the sentiment map */
+.led{grid-template-rows:minmax(0,1fr) auto}
+.closebar{grid-column:1 / -1;display:flex;align-items:center;gap:.6rem;border-top:1px solid var(--line);padding-top:.5rem;min-width:0}
+.closeb{font:inherit;font-size:.88rem;font-weight:700;flex:0 0 auto;border:0;border-radius:999px;background:var(--ink);color:#fff;padding:.4rem 1rem;cursor:pointer}
+.closeb:disabled{background:var(--accent);cursor:default}
+.closed{flex:1 1 auto;min-width:0;display:flex;gap:.35rem;overflow:auto}
+.cchip{flex:0 0 auto;display:flex;align-items:center;gap:.3rem;border:1px solid var(--accent);border-radius:999px;background:var(--accent-soft);padding:.1rem .2rem .1rem .1rem;font-size:.76rem;font-weight:700}
+.cchip button{font:inherit;border:0;background:none;color:var(--ink);cursor:pointer;padding:.15rem .5rem;border-radius:999px}
+.cchip i{font-style:normal;display:flex;gap:.25rem}
+.cchip .cx{color:var(--muted);padding:.1rem .4rem}
+.ccard{flex:0 0 auto;border:1.5px solid var(--ink);border-radius:10px;background:#fff;padding:.5rem .65rem;display:flex;flex-direction:column;gap:.15rem}
+.ccard.on{box-shadow:0 0 0 2px var(--ink)}
+.ccard small{font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.ccard b{font-size:.95rem} .ccard p{margin:0;font-size:.8rem;font-weight:600;line-height:1.25}
+.ccard p.g{color:#2f6957} .ccard p.l{color:#9a3f36} .ccard p.u{color:var(--muted)}
+.cfoot{display:flex;align-items:center;justify-content:space-between;gap:.4rem;margin-top:.2rem}
+.cfoot span{display:flex;gap:.5rem;font-size:.78rem;font-weight:700}
+.cfoot button{font:inherit;font-size:.76rem;font-weight:700;border:1px solid var(--ink);border-radius:999px;background:none;color:var(--ink);padding:.2rem .6rem;cursor:pointer}
+.ccard.on .cfoot button{background:var(--ink);color:#fff}
+/* examples: the room imagined, and the screens with their callouts */
+.exs{flex:1 1 auto;min-height:0;border:0;border-radius:0;overflow:auto;padding:4.8rem 1.6rem 1.6rem;display:flex;flex-direction:column;gap:1rem}
+.exs .hd{font-size:1.4rem}
+.exs figure{margin:0;display:flex;flex-direction:column;gap:.35rem}
+.exs img{display:block;width:100%;border-radius:12px;border:1px solid var(--line);background:var(--sunk)}
+.exs figcaption{font-size:.85rem;font-weight:600;color:var(--muted)}
+.exs .hero{max-width:70rem;align-self:center;width:100%}
+.exgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+/* a light lock: the page asks for a code when one is set */
+html.checking .app{visibility:hidden}
+.gate{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.gate form{width:22rem;max-width:100%;padding:1.4rem;display:flex;flex-direction:column;gap:.7rem;margin:0}
+.gate h2{font-size:1.3rem} .gate p{margin:0;font-size:.85rem;font-weight:600;color:var(--muted)}
+.gate input{font:inherit;font-size:1rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;background:#fff;color:var(--ink)}
+.gate button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:.65rem 1rem;background:var(--ink);color:#fff;cursor:pointer}
+.gate output{font-family:ui-monospace,Menlo,monospace;font-size:.72rem;word-break:break-all;background:var(--sunk);border-radius:8px;padding:.5rem;user-select:all}
+
 @media (max-width:900px), (max-height:520px){
   html,body{height:auto}
   .app{height:auto}
@@ -481,6 +517,27 @@ body.nopanels .akey,body.nopanels .stage[data-view="axo"] .zoomc{display:none}
 </style>
 </head>
 <body>
+<script>
+// A light lock. When access.txt holds the SHA-256 of a code, the page asks for that code before it shows anything, and remembers it on this device.
+// It keeps casual visitors out. It is not security: this page's own code is public. Open the page with ?setcode to turn a code into the line for access.txt.
+(function(){
+  var root = document.documentElement, q = new URLSearchParams(location.search); root.classList.add("checking");
+  function hex(buf){ return [].map.call(new Uint8Array(buf), function(b){ return ("0" + b.toString(16)).slice(-2); }).join(""); }
+  function sha(t){ return crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)).then(hex); }
+  function open(){ root.classList.remove("checking"); }
+  function box(html){ var g = document.createElement("div"); g.className = "gate"; g.innerHTML = '<form class="card" autocomplete="off">' + html + '</form>'; document.body.appendChild(g); return g; }
+  function when(fn){ if (document.body) fn(); else document.addEventListener("DOMContentLoaded", fn); }
+  if (q.has("setcode")){ when(function(){ var g = box('<h2>Choose an access code</h2><p>Type the code people will need. It is not sent anywhere.</p><input name="c" type="text" aria-label="Access code"><button type="submit">Make the line</button><p>Put this line in access.txt:</p><output>—</output>');
+      g.querySelector("form").addEventListener("submit", function(ev){ ev.preventDefault(); var v = ev.target.c.value; if (v) sha(v).then(function(h){ g.querySelector("output").textContent = h; }); }); }); return; }
+  var t = setTimeout(open, 2500);
+  fetch("access.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(txt){
+    clearTimeout(t); var want = ((txt || "").match(/\b[0-9a-f]{64}\b/i) || [""])[0].toLowerCase(), have = ""; try { have = localStorage.getItem("dcscope-access") || ""; } catch(e){}
+    if (!want || have === want || !window.crypto || !crypto.subtle){ open(); return; }
+    when(function(){ var g = box('<h2>DataScope.</h2><p>This page asks for an access code.</p><input name="c" type="password" aria-label="Access code" autofocus><button type="submit">Open</button><p role="alert"></p>');
+      g.querySelector("form").addEventListener("submit", function(ev){ ev.preventDefault(); sha(ev.target.c.value).then(function(h){ if (h === want){ try { localStorage.setItem("dcscope-access", want); } catch(e){} g.remove(); open(); } else g.querySelector("[role=alert]").textContent = "That code does not open it."; }); }); });
+  }).catch(function(){ clearTimeout(t); open(); });
+})();
+</script>
 <div class="app">
   <div class="card top">
     <a class="brand" href="#all">DataScope.</a>
@@ -1095,7 +1152,7 @@ function noteHTML(n){ return NOTES_ON ? '<div class="note"><b>From the brief</b>
 // ---------- screens ----------
 // Four screens, one story. Scenario Editor: decide (the table). Sentiment map: listen; it stays the original DataScope screen and opens there.
 // Neighborhood view: see. Live analysis: measure.
-var SENTIMENT = "https://cityscope.media.mit.edu/DataScope/", VIEWS = [["editor", "Scenario Editor"], ["sentiment", "Sentiment map"], ["view", "Site layout"], ["analysis", "Live analysis"], ["metrics", "Metrics"], ["all", "All"]], VIEW = "all";
+var SENTIMENT = "https://cityscope.media.mit.edu/DataScope/", VIEWS = [["editor", "Scenario Editor"], ["sentiment", "Sentiment map"], ["view", "Site layout"], ["analysis", "Live analysis"], ["metrics", "Metrics"], ["examples", "Examples"], ["all", "All"]], VIEW = "all";
 function sayLine(page){
   if (page === "design") return {D1:"The conventional campus, as proposed.", D2:"The building moves back, behind setbacks, berms and planting.", D3:"Noisy equipment sits in a yard behind zigzag sound walls.", D4:"A walkable cluster of pool, spa, community rooms and cafes uses the waste heat."}[ST.d];
   if (page === "technology") return {T1:"Conventional cooling: the reference for every other package.", T2:"Almost no cooling water. More power on hot days and louder fans.", T3:"Less electricity and water than the baseline, and quieter.", T4:"Server heat is recovered and sold to nearby customers."}[ST.t];
@@ -1138,7 +1195,7 @@ var VOICES = { tx:[
   {s:"support", t:"The sale would bring the city about $30 million.", src:"Terms of the contract · KXXV", ll:[30.57277, -96.25808]},
   {s:"support", t:"The project is meant for AI computing, not Bitcoin mining.", src:"The company's CEO · KBTX", ll:[30.57124, -96.26016]}
 ] };
-var VO = {map:null, el:null, live:null, layer:null, pts:[], dline:null, site:null, img:null, armed:0};   // pts: the marks the visitor has put on the map for the voice being written
+var VO = {map:null, el:null, live:null, layer:null, pts:[], dline:null, site:null, img:null, armed:0, about:null};   // pts: the marks the visitor has put on the map for the voice being written
 var MARKS = ["Tap the map to mark the place you mean, or several places to link them. No mark: your voice goes to the list only.", "One place marked. Tap another to link them, or tap a mark to remove it.", "Places linked. Tap a mark to remove it."];
 function visitors(){ try { var o = JSON.parse(localStorage.getItem("dcscope-voices") || "{}"); return o && Array.isArray(o[ST.site]) ? o[ST.site].filter(function(v){ return v && STANCE[v.s] && typeof v.t === "string"; }) : []; } catch(e){ return []; } }
 function saveVisitors(list){ var o = {}; try { o = JSON.parse(localStorage.getItem("dcscope-voices") || "{}") || {}; } catch(e){} o[ST.site] = list; localStorage.setItem("dcscope-voices", JSON.stringify(o)); }
@@ -1149,7 +1206,7 @@ function ptsOf(v){ return (Array.isArray(v.pts) ? v.pts : [v.ll, v.ll2]).filter(
 function whereOf(v){ var q = ptsOf(v), n = v.names || []; if (!q.length) return "The whole project"; if (q.length === 1) return n[0] ? "At " + n[0] : "On the map";
   return q.map(function(_, i){ return n[i] || (i ? "another place" : "One place"); }).join(" ↔ "); }
 function vcard(v){
-  return '<div class="vcard" style="--c:' + STANCE[v.s][1] + '">' + (okPic(v.img) ? '<img src="' + v.img + '" alt="">' : '') + '<p>' + esc(v.t) + '</p><small>' + STANCE[v.s][0] + ' · ' + esc(v.src || "Visitor · " + whereOf(v)) + '</small></div>'; }
+  return '<div class="vcard" style="--c:' + STANCE[v.s][1] + '">' + (okPic(v.img) ? '<img src="' + v.img + '" alt="">' : '') + '<p>' + esc(v.t) + '</p><small>' + STANCE[v.s][0] + ' · ' + esc(v.src || "Visitor · " + whereOf(v) + (v.about ? " · on a closed scenario" : "")) + '</small></div>'; }
 function voicesHTML(){
   return '<div class="card stage" data-view="voices"><form class="vadd" id="vadd" autocomplete="off"><h3>Add your voice</h3>' +
     '<p class="vhint" id="vwhere">' + MARKS[Math.min(2, VO.pts.length)] + '</p>' +
@@ -1207,7 +1264,8 @@ function voRefresh(){
   all.forEach(function(v){ n[v.s]++; var q = ptsOf(v); if (!q.length) return; var c = STANCE[v.s][1], pop = [vcard(v), {maxWidth:260, className:"vpop"}], line = [];
     if (q.length > 1){ q.forEach(function(b, i){ if (i) line = line.concat(arc(q[i - 1], b)); }); L.polyline(line, {color:c, weight:4, opacity:.85}).bindPopup(pop[0], pop[1]).addTo(g); }
     q.forEach(function(a){ L.circleMarker(a, {radius:q.length > 1 ? 7 : v.src ? 8 : 10, color:"#fbfdfc", weight:2.5, fillColor:c, fillOpacity:.95}).bindPopup(pop[0], pop[1]).addTo(g); }); });
-  var body = $("vbody"); if (body) body.innerHTML = '<div class="vcount">' + Object.keys(STANCE).map(function(k){ return '<div style="--c:' + STANCE[k][1] + '"><b>' + n[k] + '</b><span>' + STANCE[k][0] + '</span></div>'; }).join("") + '</div><div class="vlist">' + all.map(vcard).join("") + '</div>';
+  var body = $("vbody"); if (body) body.innerHTML = '<div class="vcount">' + Object.keys(STANCE).map(function(k){ return '<div style="--c:' + STANCE[k][1] + '"><b>' + n[k] + '</b><span>' + STANCE[k][0] + '</span></div>'; }).join("") + '</div><div class="vlist">' + closedAll().slice().reverse().map(ccardHTML).join("") + all.map(vcard).join("") + '</div>';
+  var w = $("vwhere"), ab = VO.about && closedAll().filter(function(c){ return c.id === VO.about; })[0]; if (w && ab) w.textContent = "About the closed scenario " + scenKey(ab) + ". Mark a place on the map if you mean one.";
 }
 // The picture is drawn from the visitor's sentence by an open image service (Pollinations). Only the sentence is sent.
 function genURL(text, seed){ return "https://image.pollinations.ai/prompt/" + encodeURIComponent("Impressionist painting in soft sage green and teal tones, a neighborhood of a small Texas city beside the site of a proposed data center. " + text.replace(/[\r\n]+/g, " ") + " No text, no letters.") + "?width=768&height=432&nologo=true&seed=" + seed; }
@@ -1232,10 +1290,10 @@ document.addEventListener("change", function(ev){
 document.addEventListener("submit", function(ev){
   var f = ev.target; if (!f || f.id !== "vadd") return; ev.preventDefault(); var t = f.vt.value.trim().slice(0, 160); if (!f.vs.value || !t) return;
   var list = visitors();
-  list.push({id:Date.now() + "-" + Math.floor(Math.random() * 1e6), s:f.vs.value, t:t, img:VO.img || null, pts:VO.pts.map(function(o){ var q = o.m.getLatLng(); return [+q.lat.toFixed(6), +q.lng.toFixed(6)]; }), names:VO.pts.map(function(o){ return o.name; }), at:new Date().toISOString()});
+  list.push({id:Date.now() + "-" + Math.floor(Math.random() * 1e6), s:f.vs.value, t:t, img:VO.img || null, pts:VO.pts.map(function(o){ var q = o.m.getLatLng(); return [+q.lat.toFixed(6), +q.lng.toFixed(6)]; }), names:VO.pts.map(function(o){ return o.name; }), about:VO.about || null, at:new Date().toISOString()});
   try { saveVisitors(list); } catch(e){ $("vhint").textContent = "This device is full. Export, then clear, and try again."; return; }
   f.vt.value = ""; [].forEach.call(f.querySelectorAll("input[name=vs]"), function(r){ r.checked = false; }); VO.img = null; var pv = $("vprev"); pv.hidden = true; pv.querySelector("img").removeAttribute("src"); f.querySelector(".vgen").textContent = "Generate image"; vready(f);
-  $("vhint").textContent = "Added. Thank you."; voUnmark(); voRefresh();
+  $("vhint").textContent = "Added. Thank you."; VO.about = null; voUnmark(); voRefresh(); wordsFill();
 });
 document.addEventListener("click", function(ev){
   var gb = ev.target.closest ? ev.target.closest("[data-vg]") : null; if (gb){ generate(gb.closest("form"), gb); return; }
@@ -1245,7 +1303,7 @@ document.addEventListener("click", function(ev){
   if (Date.now() - VO.armed > 4000){ VO.armed = Date.now(); b.textContent = "Clear " + list.length + "? Press again"; setTimeout(function(){ if (b.isConnected) b.textContent = "Clear visitors"; }, 4000); return; }
   VO.armed = 0; saveVisitors([]); b.textContent = "Clear visitors"; voRefresh();
 });
-window.addEventListener("storage", function(ev){ if (ev.key === "dcscope-voices") voRefresh(); });
+window.addEventListener("storage", function(ev){ if (ev.key === "dcscope-voices" || ev.key === "dcscope-closed"){ voRefresh(); wordsFill(); } });
 function sentimentHTML(bare){ if (ST.site !== "mi") return voicesHTML(); return embedHTML("live/sentiment.jpg", "The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list", "The original DataScope. Choose Sentiment map in its bar"); }
 function viewHTML(bare){ if (ST.site !== "mi") return AXO.failed ? '<div class="card stage" data-view="sat"></div>' : axoHTML(); return embedHTML("live/center.jpg", "The original Scenario Editor in Site layout: the data center on the proposed site with its 55 dBA contour, the view menu and the design alternatives", "The original DataScope Scenario Editor, Site layout"); }
 // ---------- words first: what a scenario gives, what it takes, and what nobody knows yet ----------
@@ -1318,13 +1376,44 @@ function dg(s){ return '<span class="dg' + (s.deg ? '' : ' q') + '" aria-hidden=
 function stmBtn(s){ return '<button type="button" class="stm ' + (s.un ? "u" : s.dir > 0 ? "g" : "l") + (SEL.id === s.id && !SEL.ax ? " sel" : "") + '" data-stm="' + s.id + '" aria-pressed="' + (SEL.id === s.id && !SEL.ax) + '">' + (s.un ? '<span class="dg q" aria-hidden="true">?</span>' : dg(s)) + '<b>' + s.t + '</b><span class="cd">' + s.code + '</span>' + (s.how ? '<small>' + s.how + '</small>' : '') + '</button>'; }
 function asked(){ try { var o = JSON.parse(localStorage.getItem("dcscope-asked") || "{}"); return o && Array.isArray(o[ST.site]) ? o[ST.site].filter(function(a){ return a && typeof a.q === "string"; }) : []; } catch(e){ return []; } }
 function keepAsked(q, ok){ var o = {}; try { o = JSON.parse(localStorage.getItem("dcscope-asked") || "{}") || {}; } catch(e){} var l = Array.isArray(o[ST.site]) ? o[ST.site] : []; l.push({q:String(q).slice(0, 200), ok:!!ok, scenario:chosen(ST).join(" "), at:new Date().toISOString()}); o[ST.site] = l.slice(-300); try { localStorage.setItem("dcscope-asked", JSON.stringify(o)); } catch(e){} }
+// Closing a scenario: what the room agreed on is kept, and goes back to the sentiment map, where people can say what they think of it. A loop.
+function closedAll(){ try { var o = JSON.parse(localStorage.getItem("dcscope-closed") || "{}"); return o && Array.isArray(o[ST.site]) ? o[ST.site].filter(function(c){ return c && typeof c.id === "string" && /^D[1-4]$/.test(c.d) && /^T[1-4]$/.test(c.t) && /^E[1-4]$/.test(c.e) && Array.isArray(c.b) && Array.isArray(c.g) && Array.isArray(c.l); }) : []; } catch(e){ return []; } }
+function closedSave(list){ var o = {}; try { o = JSON.parse(localStorage.getItem("dcscope-closed") || "{}") || {}; } catch(e){} o[ST.site] = list.slice(-12); try { localStorage.setItem("dcscope-closed", JSON.stringify(o)); } catch(e){} }
+function scenKey(c){ return [c.d, c.t, c.e].concat(c.b.filter(function(k){ return /^B[1-4]$/.test(k); })).join(" · "); }
+function closeNow(){
+  var st = statements(ST), c = {id:"c" + Date.now().toString(36), at:new Date().toISOString(), d:ST.d, t:ST.t, e:ST.e, b:modules(), px:ST.px, pz:ST.pz, rot:ST.rot, hw:ST.hw, hb:ST.hb, x:(ST.x || []).slice(),
+    g:st.filter(function(s){ return s.dir > 0; }).map(function(s){ return s.t; }), l:st.filter(function(s){ return s.dir < 0; }).map(function(s){ return s.t; }), u:unknowns(ST).length};
+  closedSave(closedAll().filter(function(o){ return scenKey(o) !== scenKey(c); }).concat([c])); wordsFill(); voRefresh();
+}
+function openClosed(id){ var c = closedAll().filter(function(o){ return o.id === id; })[0]; if (!c) return;
+  ST.d = c.d; ST.t = c.t; ST.e = c.e; ["B1", "B2", "B3", "B4"].forEach(function(k){ ST.b[k] = c.b.indexOf(k) >= 0; }); if ([3, 6, 9].indexOf(c.hw) >= 0) ST.hw = c.hw; if ([2, 4, 6].indexOf(c.hb) >= 0) ST.hb = c.hb;
+  adopt(JSON.stringify(Object.assign({}, ST, {x:c.x || [], px:c.px || 0, pz:c.pz || 0, rot:c.rot || 0}))); tell(); }
+function tally(id){ var n = {support:0, cond:0, concern:0}; visitors().forEach(function(v){ if (v.about === id) n[v.s]++; }); return n; }
+function tallyHTML(id){ var n = tally(id); return Object.keys(STANCE).filter(function(k){ return n[k]; }).map(function(k){ return '<b style="color:' + STANCE[k][1] + '">' + n[k] + ' ' + STANCE[k][0].toLowerCase() + '</b>'; }).join(""); }
+function closeBarHTML(){
+  var list = closedAll(), cur = scenKey({d:ST.d, t:ST.t, e:ST.e, b:modules()}), is = list.some(function(c){ return scenKey(c) === cur; });
+  return '<div class="closebar"><button type="button" class="closeb" data-close' + (is ? ' disabled' : '') + '>' + (is ? "Closed as agreed" : "Close this scenario as agreed") + '</button><div class="closed">' +
+    list.slice().reverse().map(function(c){ var n = tally(c.id);
+      return '<span class="cchip"><button type="button" data-openc="' + esc(c.id) + '" title="Show this scenario">' + scenKey(c) + '</button><i>' + Object.keys(STANCE).filter(function(k){ return n[k]; }).map(function(k){ return '<b style="color:' + STANCE[k][1] + '">' + n[k] + '</b>'; }).join("") + '</i><button type="button" class="cx" data-reopen="' + esc(c.id) + '" aria-label="Reopen this scenario" title="Reopen">×</button></span>'; }).join("") + '</div></div>';
+}
+function ccardHTML(c){
+  var names = [c.d, c.t, c.e].concat(c.b).filter(function(k){ return /^[DTEB][1-4]$/.test(k); }).map(function(k){ return optOf(k)[1]; }).join(" · "), on = VO.about === c.id;
+  return '<div class="ccard' + (on ? " on" : "") + '"><small>Closed in the room</small><b>' + scenKey(c) + '</b><p class="u">' + names + '</p>' + (c.g.length ? '<p class="g">Gained: ' + c.g.map(esc).join("; ") + '</p>' : '') + (c.l.length ? '<p class="l">Given up: ' + c.l.map(esc).join("; ") + '</p>' : '') + (c.u ? '<p class="u">' + (+c.u) + ' things not known yet</p>' : '') +
+    '<div class="cfoot"><span>' + tallyHTML(c.id) + '</span><button type="button" data-about="' + esc(c.id) + '">' + (on ? "Your voice is about this" : "Say what you think of it") + '</button></div></div>';
+}
+function examplesHTML(bare){
+  function fig(src, cap, cls){ return '<figure' + (cls ? ' class="' + cls + '"' : '') + '><a href="' + src + '" target="_blank" rel="noopener"><img src="' + src + '" alt="' + cap + '" loading="lazy"></a><figcaption>' + cap + '</figcaption></figure>'; }
+  return '<div class="card exs"><div class="hd">Examples</div>' + fig("examples/room-people.jpg", "People deliberating around the four screens, with the center wall imagined as a place you could walk into and the sound drawn as rings. Generated image: the room, the people and the landscape are imagined, and the screens are redrawn from the real ones, so small text is approximate.", "hero") +
+    '<div class="exgrid">' + fig("guide/0-layout.jpg", "The room as the page lays it out") + fig("guide/1-left-wall.jpg", "Left wall · Sentiment map") +
+    fig("guide/2-center-wall.jpg", "Center wall · Site layout") + fig("guide/3-table.jpg", "Table · Scenario Editor") + fig("guide/4-right-wall.jpg", "Right wall · Live analysis") + '</div></div>';
+}
 function ledgerHTML(st, un){
   function col(cls, title, rows, empty, foot){ return '<div class="col ' + cls + '"><h3>' + title + '</h3><div class="rows">' + (rows.length ? rows.join("") : '<p class="nil">' + empty + '</p>') + '</div>' + (foot || "") + '</div>'; }
   var open = asked().filter(function(a){ return !a.ok; }), n = asked().length;
   return col("g", "Gained", st.filter(function(s){ return s.dir > 0; }).map(stmBtn), "Nothing yet. This is the conventional campus.") +
     col("l", "Given up", st.filter(function(s){ return s.dir < 0; }).map(stmBtn), "Nothing given up so far.") +
     col("u", "Not known yet", un.map(stmBtn).concat(open.slice(-3).reverse().map(function(a){ return '<p class="askd">“' + esc(a.q) + '”</p>'; })), "No open question for these choices.",
-      '<div class="lfoot"><span>' + (n ? n + (n === 1 ? " question" : " questions") + " from the room" : "Questions from the room are kept here") + '</span><button type="button" data-ak="export">Export</button><button type="button" data-ak="clear">Clear</button></div>');
+      '<div class="lfoot"><span>' + (n ? n + (n === 1 ? " question" : " questions") + " from the room" : "Questions from the room are kept here") + '</span><button type="button" data-ak="export">Export</button><button type="button" data-ak="clear">Clear</button></div>') + closeBarHTML();
 }
 // The wheel: one spoke per outcome, one petal per statement. The ring is the conventional campus. A petal that grows outward is something
 // gained, one that cuts inward is something given up; its length is the size, in three steps, and a dashed petal has no known size.
@@ -1759,7 +1848,7 @@ function metricsHTML(bare){
     '<div class="mright"><div class="led" data-w="ledger"></div><div class="trace" data-w="trace"></div></div></div>' + offerHTML() + '</div>';
 }
 function render(){
-  var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:analysisHTML, metrics:metricsHTML};
+  var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:analysisHTML, metrics:metricsHTML, examples:examplesHTML};
   $("views").innerHTML = VIEWS.map(function(v){ return '<a class="tab" href="#' + v[0] + '"' + (v[0] === VIEW ? ' aria-current="page"' : '') + '>' + v[1] + '</a>'; }).join("");
   function mini(k){ return '<div class="mini' + (k === "analysis" || k === "metrics" ? " grey" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
   var own = (VIEW === "sentiment" || VIEW === "view") && ST.site === "mi", shown = main.getAttribute("data-shown"), key = VIEW + "|" + ST.site;
@@ -1867,6 +1956,10 @@ document.addEventListener("click", function(ev){
     if (b.getAttribute("data-ak") === "export"){ var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify({site:ST.site, exported:new Date().toISOString(), questions:list}, null, 1)], {type:"application/json"})); a.download = "questions-" + ST.site + ".json"; document.body.appendChild(a); a.click(); a.remove(); return; }
     if (!list.length) return; if (Date.now() - (SEL.armed || 0) > 4000){ SEL.armed = Date.now(); b.textContent = "Clear " + list.length + "? Again"; return; }
     SEL.armed = 0; try { var o = JSON.parse(localStorage.getItem("dcscope-asked") || "{}") || {}; o[ST.site] = []; localStorage.setItem("dcscope-asked", JSON.stringify(o)); } catch(e){} wordsFill(); return; }
+  if ((b = T.closest("[data-close]"))){ closeNow(); return; }
+  if ((b = T.closest("[data-openc]"))){ openClosed(b.getAttribute("data-openc")); return; }
+  if ((b = T.closest("[data-reopen]"))){ var rid = b.getAttribute("data-reopen"); closedSave(closedAll().filter(function(c){ return c.id !== rid; })); if (VO.about === rid) VO.about = null; wordsFill(); voRefresh(); return; }
+  if ((b = T.closest("[data-about]"))){ var aid = b.getAttribute("data-about"); VO.about = VO.about === aid ? null : aid; voTags(); voRefresh(); return; }
   if ((b = T.closest("[data-hw]"))){ ST.hw = +b.getAttribute("data-hw"); render(); tell(); return; }
   if ((b = T.closest("[data-hb]"))){ ST.hb = +b.getAttribute("data-hb"); render(); tell(); return; }
   if ((b = T.closest("[data-osz]"))){ OWN.size = +b.getAttribute("data-osz"); render(); return; }
@@ -1913,7 +2006,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-000003";
+var BUILD = "20261123-001004";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}

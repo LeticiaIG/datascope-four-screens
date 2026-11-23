@@ -17,6 +17,12 @@ For a case study that has no original DataScope (Texas), the left wall is a sent
 
 On the Texas table, under Design, the heights of the D2 berm and the D3 walls can be set, and trees, walls and berms that are in none of the four designs can be added with two taps. They enter the sound where you stand and the residents' dots.
 
+**Closing a scenario.** On the right wall, "Close this scenario as agreed" keeps the scenario with what it gains, gives up and leaves unknown. It then appears on the sentiment map (Texas), where people can say what they think of it; their answers are counted on the closed scenario on both walls. A closed scenario can be shown again or reopened.
+
+**Examples** (`#examples`): a photomontage of the room in use (a generated image) and the annotated captures of the four screens.
+
+**Access code.** The page can ask for a code before it shows anything. It is off while `access.txt` is empty. To turn it on, open the page with `?setcode`, type the code, and put the line it gives in `access.txt`. This keeps casual visitors out; it is not security, because the code of the page is public.
+
 A scenario can be given in the address: `?site=texas&pick=D2,T2,E1,B1,B4&ch=design`.
 
 ## Case studies
