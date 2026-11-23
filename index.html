@@ -477,6 +477,24 @@ body.nopanels .akey,body.nopanels .stage[data-view="axo"] .zoomc{display:none}
 .amk.pl i{width:8px;height:8px;border-radius:50%;background:#3b7a66;border:1.5px solid #fff}
 .amk.dk{background:#1c2a28;border-color:#1c2a28;color:#fff}
 .amk.sn{background:#fbfdfc;color:#7d3a6c;border:1px solid #c9a9c2;box-shadow:none}
+.amk.en{color:#2f4a78;border-color:#b3c3dc;font-weight:600}
+.hotm{display:none} body.imm .hotm{display:block}
+.hot{font:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;padding:0;cursor:pointer}
+.hot b{font-family:var(--font);font-size:12px;font-weight:700;color:#1c2a28;background:#fbfdfcf0;border:1px solid #b9cec4;border-radius:999px;padding:1px 9px;white-space:nowrap}
+.hot i{width:16px;height:16px;border-radius:50%;background:var(--accent);border:3px solid #fbfdfc;box-shadow:0 0 0 0 rgba(59,122,102,.5),0 2px 6px rgba(0,0,0,.35);animation:hotp 2.4s ease-out infinite}
+.hot b{visibility:hidden} .hot:hover b,.hot:focus-visible b,.hot.on b{visibility:visible;background:#1c2a28;border-color:#1c2a28;color:#fff} .hot.on i{background:#1c2a28;animation:none}   /* a dot is named when it is pointed at or chosen: named all at once, they hid one another */
+body.imm .axo .amk.dk,body.imm .axo .amk.en{display:none}
+.hot:focus-visible{outline:none} .hot:focus-visible b{outline:2px solid var(--ink);outline-offset:2px}
+@keyframes hotp{0%{box-shadow:0 0 0 0 rgba(59,122,102,.55),0 2px 6px rgba(0,0,0,.35)}70%,100%{box-shadow:0 0 0 12px rgba(59,122,102,0),0 2px 6px rgba(0,0,0,.35)}}
+@media (prefers-reduced-motion: reduce){ .hot i{animation:none} }
+.tour{display:none;position:absolute;right:.9rem;top:.9rem;z-index:2;width:23rem;max-width:calc(100% - 23.5rem);padding:.8rem .9rem;flex-direction:column;gap:.6rem}
+body.imm .tour{display:flex} body.nopanels .tour{display:none}
+.tour .twd{display:flex;flex-direction:column;gap:.25rem}
+.tour .twd small{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.tour .twd b{font-size:1.05rem} .tour .twd p{margin:0;font-size:.84rem;font-weight:600;color:var(--muted);line-height:1.35}
+.tour .tbt{display:flex;gap:4px}
+.tour .tbt button{font:inherit;font-size:.85rem;font-weight:700;height:2.3rem;min-width:2.3rem;padding:0 .7rem;border:0;border-radius:9px;background:var(--sunk);color:var(--ink);cursor:pointer;white-space:nowrap}
+.tour .tbt button.go{background:var(--ink);color:#fff;flex:1 1 auto}
 .akey{position:absolute;left:.9rem;top:4.6rem;z-index:2;width:20rem;max-width:calc(100% - 1.8rem);padding:.8rem .9rem;display:flex;flex-direction:column;gap:.45rem}
 .akey .hd{font-size:1.05rem}
 .arow{display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-size:.9rem;font-weight:700;border-top:1px solid var(--line);padding-top:.45rem}
@@ -1105,6 +1123,9 @@ function geoDraw(){
   if (ST.e === "E4"){ L.polygon([ll(113, -13), ll(153, -13), ll(153, 13), ll(113, 13)], {color:"#3d9b97", weight:2, fillColor:"#eeeae0", fillOpacity:.6, interactive:false}).addTo(g); glab(ll(153, 0), "Microreactors · " + shareWords(share()) + " funded", "e near", "right").addTo(g); }
   cs = bldg(ST.px, ST.pz, ST.rot);
   GEO.fp = L.polygon(cs, PTT.that ? {color:"#3b7a66", weight:4.5, dashArray:"7 6", fillColor:"#dcebe4", fillOpacity:.8, className:"gfp", bubblingMouseEvents:false} : {color:"#1c2a28", weight:2.6, fillColor:"#fbfdfc", fillOpacity:.6, className:"gfp", bubblingMouseEvents:false}).addTo(g);
+  campusPlan().forEach(function(r){ var c = [campusAt(r[0], r[1]), campusAt(r[2], r[1]), campusAt(r[2], r[3]), campusAt(r[0], r[3])].map(mll), k = r[4];   // the parts of the campus, drawn over the footprint; they do not take the hand
+    L.polygon(c, k === "fence" ? {color:"#4f5c58", weight:1.2, dashArray:"3 4", fill:false, interactive:false} : k === "energy" ? {color:"#3d5f95", weight:1.6, fillColor:"#c9d6ea", fillOpacity:.55, interactive:false} : {color:"#1c2a28", weight:k === "hall" ? 1.4 : .8, fillColor:k === "hall" ? "#fbfdfc" : k === "pad" ? "#dfe5e2" : "#eef2ef", fillOpacity:k === "hall" ? .9 : .7, interactive:false}).addTo(g); });
+  var ep = energyPlot(); if (ep){ var eq = campusAt(ep[2], (ep[1] + ep[3]) / 2); glab(ll(eq[0], eq[1]), (ST.e === "E2" ? "Solar" : "Wind") + " · " + shareWords(share()) + " of the power · built elsewhere, drawn here", "e near", "right").addTo(g); }
   glab([Math.max(cs[0][0], cs[1][0]), (cs[0][1] + cs[1][1]) / 2], "Data center", "dk", "top").addTo(g);
   var south = cs.reduce(function(a, q){ return q[0] < a[0] ? q : a; }), hp = GEO.map.latLngToContainerPoint([south[0], (cs[0][1] + cs[2][1]) / 2]); hp.y += 30;   // the handle keeps clear of the building at any zoom
   var mid = GEO.map.containerPointToLatLng(hp);
@@ -1757,7 +1778,7 @@ function gvMode(){   // the lens, the hands and the colors of the view in use
 }
 function gvShow(){   // after the eye moves: hide the labels behind it or too far to read, and set the sky down on the horizon
   var on = gvOn() && GV.pos, q = GV.pos, br = GV.b * Math.PI / 180, fx = Math.sin(br), fz = -Math.cos(br), c0 = S().center, mx = MXs();
-  [].concat(AXO.places || [], AXO.marks || [], GV.lab || []).forEach(function(m){ var v = true; if (on){ var p = m.getLngLat(), dx = (p.lng - c0[1]) * mx - q[0], dz = (c0[0] - p.lat) * MY - q[1]; v = dx * fx + dz * fz > 8 && Math.hypot(dx, dz) < 3000; } m.getElement().style.visibility = v ? "" : "hidden"; });
+  [].concat(AXO.places || [], AXO.marks || [], GV.lab || [], HOT.marks || []).forEach(function(m){ var v = true; if (on){ var p = m.getLngLat(), dx = (p.lng - c0[1]) * mx - q[0], dz = (c0[0] - p.lat) * MY - q[1]; v = dx * fx + dz * fz > 8 && Math.hypot(dx, dz) < 3000; } m.getElement().style.visibility = v ? "" : "hidden"; });
   var sky = AXO.sky; if (!sky || !on) return; var H = AXO.el.clientHeight, foc = GV.foc = H / 2 / Math.tan(GVFOV * Math.PI / 360), up = (90 - GV.tilt) * Math.PI / 180;
   GV.hz = H / 2 - foc * Math.min(.85 * Math.tan(up), Math.tan(up - .75 * Math.PI / 180));   // where MapLibre ends the ground
   sky.style.height = Math.max(0, Math.round(GV.hz) + 1) + "px"; if (AXO.haze){ AXO.haze.style.top = Math.max(0, Math.round(GV.hz)) + "px"; AXO.haze.style.height = Math.round(foc * .04) + "px"; } var st = sky.firstChild.style; st.height = Math.round(foc * .66) + "px"; st.backgroundSize = Math.round(foc * Math.PI / 180 * 120) + "px 100%"; st.backgroundPositionX = Math.round(-GV.b * foc * Math.PI / 180 - GV.drift) + "px";
@@ -1801,30 +1822,131 @@ document.addEventListener("keydown", function(ev){   // the arrows walk and turn
   if (!gvOn() || !AXO.map || !AXO.el || !AXO.el.isConnected || !GV.pos || ev.altKey || ev.ctrlKey || ev.metaKey || /INPUT|TEXTAREA|SELECT/.test(ev.target.tagName || "") || AXO.el.closest(".mini")) return;
   var k = ev.key; if (k === "ArrowLeft" || k === "ArrowRight") gvTurn(k === "ArrowLeft" ? -15 : 15); else if (k === "ArrowUp" || k === "ArrowDown") gvAhead(k === "ArrowUp" ? 30 : -30); else return; ev.preventDefault();
 });
-function axoHTML(){ var g = gvOn(); return '<div class="card stage" data-view="axo"><div class="card akey" id="akey"></div><div class="zoomc"><button type="button" data-az="left" aria-label="Turn left" title="Turn left">⟲</button><button type="button" data-az="right" aria-label="Turn right" title="Turn right">⟳</button><button type="button" data-az="out" aria-label="' + (g ? "Step back" : "Move away") + '" title="' + (g ? "Step back" : "Move away") + '">' + (g ? "↓" : "−") + '</button><button type="button" data-az="in" aria-label="' + (g ? "Walk forward" : "Come closer") + '" title="' + (g ? "Walk forward" : "Come closer") + '">' + (g ? "↑" : "+") + '</button><button type="button" data-az="reset" aria-label="' + (g ? "Back to the first place, facing the plant" : "Reset the view") + '" title="' + (g ? "Back to the first place, facing the plant" : "Reset the view") + '">⤢</button><button type="button" class="wide" data-az="imm" aria-pressed="' + document.body.classList.contains("imm") + '">Immersive</button></div></div>'; }
+function axoHTML(){ var g = gvOn(); return '<div class="card stage" data-view="axo"><div class="card akey" id="akey"></div><div class="zoomc"><button type="button" data-az="left" aria-label="Turn left" title="Turn left">⟲</button><button type="button" data-az="right" aria-label="Turn right" title="Turn right">⟳</button><button type="button" data-az="out" aria-label="' + (g ? "Step back" : "Move away") + '" title="' + (g ? "Step back" : "Move away") + '">' + (g ? "↓" : "−") + '</button><button type="button" data-az="in" aria-label="' + (g ? "Walk forward" : "Come closer") + '" title="' + (g ? "Walk forward" : "Come closer") + '">' + (g ? "↑" : "+") + '</button><button type="button" data-az="reset" aria-label="' + (g ? "Back to the first place, facing the plant" : "Reset the view") + '" title="' + (g ? "Back to the first place, facing the plant" : "Reset the view") + '">⤢</button><button type="button" class="wide" data-az="imm" aria-pressed="' + document.body.classList.contains("imm") + '">Immersive</button></div><div class="card tour" id="tour"></div></div>'; }
 function metres(a, b){ return Math.hypot((a[1] - b[1]) * MY * Math.cos(a[0] * Math.PI / 180), (a[0] - b[0]) * MY); }   // [lat, lng] pairs
 function gj(features){ return {type:"FeatureCollection", features:features}; }
 function poly(pts, props){ var r = pts.map(function(q){ return [q[1], q[0]]; }); r.push(r[0]); return {type:"Feature", properties:props || {}, geometry:{type:"Polygon", coordinates:[r]}}; }
 function circleLL(c, r, n){ var out = []; for (var i = 0; i < (n || 72); i++){ var a = i / (n || 72) * 2 * Math.PI; out.push([c[0] + Math.sin(a) * r / MY, c[1] + Math.cos(a) * r / (MY * Math.cos(c[0] * Math.PI / 180))]); } return out; }
-// The data center as blocks, in metres around the building on the table: the hall, its cooling units, and what each design adds.
+// The data center as a campus, in metres around the hall on the table. It is a model of our own of the kind of plant the brief describes: two data
+// halls on a service spine with the cooling on their roofs, a generator yard to the west, a substation, an office, a car park and a fence. Only the
+// outline of the halls (90 m by 46.45 m), the yard and the heights the sound model uses come from the original; the rest is drawn to be recognised,
+// not measured. Each design, cooling package and energy choice changes the same campus. Everything moves and turns with the hall on the table.
+var CAMPUS = {fence:[-84, -30, 82, 31.5]}, WINDAT = [[0, -72], [-52, -62], [52, -80], [-26, -92], [28, -54]];   // around the hall's centre: the fence, and where turbines stand
+function energyPlot(){   // the ground a chosen solar or wind supply is drawn on, north of the fence: no larger than what is drawn
+  if (ST.e === "E2"){ var n = solarTables(), rows = Math.ceil(n / 7), cols = Math.min(7, n); return [-76, -44 - rows * 9, -72 + (cols - 1) * 21.4 + 22, -40]; }
+  if (ST.e === "E3"){ var t = WINDAT.slice(0, windTurbines()), xs = t.map(function(q){ return q[0]; }), zs = t.map(function(q){ return q[1]; }); return [Math.min.apply(null, xs) - 24, Math.min.apply(null, zs) - 10, Math.max.apply(null, xs) + 24, -40]; }
+  return null;
+}
+function campusAt(x, z){ return local(-6.5 * MSC + x, -10 * MSC + z, ST.px * MSC, ST.pz * MSC, ST.rot); }   // a place on the campus, in metres east and south of the site centre
+function campusPlan(){   // the same campus seen from straight above, for the table: [x0, z0, x1, z1, kind] around the hall's centre
+  var F = CAMPUS.fence, o = [[F[0], F[1], F[2], F[3], "fence"], [-45, -23.2, 45, -3.2, "hall"], [-45, 3.2, 45, 23.2, "hall"], [-42, -3.2, 42, 3.2, "bld"], [45, 4, 58, 19, "bld"], [61, -22, 79, -5, "pad"], [61, 8, 79, 28, "pad"],
+    ST.d === "D3" ? [-78, -23.2, -45, 23.2, "pad"] : [-78, -22, -48, 22, "pad"]], e = energyPlot();
+  if (e) o.push([e[0], e[1], e[2], e[3], "energy"]);
+  return o;
+}
+function solarTables(){ return Math.max(4, Math.min(42, Math.round(42 * share() / .2))); }   // what the budget buys is what is drawn, as in the brief
+function windTurbines(){ return Math.max(1, Math.min(5, Math.round(share() * 16))); }
 function dcBlocks(){
-  var out = [], cx = -6.5 * MSC, cz = -10 * MSC, px = ST.px * MSC, pz = ST.pz * MSC, i;
+  var out = [], cx = -6.5 * MSC, cz = -10 * MSC, px = ST.px * MSC, pz = ST.pz * MSC, i, j, d3 = ST.d === "D3", dry = ST.t === "T2";
   function blk(x0, z0, x1, z1, h, b, c, fixed){ out.push(poly([[x0, z0], [x1, z0], [x1, z1], [x0, z1]].map(function(q){ var p = fixed ? q : local(q[0], q[1], px, pz, ST.rot); return ll(p[0], p[1]); }), {h:h, b:b, c:c})); }
-  blk(cx - 45, cz - 23.2, cx + 45, cz + 23.2, 16, 0, "#fbfdfc"); blk(cx - 45.6, cz - 23.8, cx + 45.6, cz + 23.8, 16.9, 16, "#e3e9e6");
-  if (ST.d !== "D3"){ var nu = ST.t === "T2" ? 14 : 10, per = nu / 2, uh = ST.t === "T2" ? 8 : 6;
-    for (i = 0; i < nu; i++){ var ux = cx - 36 + (i % per) * (72 / (per - 1)), uz = cz + (i < per ? -10 : 10); blk(ux - 4.2, uz - 3.4, ux + 4.2, uz + 3.4, 17 + uh, 17, "#9fb0b5"); } }
-  else { blk(cx - 77, cz - 23.2, cx - 45, cz + 23.2, .5, 0, "#e9eeeb");
-    for (i = 0; i < 6; i++){ var yx = cx - 68 + (i % 2) * 13, yz = cz - 14 + Math.floor(i / 2) * 14; blk(yx - 4, yz - 3, yx + 4, yz + 3, 6, 0, "#9fb0b5"); }
-    blk(cx - 78, cz - 24.2, cx - 45, cz - 23.2, ST.hw, 0, "#c3ccc8"); blk(cx - 78, cz + 23.2, cx - 45, cz + 24.2, ST.hw, 0, "#c3ccc8"); blk(cx - 79, cz - 24.2, cx - 78, cz + 24.2, ST.hw, 0, "#c3ccc8"); }
+  function B(x0, z0, x1, z1, b, h, c){ blk(cx + x0, cz + z0, cx + x1, cz + z1, h, b, c); }          // a box on the campus, from b to h metres up
+  function C(x, z, r, b, h, c){ var q = campusAt(x, z); out.push(poly(hexLL(q[0], q[1], r, .5), {h:h, b:b, c:c})); }   // a tank or a mast
+  function T(x, z, u){ var q = campusAt(x, z); treeAt(out, q[0], q[1], u, 0); }
+  var WHITE = "#fbfdfc", CAP = "#e3e9e6", UNIT = "#9fb0b5", FAN = "#73858b", PAD = "#e9eeeb", STEEL = "#8e9a96", WALL = "#c3ccc8";
+  // ground: the service road through the gate, the pads
+  B(45.5, -2.6, 96, 2.6, 0, .12, "#dfe5e2"); B(61, 8, 79, 28, 0, .15, "#dfe5e2"); B(61, -22, 79, -5, 0, .25, PAD);
+  // the two data halls on their spine
+  [[-23.2, -3.2], [3.2, 23.2]].forEach(function(z){ B(-45, z[0], 45, z[1], 0, 16, WHITE); B(-45.5, z[0] - .5, 45.5, z[1] + .5, 16, 16.8, CAP); });
+  B(-42, -3.2, 42, 3.2, 0, 11, "#eef2ef"); for (i = 0; i < 6; i++) B(-37.5 + i * 14, -1.5, -32.5 + i * 14, 1.5, 11, 12.6, UNIT);
+  for (i = 0; i < 4; i++) B(-31 + i * 18, -25.6, -23 + i * 18, -23.7, 0, 4.6, "#d5ddd9");   // loading docks on the north side
+  // cooling: on the roofs, or in the walled yard of D3. Dry cooling has more and taller units.
+  if (!d3){ var per = dry ? 7 : 5, uh = dry ? 8 : 6, uw = dry ? 3.6 : 4.2;
+    [-13.2, 13.2].forEach(function(zc){ for (i = 0; i < per; i++){ var ux = -36 + i * (72 / (per - 1)); B(ux - uw, zc - 3.4, ux + uw, zc + 3.4, 16.8, 16.8 + uh, UNIT); B(ux - uw + .8, zc - 2.6, ux + uw - .8, zc + 2.6, 16.8 + uh, 17.3 + uh, FAN); } });
+    // the west yard: the backup generators, each with its exhaust, and their fuel
+    B(-78, -22, -48, 22, 0, .25, PAD);
+    [-70, -57].forEach(function(xc){ [-16, -8, 0, 8, 16].forEach(function(zc){ B(xc - 5, zc - 1.7, xc + 5, zc + 1.7, .25, 3.9, "#b5c2c5"); B(xc + 3.6, zc - .5, xc + 4.6, zc + .5, 3.9, 5.6, "#7c8b8f"); }); });
+    C(-50.3, -19, 1.6, .25, 3.4, "#c9d3cf"); C(-50.3, -14.6, 1.6, .25, 3.4, "#c9d3cf");
+  } else {   // D3: the coolers and the generators together in a yard behind sound walls
+    B(-77, -23.2, -45, 23.2, 0, .5, PAD);
+    for (i = 0; i < 6; i++){ var yx = -68 + (i % 2) * 13, yz = -14 + Math.floor(i / 2) * 14; B(yx - 4, yz - 3, yx + 4, yz + 3, .5, 6, UNIT); B(yx - 3.2, yz - 2.2, yx + 3.2, yz + 2.2, 6, 6.5, FAN); }
+    [-17, -6, 6, 17].forEach(function(zc){ B(-76.8, zc - 4, -73.6, zc + 4, .5, 3.9, "#b5c2c5"); });
+    B(-78, -24.2, -45, -23.2, 0, ST.hw, WALL); B(-78, 23.2, -45, 24.2, 0, ST.hw, WALL); B(-79, -24.2, -78, 24.2, 0, ST.hw, WALL);
+  }
+  // the substation: transformers under a gantry, and the switchgear house
+  [65, 70, 75].forEach(function(xc){ B(xc - 1.8, -19, xc + 1.8, -15.4, .25, 4.4, "#8fa2a8"); B(xc - .2, -17.4, xc + .2, -17, 4.4, 7.2, STEEL); });
+  B(62, -10.5, 78, -6.5, .25, 4.6, "#f1f4f2"); B(61.7, -21.3, 62.3, -20.7, 0, 9.5, STEEL); B(77.7, -21.3, 78.3, -20.7, 0, 9.5, STEEL); B(61.7, -21.2, 78.3, -20.8, 9, 9.5, STEEL);
+  // the office, with its glass front and its door
+  B(45, 4, 58, 19, 0, 8.5, "#f1f4f2"); B(58, 6, 58.4, 17, 1, 7, "#a9cbd6"); B(58, 9.5, 62, 13.5, 3.4, 3.8, CAP);
+  // the car park, the gatehouse, a few trees, and the fence with its gate on the east side
+  ["#c9d3cf", "#8fa2a8", "#d9b7a0", "#eef2ef", "#6f8f96"].forEach(function(c, n){ B(63 + n * 3, 9.5, 65 + n * 3, 13.9, .15, 1.6, c); if (n < 4) B(64.5 + n * 3, 21, 66.5 + n * 3, 25.4, .15, 1.6, ["#eef2ef", "#d9b7a0", "#8fa2a8", "#c9d3cf"][n]); });
+  B(77.5, 3.4, 81, 6.4, 0, 3.2, "#f1f4f2");
+  [[50, 26, .2], [56, 27, .7], [-20, 28, .45], [-6, 28.5, .9], [8, 28, .3], [22, 28.5, .6], [36, 28, .8], [72, 30, .5]].forEach(function(t){ T(t[0], t[1], t[2]); });
+  var F = CAMPUS.fence, FC = "#aebbb5"; B(F[0], F[1], F[2], F[1] + .4, 0, 2.6, FC); B(F[0], F[3] - .4, F[2], F[3], 0, 2.6, FC); B(F[0], F[1], F[0] + .4, F[3], 0, 2.6, FC); B(F[2] - .4, F[1], F[2], -3, 0, 2.6, FC); B(F[2] - .4, 3, F[2], F[3], 0, 2.6, FC);
+  // what each design adds
   if (ST.d === "D2"){ blk(cx - 72, cz + 32, cx + 72, cz + 44, ST.hb, 0, "#9cc0a0"); if (gvOn()) beltTrees(out, local(cx - 72, cz + 38, px, pz, ST.rot), local(cx + 72, cz + 38, px, pz, ST.rot), 8, ST.hb, 77); else blk(cx - 72, cz + 34, cx + 72, cz + 42, ST.hb + 6, ST.hb, "#7db3a8"); }
-  if (ST.d !== "D3") blk(cx - 77, cz - 12, cx - 47, cz + 12, 3, 0, "#9fb0b5");   // the west yard of the reference plant
   (ST.x || []).forEach(function(o, n){ if (o.k === "trees" && gvOn()) return beltTrees(out, o.a, o.b, o.v, 0, 31 + n); var w = o.k === "trees" ? o.v : o.k === "wall" ? 1.4 : 9; out.push(poly(belt(o.a, o.b, w).map(function(q){ return ll(q[0], q[1]); }), {h:o.k === "trees" ? 8 : o.v, b:0, c:o.k === "trees" ? "#7db3a8" : o.k === "wall" ? "#c3ccc8" : "#9cc0a0"})); });
-  if (ST.t === "T3") blk(cx + 50, cz - 16, cx + 60, cz - 6, 11, 0, "#b9d0dc");
-  if (ST.t === "T4") blk(cx - 34, cz + 25, cx - 26, cz + 31, 7, 0, "#d99a7c");
+  if (ST.t === "T3"){ C(51.5, -14, 5.5, 0, 11, "#b9d0dc"); C(51.5, -14, 5.9, 11, 11.6, "#9fbccb"); }   // the water tank of the hybrid package
+  if (ST.t === "T4"){ B(-34, 25, -26, 30.5, 0, 7, "#d99a7c"); B(-33, 23.2, -32, 25, 5, 6, "#d99a7c"); }   // the heat pumps of the heat-recovery package, piped to the south hall
   if (ST.d === "D4"){ blk(-23, 31, 47, 65, .4, 0, "#eef2ef", true); blk(14, 37, 40, 49, .9, 0, "#9fd0dc", true);
     [[-18, 35, "#e3c3b4"], [-18, 51, "#eadfc4"], [0, 53, "#d9c7ac"], [18, 53, "#e3d0c4"], [34, 53, "#eadcc4"]].forEach(function(b, n){ blk(b[0], b[1], b[0] + 12, b[1] + 9, 7 + (n % 2) * 3, 0, b[2], true); }); }
+  // energy: nothing is drawn for the grid. A chosen solar or wind supply is built elsewhere; it is drawn on the ground north of the fence so that
+  // what the budget buys can be seen, as many tables or turbines as the share of the power it pays for.
+  var P = energyPlot();
+  if (ST.e === "E2"){ B(P[0], P[1], P[2], P[3], 0, .15, "#e3e9df"); var np = solarTables();   // the first row is the one nearest the fence
+    for (i = 0; i < np; i++){ var sx = -72 + (i % 7) * 21.4, sz = -50 - Math.floor(i / 7) * 9; B(sx, sz, sx + 18, sz + 2.4, 2, 2.3, "#4a6ea8"); B(sx, sz + 2.4, sx + 18, sz + 4.8, 1.2, 1.5, "#3d5f95"); B(sx + 8.6, sz + 1, sx + 9.4, sz + 3.8, 0, 1.2, STEEL); } }
+  if (ST.e === "E3"){ B(P[0], P[1], P[2], P[3], 0, .15, "#e3e9df");
+    WINDAT.slice(0, windTurbines()).forEach(function(t, n){ var hub = 54 - (n % 2) * 4;
+      C(t[0], t[1], 1.4, 0, hub, "#f4f6f5"); B(t[0] - 2.6, t[1] - 1.2, t[0] + 2.6, t[1] + 1.2, hub - 1.2, hub + 1.4, "#f4f6f5"); B(t[0] - 3, t[1] - 3, t[0] + 3, t[1] + 3, 0, .5, "#cfd8d4");
+      [90, 210, 330].forEach(function(deg){ var a = (deg + n * 23) * Math.PI / 180; for (j = 0; j < 9; j++){ var dd = 2.4 + j * 2.4, bx = t[0] + Math.cos(a) * dd, by = hub + Math.sin(a) * dd; B(bx - 1.25, t[1] + 1.4, bx + 1.25, t[1] + 2, by - 1.3, by + 1.3, "#fbfdfc"); } }); }); }
   if (ST.e === "E4"){ blk(113, -13, 153, 13, .4, 0, "#e9eeeb", true); for (i = 0; i < 6; i++){ var nx = 118 + (i % 3) * 12, nz = -9 + Math.floor(i / 3) * 12; blk(nx, nz, nx + 9, nz + 5, 4, 0, "#6ea79d", true); } }
   return out;
+}
+// ---------- the parts of the campus, to visit ----------
+// In the immersive view each part of the campus carries a dot. Tap one to read what it is and what the choices made change there; "Go there" walks
+// to a place beside it and turns to face it, and Next goes round the campus part by part. The listener goes along, so the sound and its readout
+// follow. Every figure in these cards is one the page shows elsewhere, from the same source; what is only drawn to be recognised is said to be so.
+var HOT = {i:-1, k:null, marks:[], list:[]};
+function hotSpots(){
+  var t = TECH[ST.t], lv = LV[ST.t], to = optOf(ST.t), d3 = ST.d === "D3", en = ENERGY[ST.e], f = funds(), w = shareWords(f.share), out = [], all = statements(ST);
+  function st(code, ax){ return all.filter(function(x){ return x.code === code && (!ax || x.ax === ax); })[0]; }
+  function line(x){ return x ? x.t + (x.how ? " (" + x.how + ")" : "") + "." : ""; }
+  out.push({k:"halls", n:"Data halls", at:campusAt(28, 13.2), from:campusAt(-45, 150), say:["Two halls of servers on one spine. The figures are those of the reference plant of the original DataScope: 17.3 MW of computing.",
+    "With " + to[1].toLowerCase() + ": " + t.gwh + " GWh of electricity a year, " + t.mw.toFixed(1) + " MW at peak.", ST.site === "tx" ? "The College Station proposal was for 600 MW: there are no figures for it yet." : ""]});
+  out.push({k:"cooling", n:"Cooling", at:d3 ? campusAt(-61.5, 0) : campusAt(-22, -13.2), from:d3 ? campusAt(-190, -45) : campusAt(140, 115), say:[to[0] + " " + to[1] + ": " + to[2].charAt(0).toLowerCase() + to[2].slice(1) + ".",
+    t.water + " million gallons of cooling water a year. The units give " + lv[0] + " dBA at 15 m.", d3 ? "In this design they stand in the yard, behind sound walls " + ST.hw + " m high." : "They stand on the roofs, " + lv[2] + " m up."]});
+  if (d3) out.push({k:"walls", n:"Sound walls", at:campusAt(-78.5, 0), from:campusAt(-200, 45), say:["D3 Protected equipment yard: walls " + ST.hw + " m high on three sides of the yard. The hall closes the fourth.", line(st("D3", "quiet")), "Their height is not in the brief: it is the one set on the table."]});
+  else out.push({k:"yard", n:"Equipment yard", at:campusAt(-63.5, 0), from:campusAt(-200, 45), say:["The second source of sound in the model, after the roof units: " + lv[1] + " dBA at 15 m.", "The hall stands between this yard and the east side.", "The generators are drawn to be recognised. They are not taken from a plan."]});
+  out.push({k:"power", n:"Substation", at:campusAt(70, -14), from:campusAt(175, 75), say:["Where the grid comes in. Peak demand with this cooling package: " + t.mw.toFixed(1) + " MW.",
+    en ? "Supply: the grid, with " + w + " of the power " + (ST.e === "E4" ? "from microreactors on the site." : "matched by new " + en.what + " built elsewhere.") : "Supply: the grid alone (E1).", "The substation is drawn to be recognised, not taken from a plan."]});
+  var ep = energyPlot(), es = st(ST.e, "clean");
+  if (ep && es) out.push({k:"energy", n:ST.e === "E2" ? "Solar" : "Wind", at:campusAt((ep[0] + ep[2]) / 2, (ep[1] + ep[3]) / 2), from:campusAt(ep[0] - 70, ep[1] - 75), say:[es.t + ".", es.why, "All the power would take " + en.land.replace("sq mi", "square miles") + " of land, elsewhere, with its own neighbors. It is drawn here, beside the site, so that what the budget buys can be seen."]});
+  if (ST.e === "E4" && es) out.push({k:"energy", n:"Microreactors", at:[133, 0], from:[215, 95], say:[es.t + ".", es.why]});
+  if (ST.d === "D2") out.push({k:"screen", n:"Berm and trees", at:campusAt(0, 38), from:campusAt(15, 165), say:["D2 Reoriented and screened: a berm " + ST.hb + " m high and a belt of trees between the plant and the neighbors.", line(st("D2", "quiet")), line(st("D2", "views"))]});
+  if (ST.d === "D4"){ var s4 = st("D4"); out.push({k:"district", n:"Community district", at:[12, 48], from:[25, 170], say:["D4 Compact community district. " + (s4 ? s4.t + "." : ""), s4 ? s4.why : ""]}); }
+  if (ST.t === "T4"){ var sh = st("T4"); out.push({k:"heat", n:"Heat recovery", at:campusAt(-30, 27.7), from:campusAt(-55, 140), say:["T4 Heat recovery and reuse. " + (sh ? sh.t + "." : ""), sh ? sh.why : "", sh && sh.how ? sh.how.charAt(0).toUpperCase() + sh.how.slice(1) + "." : ""]}); }
+  return out;
+}
+function hotSync(){   // the dots follow the campus and the choices
+  HOT.marks.forEach(function(m){ m.remove(); }); HOT.marks = []; if (!AXO.map) return; HOT.list = hotSpots();
+  var i = HOT.k ? HOT.list.map(function(x){ return x.k; }).indexOf(HOT.k) : -1; HOT.i = i; if (i < 0) HOT.k = null;
+  HOT.list.forEach(function(sp, n){ var d = document.createElement("div"); d.className = "hotm"; d.innerHTML = '<button type="button" class="hot' + (n === HOT.i ? " on" : "") + '" data-hot="' + sp.k + '"><i></i><b>' + esc(sp.n) + '</b></button>';
+    var g = ll(sp.at[0], sp.at[1]); HOT.marks.push(new maplibregl.Marker({element:d, anchor:"bottom"}).setLngLat([g[1], g[0]]).addTo(AXO.map)); });
+  tourFill();
+}
+function tourFill(){
+  var el = $("tour"); if (!el) return; var sp = HOT.list[HOT.i], n = HOT.list.length;
+  el.innerHTML = !sp ? '<div class="twd"><b>The parts of the campus</b><p>Tap a dot to read what that part is and what the choices change there, or go round them one by one.</p></div><div class="tbt"><button type="button" class="go" data-tour="next">Start the tour ›</button></div>'
+    : '<div class="twd"><small>' + (HOT.i + 1) + ' of ' + n + '</small><b>' + esc(sp.n) + '</b>' + sp.say.filter(function(x){ return x; }).map(function(x){ return '<p>' + esc(x) + '</p>'; }).join("") + '</div>' +
+      '<div class="tbt"><button type="button" data-tour="prev" aria-label="Previous part">‹</button><button type="button" data-tour="go">Go there</button><button type="button" class="go" data-tour="next">Next ›</button><button type="button" data-tour="x" aria-label="Close">×</button></div>';
+  [].forEach.call(document.querySelectorAll(".hot"), function(b){ b.classList.toggle("on", !!sp && b.getAttribute("data-hot") === sp.k); });
+}
+function hotPick(i, go){ var n = HOT.list.length; if (!n) return; HOT.i = ((i % n) + n) % n; HOT.k = HOT.list[HOT.i].k; tourFill(); if (go) hotGo(HOT.list[HOT.i]); }
+function hotGo(sp){   // stand beside the part and face it; from above, bring it to the middle
+  var map = AXO.map, p = sp.at, q = sp.from; if (!map) return; AXO.hold = performance.now() + 15000;
+  if (gvOn() && GV.pos){ var d = Math.hypot(q[0] - GV.pos[0], q[1] - GV.pos[1]), bt = Math.atan2(p[0] - q[0], -(p[1] - q[1])) * 180 / Math.PI;
+    while (bt - GV.b > 180) bt -= 360; while (bt - GV.b < -180) bt += 360; GV.auto = false; GV.bTo = bt;
+    if (d > 3){ gvGo(q, d); GV.nf = true; } }
+  else { var g = ll(p[0], p[1]); map.easeTo({center:[g[1], g[0]], zoom:Math.max(map.getZoom(), 17.8), duration:900}); }
 }
 function axoStyle(light){
   var st = {version:8, light:{anchor:"viewport", color:"#ffffff", intensity:.32, position:[1.3, 215, 38]}, sky:{"sky-color":"#7fb1e4", "horizon-color":"#eaf2f6", "fog-color":"#e6efe6", "fog-ground-blend":.62, "horizon-fog-blend":.55, "sky-horizon-blend":.8, "atmosphere-blend":0}, sources:{}, layers:[{id:"bg", type:"background", paint:{"background-color":"#d9e3de"}}]};
@@ -1886,6 +2008,8 @@ function axoSync(){   // everything that follows the table: the blocks, the ring
   map.getSource("dc").setData(gj(dcBlocks()));
   AXO.marks.forEach(function(m){ m.remove(); }); AXO.marks = [amark([Math.max(cs[0][0], cs[1][0]), (cs[0][1] + cs[1][1]) / 2], "Data center", "dk", "bottom")];
   if (!gon) AXO.marks.push(amark(ll(c55[45][0], c55[45][1]), "55 dBA contour", "sn", "center"), amark(ll(c45[27][0], c45[27][1]), "45 dBA", "sn", "center"));
+  var ep = energyPlot(); if (ep){ var eq = campusAt((ep[0] + ep[2]) / 2, ep[1]); AXO.marks.push(amark(ll(eq[0], eq[1]), (ST.e === "E2" ? "Solar" : "Wind") + " · " + shareWords(share()) + " of the power · built elsewhere, drawn here", "en", "bottom")); }
+  hotSync();
   if (!AXO.you){ var d = document.createElement("div"); d.className = "you"; d.innerHTML = "<i></i><b>You</b>"; d.title = "Drag to stand somewhere else";
     AXO.you = new maplibregl.Marker({element:d, draggable:true, anchor:"bottom"}).setLngLat([0, 0]).addTo(map);
     AXO.you.on("drag", function(){ var p = AXO.you.getLngLat(), c0 = S().center; AXO.live = [(p.lng - c0[1]) * MXs(), (c0[0] - p.lat) * MY]; axoEar(); });
@@ -2256,6 +2380,9 @@ document.addEventListener("click", function(ev){
   if ((b = T.closest("[data-gv]"))){ GV.on = b.getAttribute("data-gv") === "on"; GV.auto = true; GV.bTo = null; GV.to = null; gvSave(); render(); return; }
   if ((b = T.closest("[data-gh]"))){ GV.h = +b.getAttribute("data-gh"); GV.tilt = GVTILT[GV.h]; gvSave(); gvCam(); axoKey(); return; }
   if ((b = T.closest("[data-snd]"))){ AXO.on = b.getAttribute("data-snd") === "on" && audioStart(); axoEar(); axoKey(); return; }
+  if ((b = T.closest("[data-hot]"))){ var hk = b.getAttribute("data-hot"); hotPick(HOT.list.map(function(x){ return x.k; }).indexOf(hk), false); AXO.hold = performance.now() + 15000; return; }
+  if ((b = T.closest("[data-tour]"))){ var tw = b.getAttribute("data-tour");
+    if (tw === "x"){ HOT.i = -1; HOT.k = null; tourFill(); } else if (tw === "go"){ if (HOT.list[HOT.i]) hotGo(HOT.list[HOT.i]); } else hotPick(HOT.i < 0 ? 0 : HOT.i + (tw === "next" ? 1 : -1), true); return; }
   if ((b = T.closest("[data-az]")) && AXO.map){ var how = b.getAttribute("data-az"), m = AXO.map, c0 = S().center;
     if (how === "imm"){ immersive(!document.body.classList.contains("imm")); return; }
     if (gvOn()){ if (how === "in" || how === "out") gvAhead(how === "in" ? 60 : -60); else if (how === "reset"){ GV.auto = true; GV.bTo = null; GV.tilt = GVTILT[GV.h]; GV.earKey = null; GV.rel = null; ST.ear = null; ST.pan = [0, 0]; render(); tell(); } else gvTurn(how === "left" ? -30 : 30); return; }
@@ -2293,7 +2420,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-170851";
+var BUILD = "20261123-172510";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
