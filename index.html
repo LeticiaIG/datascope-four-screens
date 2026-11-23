@@ -196,6 +196,10 @@ body.grey{background:var(--bg)}
 .bar.bm{flex:0 0 auto;width:5.5rem;height:.5rem} .bar.bm i{background:var(--accent)} .bar.bm.over i{background:var(--over)}
 .pbtn{font:inherit;font-size:.82rem;font-weight:700;color:var(--ink);background:var(--sunk);border:0;border-radius:999px;padding:.3rem .8rem;cursor:pointer}
 .pbtn:hover,.pbtn[aria-expanded="true"]{background:var(--ink);color:#fff}
+.padd{font:inherit;font-size:.8rem;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:999px;padding:.28rem .65rem;cursor:pointer;white-space:nowrap}
+.padd:hover{background:var(--ink)} .padd:active{transform:scale(.94)}
+.pback{white-space:nowrap} .omini .bl.sub{font-weight:600}
+.budget .omini{gap:.6rem} .budget .omini .bar{width:7rem} .budget .omini .bl{white-space:nowrap}
 .opt.no > span{opacity:.55} .opt.no input{cursor:not-allowed} .opt.no .sub{color:var(--over);font-weight:600}
 .opt .val{color:var(--muted)} .opt input:checked + span .val{color:var(--ink)}
 .exnote{margin:0;font-size:.78rem !important;font-weight:600 !important;color:var(--muted);letter-spacing:0 !important}
@@ -403,6 +407,11 @@ body.inroom .scr{border-color:#2b3432;box-shadow:0 0 60px rgba(190,220,205,.13),
 .whl[data-size="big"] .wl{font-size:18px} .whl[data-size="big"] .pc{font-size:13px} .whl[data-size="big"] .rc{font-size:13px}
 .wkey{margin:0;display:flex;flex-wrap:wrap;justify-content:center;gap:.1rem .9rem;font-size:.74rem;font-weight:600;color:var(--muted)}
 .wkey span{display:flex;align-items:center;gap:.3rem}
+.wtap{margin:0;text-align:center;font-size:.9rem;font-weight:600;color:var(--muted)} .wtap b{color:var(--ink)}
+.whow{display:flex;flex-direction:column;gap:.15rem} .wkey.w2 b{color:var(--ink);font-weight:700}
+.wl[data-wax]{cursor:pointer} .wl.on{text-decoration:underline;text-underline-offset:3px} .wl[data-wax]:focus-visible{outline:none;text-decoration:underline}
+.tfor{margin:0 0 .15rem;font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap} .tfor b{font-weight:700}
+.tfor i{width:1rem;height:.7rem;border-radius:2px;background:var(--accent);flex:none} .tfor i.l{background:var(--over)} .tfor i.q{background:none;border:1.5px dashed var(--accent)} .tfor i.l.q{border-color:var(--over)}
 .wkey i{width:.9rem;height:.6rem;border-radius:2px;background:var(--accent)} .wkey i.l{background:var(--over)} .wkey i.q{background:none;border:1.5px dashed var(--muted)}
 .trc{min-height:0;min-width:0;padding:.7rem .9rem;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);grid-template-rows:minmax(0,1fr);gap:.8rem}
 .trace{min-height:0;min-width:0;display:flex;flex-direction:column;gap:.4rem}
@@ -560,7 +569,8 @@ html.checking .app{visibility:hidden}
 </head>
 <body>
 <script>
-// A light lock. When access.txt holds the SHA-256 of a code, the page asks for that code before it shows anything, and remembers it on this device.
+// A light lock. When access.txt holds the SHA-256 of a code, the page asks for that code every time it is opened, before it shows anything.
+// Nothing is remembered on the device. One exception: when the page reloads itself because a new version was published, that reload passes once.
 // It keeps casual visitors out. It is not security: this page's own code is public. Open the page with ?setcode to turn a code into the line for access.txt.
 (function(){
   var root = document.documentElement, q = new URLSearchParams(location.search); root.classList.add("checking");
@@ -571,13 +581,24 @@ html.checking .app{visibility:hidden}
   function when(fn){ if (document.body) fn(); else document.addEventListener("DOMContentLoaded", fn); }
   if (q.has("setcode")){ when(function(){ var g = box('<h2>Choose an access code</h2><p>Type the code people will need. It is not sent anywhere.</p><input name="c" type="text" aria-label="Access code"><button type="submit">Make the line</button><p>Put this line in access.txt:</p><output>—</output>');
       g.querySelector("form").addEventListener("submit", function(ev){ ev.preventDefault(); var v = ev.target.c.value; if (v) sha(v).then(function(h){ g.querySelector("output").textContent = h; }); }); }); return; }
-  var t = setTimeout(open, 2500);
-  fetch("access.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(txt){
-    clearTimeout(t); var want = ((txt || "").match(/\b[0-9a-f]{64}\b/i) || [""])[0].toLowerCase(), have = ""; try { have = localStorage.getItem("dcscope-access") || ""; } catch(e){}
-    if (!want || have === want || !window.crypto || !crypto.subtle){ open(); return; }
-    when(function(){ var g = box('<h2>DataScope.</h2><p>This page asks for an access code.</p><input name="c" type="password" aria-label="Access code" autofocus><button type="submit">Open</button><p role="alert"></p>');
-      g.querySelector("form").addEventListener("submit", function(ev){ ev.preventDefault(); sha(ev.target.c.value).then(function(h){ if (h === want){ try { localStorage.setItem("dcscope-access", want); } catch(e){} g.remove(); open(); } else g.querySelector("[role=alert]").textContent = "That code does not open it."; }); }); });
-  }).catch(function(){ clearTimeout(t); open(); });
+  var wait = null, slow = setTimeout(function(){ when(function(){ wait = box('<h2>DataScope.</h2><p>Checking the access code…</p>'); }); }, 4000);
+  function settle(){ clearTimeout(slow); if (wait){ wait.remove(); wait = null; } }
+  function ask(want){
+    when(function(){ var g = box('<h2>DataScope.</h2><p>This page asks for an access code.</p><input name="c" type="password" inputmode="numeric" aria-label="Access code" autofocus><button type="submit">Open</button><p role="alert"></p>');
+      g.querySelector("form").addEventListener("submit", function(ev){ ev.preventDefault(); sha(ev.target.c.value).then(function(h){ if (h === want){ window.dcKeepOpen = function(){ try { sessionStorage.setItem("dcscope-pass", want); } catch(e){} }; g.remove(); open(); } else { g.querySelector("[role=alert]").textContent = "That code does not open it."; ev.target.c.select(); } }); }); });
+  }
+  function check(){
+    fetch("access.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ if (!r.ok && r.status !== 404) throw new Error("access " + r.status); return r.ok ? r.text() : ""; }).then(function(txt){
+      settle(); var want = ((txt || "").match(/\b[0-9a-f]{64}\b/i) || [""])[0].toLowerCase(), pass = "";
+      try { pass = sessionStorage.getItem("dcscope-pass") || ""; sessionStorage.removeItem("dcscope-pass"); localStorage.removeItem("dcscope-access"); } catch(e){}
+      if (!want || !window.crypto || !crypto.subtle){ open(); return; }   // no code set, or a browser that cannot check one
+      if (pass === want){ window.dcKeepOpen = function(){ try { sessionStorage.setItem("dcscope-pass", want); } catch(e){} }; open(); return; }
+      ask(want);
+    }).catch(function(){ settle();
+      if (location.protocol === "file:"){ open(); return; }   // a copy opened from a folder has no access.txt to read
+      when(function(){ var g = box('<h2>DataScope.</h2><p>The access code could not be checked. Check the connection and try again.</p><button type="submit">Try again</button>'); g.querySelector("form").addEventListener("submit", function(ev){ ev.preventDefault(); g.remove(); check(); }); }); });
+  }
+  check();
 })();
 </script>
 <div class="app">
@@ -638,6 +659,8 @@ var ENERGY = { E2:{cost:275, land:"1.5 sq mi", what:"solar"}, E3:{cost:150, land
 var BUD0 = [20, 1], PRICE0 = {D1:[0, 0], D2:[4, .1], D3:[6, .2], D4:[12, .5], T1:[0, 0], T2:[5, .2], T3:[3, .1], T4:[8, .3], B1:[6, .4], B2:[8, 0], B3:[5, .3], B4:[3, .4]}, PRICED = Object.keys(PRICE0), PRED = false;
 function r2(x){ return Math.round(x * 100) / 100; }
 function bud(){ return Array.isArray(ST.bud) ? ST.bud : BUD0; }
+var BUDSTEP = [1, .1];   // what one tap on the table adds to the budget: $1M upfront, $0.1M a year
+function budChanged(){ var b = bud(); return b[0] !== BUD0[0] || b[1] !== BUD0[1]; }
 function price(code){ return (ST.pr && ST.pr[code]) || PRICE0[code] || [0, 0]; }
 function spentOf(st){ var u = 0, y = 0; [st.d, st.t].concat(["B1", "B2", "B3", "B4"].filter(function(k){ return st.b[k]; })).forEach(function(c){ var p = price(c); u += p[0]; y += p[1]; }); return [r2(u), r2(y)]; }
 function leftOf(st){ var sp = spentOf(st || ST), b = bud(); return [r2(b[0] - sp[0]), r2(b[1] - sp[1])]; }   // what the choices leave of the budget, before energy takes the rest
@@ -1215,7 +1238,7 @@ function noteHTML(n){ return NOTES_ON ? '<div class="note"><b>From the brief</b>
 // ---------- screens ----------
 // Four screens, one story. Scenario Editor: decide (the table). Sentiment map: listen; it stays the original DataScope screen and opens there.
 // Neighborhood view: see. Live analysis: measure.
-var SENTIMENT = "https://cityscope.media.mit.edu/DataScope/", VIEWS = [["editor", "Scenario Editor"], ["sentiment", "Sentiment map"], ["view", "Site layout"], ["analysis", "Live analysis"], ["metrics", "Metrics"], ["examples", "Examples"], ["all", "All"]], VIEW = "all";
+var SENTIMENT = "https://cityscope.media.mit.edu/DataScope/", VIEWS = [["editor", "Scenario Editor"], ["sentiment", "Sentiment map"], ["view", "Site layout"], ["analysis", "Live analysis"], ["examples", "Examples"], ["all", "All"]], VIEW = "all";
 function sayLine(page){
   if (page === "design") return {D1:"The conventional campus, as proposed.", D2:"The building moves back, behind setbacks, berms and planting.", D3:"Noisy equipment sits in a yard behind zigzag sound walls.", D4:"A walkable cluster of pool, spa, community rooms and cafes uses the waste heat."}[ST.d];
   if (page === "technology") return {T1:"Conventional cooling: the reference for every other package.", T2:"Almost no cooling water. More power on hot days and louder fans.", T3:"Less electricity and water than the baseline, and quieter.", T4:"Server heat is recovered and sold to nearby customers."}[ST.t];
@@ -1228,7 +1251,7 @@ function sayLine(page){
 function meterHTML(used, total){ var p = total > 0 ? Math.max(0, Math.min(1, used / total)) : (used > 0 ? 1 : 0); return '<span class="bar bm' + (used > total + 1e-9 ? " over" : "") + '" role="img" aria-label="' + money(used) + ' of ' + money(total) + ' spent"><i style="width:' + Math.round(p * 100) + '%"></i></span>'; }
 function offerHTML(){   // the budget on the walls: what it is, what the choices have spent, and what is left
   var en = ENERGY[ST.e], b = bud(), sp = spentOf(ST), l = leftOf(ST), f = funds(), over = overBudget(), lines = chosen(ST).filter(function(c){ return c.charAt(0) !== "E" && (price(c)[0] || price(c)[1]); }).map(function(c){ return c + " " + priceWords(price(c)); });
-  return '<div class="card offerbar"><div class="offer"><small>The budget · the developer’s offer, for the community to allocate · taxes come on top</small><b>' + money(b[0]) + ' upfront + ' + money(b[1]) + ' a year</b><small>Example prices: no source gives the real ones yet</small></div>' +
+  return '<div class="card offerbar"><div class="offer"><small>The budget · the developer’s offer, for the community to allocate · taxes come on top</small><b>' + money(b[0]) + ' upfront + ' + money(b[1]) + ' a year</b><small>' + (budChanged() ? 'Started at ' + money(BUD0[0]) + ' + ' + money(BUD0[1]) + ' a year, changed on the table · ' : '') + 'Example prices: no source gives the real ones yet</small></div>' +
     '<div class="mid"><b class="goes' + (over ? " bad" : "") + '">' + (over ? "Over the budget by " + shortWords([Math.max(0, -l[0]), Math.max(0, -l[1])]).replace(" short", "") + ": something has to go." :
       "Spent " + money(sp[0]) + " upfront and " + money(sp[1]) + " a year. " + (en ? (f.e > 0 ? "The " + money(f.e) + " left goes to " + en.what + ": " + shareWords(f.share) + " of the power." : "Nothing is left for " + en.what + ".") : "Left: " + money(l[0]) + " and " + money(l[1]) + " a year.")) + '</b>' +
     '<span class="goes">' + (lines.length ? lines.join(" · ") : "Nothing chosen costs extra yet.") + '</span></div>' +
@@ -1238,7 +1261,10 @@ function chosenName(key){ var P = PAGES[{d:"design", t:"technology", e:"energy"}
 function ominiHTML(ro){   // the budget on the table: what is left of each part, and the way to the prices (ro: on a wall, to read only)
   var b = bud(), sp = spentOf(ST), l = leftOf(ST), f = funds(), over = overBudget();
   function part(left, total, unit, extra){ return '<span class="bl' + (left < 0 ? " bad" : "") + '">' + (left < 0 ? '<b>' + money(-left) + '</b> over the ' + money(total) + ' ' + unit : '<b>' + money(left) + '</b> of ' + money(total) + ' ' + unit + ' left' + (extra || "")) + '</span>'; }
-  return '<span class="omini"><b>Budget</b>' + part(l[0], b[0], "upfront", f.e > 0 ? ", for " + ENERGY[ST.e].what : "") + meterHTML(sp[0] + f.e, b[0]) + part(l[1], b[1], "a year") + meterHTML(sp[1], b[1]) + (over ? '<span class="pill over">Over the budget</span>' : '') +
+  var grown = budChanged(), start = money(BUD0[0]) + " + " + money(BUD0[1]) + " a year";
+  function add(i){ return ro ? '' : '<button type="button" class="padd" data-budadd="' + i + '" title="Add ' + money(BUDSTEP[i]) + (i ? " a year" : " upfront") + ' to the budget" aria-label="Add ' + money(BUDSTEP[i]) + (i ? " a year" : " upfront") + ' to the budget">+ ' + money(BUDSTEP[i]) + '</button>'; }
+  return '<span class="omini"><b>Budget</b>' + part(l[0], b[0], "upfront", f.e > 0 ? ", for " + ENERGY[ST.e].what : "") + meterHTML(sp[0] + f.e, b[0]) + add(0) + part(l[1], b[1], "a year") + meterHTML(sp[1], b[1]) + add(1) + (over ? '<span class="pill over">Over the budget</span>' : '') +
+    (grown ? (ro ? '<span class="bl sub">started at ' + start + '</span>' : '<button type="button" class="pbtn pback" data-budback title="Back to the starting budget: ' + start + '">↺ ' + start + '</button>') : '') +
     (ro ? '' : '<button type="button" class="pbtn" data-prices aria-expanded="' + PRED + '">Prices</button>') + '</span>';
 }
 function pricerHTML(){   // the budget and the prices, open to change: they are examples until the real ones are known
@@ -1400,6 +1426,7 @@ function viewHTML(bare){ if (ST.site !== "mi") return AXO.failed ? '<div class="
 var WAX = [["quiet", "Quiet"], ["views", "Views"], ["water", "Water"], ["power", "Electricity"], ["clean", "Clean power"], ["places", "Places to use"], ["money", "Money and jobs"]];
 var DEGW = ["", "A little", "Clearly", "Much"];
 function degPct(now, ref){ var p = Math.abs(now - ref) / ref; return p < .1 ? 1 : p < .3 ? 2 : 3; }   // under 10%, 10 to 30%, over 30%
+function degShare(x){ return x < .1 ? 1 : x < .3 ? 2 : 3; }                                         // a share of the power: the same steps
 function degDb(d){ d = Math.abs(d); return d < 3 ? 1 : d < 8 ? 2 : 3; }                              // sound: under 3 dB, 3 to 8 dB, over 8 dB
 var SRC = {
   brief:"The brief describes this alternative. It gives no measurement yet.",
@@ -1437,8 +1464,8 @@ function fx(code){
     case "B4": return [{ax:"money", dir:1, full:"Paid training and internships", why:"Part of the budget pays for training and internships for residents.", src:"offer", how:HOWC}];
   }
   if (en){ var big = en.cost >= 1000 ? "$1B" : "$" + en.cost + "M", fe = funds().e, w = shareWords(fe / en.cost), W = w.charAt(0).toUpperCase() + w.slice(1), got = fe > 0 ? "The " + money(fe) + " left of the upfront budget" : "Nothing is left of the upfront budget, which";
-    return [code === "E4" ? {ax:"clean", dir:1, deg:1, full:W + " of six microreactors paid for", why:"Six eVinci units on the site would cost about $1B. " + got + " covers " + w + " of that.", num:money(fe) + " of about $1B.", src:"notes"}
-        : {ax:"clean", dir:1, deg:1, full:W + " of the power from new " + en.what, why:got + " pays for " + (fe > 0 ? "" : "no ") + en.what + " built elsewhere. Matching all the power takes about " + big + ".", num:money(fe) + " of about " + big + ". Matching all the power takes " + en.land.replace("sq mi", "square miles") + " of land elsewhere, with its own neighbors.", src:"notes"},
+    return [code === "E4" ? {ax:"clean", dir:1, deg:degShare(fe / en.cost), full:W + " of six microreactors paid for", why:"Six eVinci units on the site would cost about $1B. " + got + " covers " + w + " of that.", num:money(fe) + " of about $1B.", src:"notes"}
+        : {ax:"clean", dir:1, deg:degShare(fe / en.cost), full:W + " of the power from new " + en.what, why:got + " pays for " + (fe > 0 ? "" : "no ") + en.what + " built elsewhere. Matching all the power takes about " + big + ".", num:money(fe) + " of about " + big + ". Matching all the power takes " + en.land.replace("sq mi", "square miles") + " of land elsewhere, with its own neighbors.", src:"notes"},
       {ax:"money", dir:-1, full:"Upfront money spent on energy is not there for benefits", why:"The budget is spent once. The community decides between energy and benefits.", src:"offer", how:HOWC}]; }
   return [];
 }
@@ -1524,13 +1551,23 @@ function wheelSVG(st, sel, size){
       if (!mini){ var am = (a0 + a1) / 2, rt = s.dir > 0 ? r2 + (big ? 13 : 10) : r1 - (big ? 12 : 9), q = P(rt, am).split(" "); o += '<text x="' + q[0] + '" y="' + (+q[1] + 4).toFixed(1) + '" text-anchor="middle" class="pc' + (dim ? " dim" : "") + '">' + s.code + '</text>'; }
     });
     if (!mini){ var q = P(R0 + so * 3.2 + (big ? 30 : 16), a).split(" "), dx = +q[0] - cx, has = mine.length;
-      o += '<text x="' + q[0] + '" y="' + (+q[1] + 5).toFixed(1) + '" text-anchor="' + (Math.abs(dx) < 14 ? "middle" : dx > 0 ? "start" : "end") + '" class="wl' + (has ? "" : " off") + '">' + ax[1] + '</text>'; }
+      o += '<text x="' + q[0] + '" y="' + (+q[1] + 5).toFixed(1) + '" text-anchor="' + (Math.abs(dx) < 14 ? "middle" : dx > 0 ? "start" : "end") + '" class="wl' + (has ? "" : " off") + ((selS ? selS.ax : sel ? null : SEL.ax) === ax[0] ? " on" : "") + '" data-wax="' + ax[0] + '" tabindex="0" role="button" aria-label="' + ax[1] + ': why">' + ax[1] + '</text>'; }
   });
   o += '<circle cx="' + cx + '" cy="' + cy + '" r="' + R0 + '" class="ring"/>';
   if (!mini) o += '<text x="' + cx + '" y="' + (cy - 2) + '" text-anchor="middle" class="rc">Conventional</text><text x="' + cx + '" y="' + (cy + (big ? 15 : 11)) + '" text-anchor="middle" class="rc">campus</text>';
   return o + '</svg>';
 }
 var WKEY = '<p class="wkey"><span><i class="g"></i>gained, outward</span><span><i class="l"></i>given up, inward</span><span><i class="q"></i>size not known</span><span>longer = more</span></p>';
+// The wheel explained where it is drawn: what to tap, and what a wedge's place, color, length and code say. The steps are the ones the statements use.
+var WTAP = '<p class="wtap"><b>Tap a wedge</b>, or the name of a spoke, to see why it is there.</p>';
+var WHOW = '<div class="whow">' + WKEY + '<p class="wkey w2"><span><b>A wedge</b> is one effect of one choice; its code (T2) is the choice</span><span><b>The circle</b> is the conventional campus</span></p>' +
+  '<p class="wkey w2"><span><b>Length</b> a little: under 10%</span><span>clearly: 10 to 30%</span><span>much: over 30%</span><span>sound: under 3, 3 to 8, over 8 dB</span></p></div>';
+var LENW = ["", "Short", "Medium", "Long"], LENPCT = ["", "under 10%", "10 to 30%", "over 30%"], LENDB = ["", "under 3 dB", "3 to 8 dB", "over 8 dB"];
+function axName(k){ return WAX.filter(function(a){ return a[0] === k; })[0][1]; }
+function lenWhy(s){   // why the wedge is as long as it is, or why it is dashed
+  if (!s.deg) return '<b>Why it is dashed</b> The direction is known, the size is not yet. ' + (s.how === HOWC ? "The community decides how much of the budget goes here." : "The brief asks the developer for it.");
+  return '<b>Why this length</b> ' + LENW[s.deg] + ": " + (s.ax === "quiet" ? LENDB : LENPCT)[s.deg] + (s.ax === "clean" ? " of the power" : s.ax === "quiet" ? "" : " of the reference") + ". " + s.num;
+}
 var QS = [["why", "Why?"], ["else", "What else?"], ["change", "What would change it?"], ["source", "Source?"]];
 function setBtn(code, note, cls){ var o = optOf(code); return '<button type="button" class="setb ' + (cls || "") + '" data-set="' + code + '"><span class="cd">' + code + '</span><b>' + o[1] + '</b><small>' + note + '</small></button>'; }
 function others(ax, skip){   // choices not made that would move this outcome
@@ -1538,19 +1575,24 @@ function others(ax, skip){   // choices not made that would move this outcome
     if (chosen(ST).indexOf(code) >= 0 || code === skip) return; stmOf(code).forEach(function(s){ if (s.ax === ax) out.push(setBtn(code, s.t + (s.how ? ", " + s.how : ""), s.dir > 0 ? "g" : "l")); }); });
   return out;
 }
+function pickSpoke(ax){   // a spoke's name: its wedges one after the other, or why it has none
+  var on = statements(ST).filter(function(x){ return x.ax === ax; }), i = SEL.ax ? -1 : on.map(function(x){ return x.id; }).indexOf(SEL.id);
+  if (on.length){ SEL.id = on[(i + 1) % on.length].id; SEL.ax = null; SEL.q = "why"; } else SEL.ax = ax;
+  SEL.msg = ""; wordsFill();
+}
 function askRow(){ return '<form class="askf" id="askf" autocomplete="off"><input id="askq" name="q" maxlength="200" placeholder="Ask about a result: why is it louder?" aria-label="Ask about a result" value="' + esc(SEL.text) + '">' + micBtn("ask") + '<button type="submit">Ask</button></form>'; }
 function traceHTML(st, un){
   var s = pickSel(st, un), o = "";
   if (SEL.ax){ var axn = WAX.filter(function(a){ return a[0] === SEL.ax; })[0][1], alt = others(SEL.ax);
-    o = '<div class="tbody"><p class="tmsg">Nothing chosen so far changes <b>' + axn.toLowerCase() + '</b>.' + (alt.length ? " These would:" : "") + '</p><div class="sets">' + alt.join("") + '</div></div>'; }
-  else if (!s) o = '<div class="tbody"><p class="tmsg">This is the conventional campus: the reference every other choice is compared with. Choose an alternative on the table, then tap a result to see where it comes from.</p></div>';
+    o = '<div class="tbody"><p class="tfor">Why there is no wedge on <b>' + axn + '</b></p><p class="tmsg">Nothing chosen so far changes <b>' + axn.toLowerCase() + '</b>, so the wheel stays on the circle there.' + (alt.length ? " These would:" : "") + '</p><div class="sets">' + alt.join("") + '</div></div>'; }
+  else if (!s) o = '<div class="tbody"><p class="tfor">Why the wheel is empty</p><p class="tmsg">This is the conventional campus: the circle, the reference every other choice is compared with. Choose an alternative on the table: each of its effects appears as a wedge. Then tap a wedge to see where it comes from.</p></div>';
   else {
     var op = s.calc ? ["ADD", "Added on the table"] : optOf(s.code), ch = s.calc ? "design" : CHOF[s.code.charAt(0)], cls = s.un ? "u" : s.dir > 0 ? "g" : "l", q = s.un ? "why" : SEL.q, body;
     var head = '<div class="tq" role="group" aria-label="Questions about this result">' + (s.un ? '' : QS.map(function(x){ return '<button type="button" data-q="' + x[0] + '" aria-pressed="' + (q === x[0]) + '">' + x[1] + '</button>'; }).join("")) + '</div>';
-    var chain = '<div class="chain"><div class="bx ' + cls + '"><small>' + (s.un ? "Not known yet" : s.dir > 0 ? "Gained" : "Given up") + '</small><b>' + s.t + '</b></div>' +
+    var chain = '<div class="chain"><div class="bx ' + cls + '"><small>' + (s.un ? "Not known yet" : (s.dir > 0 ? "Gained" : "Given up") + " · the " + (s.dir > 0 ? "green" : "red") + (s.deg ? "" : " dashed") + " wedge on " + axName(s.ax)) + '</small><b>' + s.t + '</b></div>' +
       '<div class="bx"><small>Because</small><span>' + (s.un ? "The brief asks the developer for this. No answer yet." : s.why) + '</span></div>' +
       '<button type="button" class="bx ch" data-ch="' + ch + '"><small>' + (s.calc ? "It comes from what was added" : "It comes from this choice") + '</small><b><span class="cd">' + s.code + '</span>' + op[1] + '</b></button></div>';
-    if (q === "why") body = chain + '<p class="tnum">' + (s.un ? '<button type="button" class="keep" data-keep="' + esc(s.code + " " + op[1] + ": " + s.t + "?") + '">Keep this question for the developer</button>' : s.num ? "<b>The number behind it</b> " + s.num : "<b>No figure yet.</b> " + (s.how === HOWC ? "The community decides how much of the budget goes here." : "The brief asks the developer for it.")) + '</p>';
+    if (q === "why") body = chain + '<p class="tnum">' + (s.un ? '<button type="button" class="keep" data-keep="' + esc(s.code + " " + op[1] + ": " + s.t + "?") + '">Keep this question for the developer</button>' : lenWhy(s)) + '</p>';
     else if (q === "else"){ var same = st.concat(un).filter(function(x){ return x.code === s.code && x.id !== s.id; });
       body = '<p class="tmsg"><span class="cd">' + s.code + '</span> <b>' + op[1] + '</b> also brings:</p><div class="sets">' + (same.length ? same.map(stmBtn).join("") : '<p class="nil">Nothing else that is known.</p>') + '</div>'; }
     else if (q === "change"){ var g = s.code.charAt(0), undo = s.calc ? '' : g === "B" ? '<button type="button" class="setb" data-set="' + s.code + '"><span class="cd">' + s.code + '</span><b>Leave it out</b><small>removes this result</small></button>' : setBtn(g + "1", "back to the baseline: removes this result");
@@ -1564,7 +1606,7 @@ function wordsFill(){
   var st = statements(ST), un = unknowns(ST), had = document.activeElement && document.activeElement.id === "askq";
   pickSel(st, un);
   [].forEach.call(document.querySelectorAll('[data-w="ledger"]'), function(el){ el.innerHTML = ledgerHTML(st, un); });
-  [].forEach.call(document.querySelectorAll('[data-w="wheel"]'), function(el){ el.innerHTML = wheelSVG(st, SEL.ax ? null : SEL.id, el.getAttribute("data-size")) + WKEY; });
+  [].forEach.call(document.querySelectorAll('[data-w="wheel"]'), function(el){ var big = el.getAttribute("data-size") === "big"; el.innerHTML = (big ? WTAP : "") + wheelSVG(st, SEL.ax ? null : SEL.id, el.getAttribute("data-size")) + (big ? WHOW : WKEY); });
   [].forEach.call(document.querySelectorAll('[data-w="trace"]'), function(el){ el.innerHTML = traceHTML(st, un); });
   if (had && $("askq")){ var i = $("askq"); i.focus(); try { i.setSelectionRange(i.value.length, i.value.length); } catch(e){} }
 }
@@ -2064,21 +2106,8 @@ function altCards(cls){   // one card per alternative of the chapter: its pictur
     return '<label class="' + cls + (on ? " on" : "") + (no ? " no" : "") + '"' + (no ? ' title="Does not fit the budget: ' + shortWords(shortOf(op[0])) + '"' : '') + '><input type="' + (P.multi ? "checkbox" : "radio") + '" name="' + (P.multi ? "ben" : "pick") + '" id="' + cls + "-" + op[0] + '" value="' + op[0] + '"' + (on ? " checked" : "") + (no ? " disabled" : "") + ' aria-label="' + op[0] + " " + op[1] + (no ? ", does not fit the budget" : "") + '">' + (cls === "sc" ? '<div class="thumb" data-alt="' + op[0] + '"></div>' : '') + '<div class="t"><b>' + op[0] + '</b><span>' + op[1] + '</span></div><div class="r">' + wheelSVG(st, null, "mini") + '</div></label>'; }).join("");
 }
 // The right wall: the picture and its alternatives on the left; on the right what the scenario gives, takes and leaves unknown, and the trace of one result back to its choice.
-function analysisHTML(bare){
-  return '<div class="outcome"><div class="card stage" data-view="tall"><div class="say" aria-live="polite">' + sayLine(ST.ch) + '<span class="saybud">' + ominiHTML(true) + '</span></div>' +
-    '<div class="card pick"><div class="steps">' + CH.map(function(c, i){ return '<button type="button" data-ch="' + c + '" aria-pressed="' + (c === ST.ch) + '"><b>' + (i + 1) + '</b>' + (c === "benefits" ? "Benefits" : PAGES[c].n) + '</button>'; }).join("") + '</div></div></div>' +
-    '<div class="card led" data-w="ledger"></div>' +
-    '<div class="scen">' + altCards("sc") + '</div>' +
-    '<div class="card trc"><div class="whl" data-w="wheel" data-size="mid"></div><div class="trace" data-w="trace"></div></div></div>';
-}
-var TOK = 0;
-function drawThumbs(list, tok){
-  var el = list.shift(); if (!el || tok !== TOK) return;
-  var src = withAlt(ST.ch, el.getAttribute("data-alt"), function(){ return painting("paint", ST.ch, "S"); });
-  if (src){ var cv = document.createElement("canvas"); cv.width = src.width; cv.height = src.height; cv.getContext("2d").drawImage(src, 0, 0); cv.setAttribute("aria-hidden", "true"); el.appendChild(cv); }
-  if (list.length) setTimeout(function(){ drawThumbs(list, tok); }, 0);
-}
-// The extra page: the same reading without the picture. The wheel, large; one small wheel per alternative of the chapter (tap one to choose it); the three lists; the trace; the offer.
+// The right wall: the reading in words and in the wheel, with no picture. The wheel, large, with how to read it; one small wheel per alternative of the chapter
+// (tap one to choose it); the three lists; the trace, which says why each wedge is there; the offer. (#metrics, its older address, opens the same screen.)
 function metricsHTML(bare){
   var b = modules();
   return '<div class="card measure"><div class="hd">Live analysis · what this scenario gives and takes</div>' +
@@ -2088,15 +2117,14 @@ function metricsHTML(bare){
     '<div class="mright"><div class="led" data-w="ledger"></div><div class="trace" data-w="trace"></div></div></div>' + offerHTML() + '</div>';
 }
 function render(){
-  var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:analysisHTML, metrics:metricsHTML, examples:examplesHTML};
+  var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:metricsHTML, examples:examplesHTML};
   $("views").innerHTML = VIEWS.map(function(v){ return '<a class="tab" href="#' + v[0] + '"' + (v[0] === VIEW ? ' aria-current="page"' : '') + '>' + v[1] + '</a>'; }).join("");
-  function mini(k){ return '<div class="mini' + (k === "analysis" || k === "metrics" ? " grey" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
+  function mini(k){ return '<div class="mini' + (k === "analysis" ? " grey" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
   var own = (VIEW === "sentiment" || VIEW === "view") && ST.site === "mi", shown = main.getAttribute("data-shown"), key = VIEW + "|" + ST.site;
   $("sites").innerHTML = ["mi", "tx"].map(function(k){ return '<button type="button" data-site="' + k + '" aria-pressed="' + (ST.site === k) + '">' + SITES[k].name + '</button>'; }).join("");
-  document.body.classList.toggle("grey", VIEW === "analysis" || VIEW === "metrics"); document.body.classList.toggle("inroom", VIEW === "all"); document.body.classList.toggle("embed", own && LIVE);
+  document.body.classList.toggle("grey", VIEW === "analysis"); document.body.classList.toggle("inroom", VIEW === "all"); document.body.classList.toggle("embed", own && LIVE);
   if (shown === key && (own || VIEW === "sentiment")){ if (!own && VO.map) panSync(VO.map); return; }   // the embedded original keeps running; nothing on it follows the choices made here
-  function right(){ return '<a class="lab" href="#' + ST.rw + '">Right wall · Live analysis</a>' +
-    '<span class="rw" role="group" aria-label="Right wall"><button type="button" data-rw="analysis" aria-pressed="' + (ST.rw === "analysis") + '">With images</button><button type="button" data-rw="metrics" aria-pressed="' + (ST.rw === "metrics") + '">Metrics only</button></span>' + mini(ST.rw); }
+  function right(){ return '<a class="lab" href="#analysis">Right wall · Live analysis</a>' + mini("analysis"); }
   function table(){ return '<a class="lab" href="#editor">Table · Scenario Editor</a>' + mini("editor"); }
   if (VIEW === "all" && shown === key && main.querySelector(".scr.wr")){ main.querySelector(".scr.wr").innerHTML = right(); main.querySelector(".scr.tb").innerHTML = table(); }   // the two embedded screens are left alone, so they do not reload
   else if (VIEW !== "all") main.innerHTML = H[VIEW]();
@@ -2112,7 +2140,6 @@ function render(){
   var vs = main.querySelector('.stage[data-view="voices"]'); if (vs && window.L){ try { voDraw(vs); } catch(e){ if (window.console) console.warn("Voices map failed", e); } }
   var ss = main.querySelector('.stage[data-view="sat"]'); if (ss && window.L){ try { satDraw(ss); } catch(e){ if (window.console) console.warn("Aerial view failed", e); } }
   var gs = main.querySelector('.stage[data-view="geo"]'); if (gs){ try { geoInit(gs); gs.insertBefore(GEO.el, gs.firstChild); GEO.map.invalidateSize(false); geoSite(); panSync(GEO.map); geoDraw(); } catch(e){ if (window.console) console.warn("Map failed", e); GEO.failed = true; return render(); } }
-  var tok = ++TOK, th = [].slice.call(main.querySelectorAll(".thumb[data-alt]")); if (th.length) setTimeout(function(){ drawThumbs(th, tok); }, 0);
   fit(); wordsFill(); cancelAnimationFrame(agRaf); agRaf = requestAnimationFrame(drawAgents); if (keep && $(keep)) $(keep).focus();
 }
 function fit(){
@@ -2200,6 +2227,7 @@ document.addEventListener("click", function(ev){
   var T = ev.target.closest ? ev.target : null; if (!T) return; var b;
   if ((b = T.closest("[data-mic]"))){ listen(b.getAttribute("data-mic"), b); return; }
   if ((b = T.closest("[data-stm]"))){ SEL.id = b.getAttribute("data-stm"); SEL.ax = null; SEL.msg = ""; wordsFill(); return; }
+  if ((b = T.closest("[data-wax]"))){ pickSpoke(b.getAttribute("data-wax")); return; }
   if ((b = T.closest("[data-q]"))){ SEL.q = b.getAttribute("data-q"); SEL.msg = ""; wordsFill(); return; }
   if ((b = T.closest("[data-set]"))){ SEL.ax = null; SEL.msg = ""; choose(b.getAttribute("data-set")); return; }
   if ((b = T.closest("[data-keep]"))){ keepAsked(b.getAttribute("data-keep"), false); SEL.msg = "Kept for the developer."; wordsFill(); return; }
@@ -2219,6 +2247,10 @@ document.addEventListener("click", function(ev){
     return; }
   if ((b = T.closest("[data-ag]"))){ ST.ag = b.getAttribute("data-ag") === "on"; axoKey(); tell(); return; }
   if ((b = T.closest("[data-big]"))){ ST.big = b.getAttribute("data-big") === "big"; render(); tell(); return; }
+  if ((b = T.closest("[data-budadd]"))){ var bi = +b.getAttribute("data-budadd"), out0 = PRICED.filter(function(c){ return !fits(c); }), nb = bud().slice(); nb[bi] = r2(nb[bi] + BUDSTEP[bi]); ST.bud = nb;   // adding to the budget: say what it is now and what has come within reach
+    var got = out0.filter(function(c){ return fits(c) && chosen(ST).indexOf(c) < 0; }); render(); tell();
+    note("The budget is now " + money(nb[0]) + " upfront and " + money(nb[1]) + " a year." + (got.length ? " Now within reach: " + got.map(function(c){ return c + " " + optOf(c)[1]; }).join(", ") + "." : overBudget() ? " Still over the budget." : "")); return; }
+  if ((b = T.closest("[data-budback]"))){ ST.bud = null; render(); tell(); note("Back to the starting budget: " + money(BUD0[0]) + " upfront and " + money(BUD0[1]) + " a year." + (overBudget() ? " The choices no longer fit: something has to go." : "")); return; }
   if ((b = T.closest("[data-prices-reset]"))){ ST.bud = null; ST.pr = {}; render(); tell(); return; }
   if ((b = T.closest("[data-prices]"))){ PRED = !PRED; render(); return; }
   if ((b = T.closest("[data-gv]"))){ GV.on = b.getAttribute("data-gv") === "on"; GV.auto = true; GV.bTo = null; GV.to = null; gvSave(); render(); return; }
@@ -2239,6 +2271,7 @@ document.addEventListener("fullscreenchange", function(){ if (!document.fullscre
 document.addEventListener("keydown", function(ev){ if ((ev.key === "h" || ev.key === "H") && document.body.classList.contains("imm") && !/INPUT|TEXTAREA/.test(ev.target.tagName || "")) document.body.classList.toggle("nopanels"); });
 document.addEventListener("submit", function(ev){ if (!ev.target || ev.target.id !== "askf") return; ev.preventDefault(); var t = ev.target.q.value.trim(); if (t) askFree(t); });
 document.addEventListener("input", function(ev){ if (ev.target && ev.target.id === "askq") SEL.text = ev.target.value; });
+document.addEventListener("keydown", function(ev){ if ((ev.key === "Enter" || ev.key === " ") && ev.target && ev.target.hasAttribute && ev.target.hasAttribute("data-wax")){ ev.preventDefault(); pickSpoke(ev.target.getAttribute("data-wax")); } });
 document.addEventListener("keydown", function(ev){ if ((ev.key === "Enter" || ev.key === " ") && ev.target && ev.target.classList && ev.target.classList.contains("pt") && ev.target.hasAttribute("data-stm")){ ev.preventDefault(); SEL.id = ev.target.getAttribute("data-stm"); SEL.ax = null; wordsFill(); } });
 window.addEventListener("storage", function(ev){ if (ev.key === "dcscope-asked") wordsFill(); });
 document.addEventListener("click", function(ev){   // the case study switch sits in the header
@@ -2247,14 +2280,12 @@ document.addEventListener("click", function(ev){   // the case study switch sits
 });
 $("main").addEventListener("click", function(ev){
   var z = ev.target.closest ? ev.target.closest("[data-zoom]") : null;
-  var rw = ev.target.closest ? ev.target.closest("[data-rw]") : null;
-  if (rw){ ST.rw = rw.getAttribute("data-rw"); render(); tell(); return; }
   var bb = ev.target.closest ? ev.target.closest("[data-base]") : null;
   if (bb && GEO.map){ useBase(bb.getAttribute("data-base")); [].forEach.call(bb.parentNode.children, function(x){ x.setAttribute("aria-pressed", String(x === bb)); }); return; }
   if (z && GEO.map && z.closest('.stage[data-view="geo"]')){ var hz = z.getAttribute("data-zoom"); if (hz === "reset"){ var fp = focusM(), fq = ear(); GEO.map._dcSkip = true; GEO.map.setView(S().center, S().zoom); GEO.map._dcSkip = false; if (S().open && (fp[0] || fp[1])){ ST.ear = [Math.round(fq[0] - fp[0]), Math.round(fq[1] - fp[1])]; ST.pan = [0, 0]; render(); tell(); } } else GEO.map.setZoom(GEO.map.getZoom() + (hz === "in" ? 1 : -1)); return; }
   if (z){ var how = z.getAttribute("data-zoom"); if (how === "reset"){ MAPV = null; redrawMap(); } else zoomMap(how === "in" ? .72 : 1 / .72, WM / 2, HM / 2); return; }
   var t = ev.target.closest ? ev.target.closest("[data-ch]") : null; if (!t) return; ST.ch = t.getAttribute("data-ch"); render(); tell(); });
-function route(){ var h = (location.hash || "").replace("#", ""); VIEW = "all"; VIEWS.forEach(function(v){ if (v[0] === h) VIEW = h; }); render(); }
+function route(){ var h = (location.hash || "").replace("#", ""); if (h === "metrics") h = "analysis"; VIEW = "all"; VIEWS.forEach(function(v){ if (v[0] === h) VIEW = h; }); render(); }
 window.addEventListener("hashchange", route);
 try { var saved = localStorage.getItem("dcscope-v5"); if (saved) adopt(saved); } catch(e){}
 try { var qs = new URLSearchParams(location.search).get("site"); if (qs) ST.site = /^t/i.test(qs) ? "tx" : "mi"; } catch(e){}
@@ -2262,9 +2293,9 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-153031";
+var BUILD = "20261123-170851";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
-  if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
+  if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
 })();
 </script>
