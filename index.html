@@ -424,6 +424,19 @@ body.nopanels .akey,body.nopanels .stage[data-view="axo"] .zoomc{display:none}
 .geomap.axo{position:absolute;inset:0}
 .axo canvas.aagents{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .mini .axo{pointer-events:none}
+/* the same wall from the ground: the sky sits on the horizon, clouds drift and turn with the view */
+.axo.gv .you{display:none}
+.axo.gv .maplibregl-canvas-container,.axo.gv canvas.maplibregl-canvas{touch-action:none;cursor:grab}
+.axo .gsky{position:absolute;left:0;right:0;top:0;height:0;z-index:1;pointer-events:none;overflow:hidden;display:none;-webkit-mask-image:linear-gradient(#000 70%,transparent 97%);mask-image:linear-gradient(#000 70%,transparent 97%)}
+.axo.gv .gsky,.axo.gv .ghaze{display:block}
+.axo .ghaze{position:absolute;left:0;right:0;top:0;height:0;z-index:1;pointer-events:none;display:none;background:linear-gradient(#e9f1f4b3,#e9f1f440 40%,#e9f1f400)}
+.gsky i{position:absolute;left:0;right:0;bottom:0;display:block;background-repeat:repeat-x;opacity:.92;background-image:
+  radial-gradient(ellipse 5.5% 7% at 9% 70%,#fffffff0 0,#ffffff00 100%),radial-gradient(ellipse 4% 9% at 12.5% 64%,#ffffffeb 0,#ffffff00 100%),radial-gradient(ellipse 5% 6% at 16% 71%,#ffffffe0 0,#ffffff00 100%),
+  radial-gradient(ellipse 7% 9% at 36% 44%,#fffffff0 0,#ffffff00 100%),radial-gradient(ellipse 5% 12% at 40% 36%,#ffffffeb 0,#ffffff00 100%),radial-gradient(ellipse 6.5% 8% at 45% 45%,#ffffffe0 0,#ffffff00 100%),
+  radial-gradient(ellipse 4% 4.5% at 58% 80%,#ffffffd9 0,#ffffff00 100%),radial-gradient(ellipse 3% 5.5% at 61% 77%,#ffffffd0 0,#ffffff00 100%),
+  radial-gradient(ellipse 6% 7.5% at 76% 58%,#fffffff0 0,#ffffff00 100%),radial-gradient(ellipse 4.5% 10% at 80% 51%,#ffffffeb 0,#ffffff00 100%),radial-gradient(ellipse 5.5% 6.5% at 84.5% 59%,#ffffffe0 0,#ffffff00 100%),
+  radial-gradient(ellipse 9% 5% at 25% 16%,#ffffffb8 0,#ffffff00 100%),radial-gradient(ellipse 11% 4.5% at 66% 22%,#ffffffb0 0,#ffffff00 100%),radial-gradient(ellipse 3.5% 3.5% at 95% 84%,#ffffffd0 0,#ffffff00 100%)}
+.axo.gv .amk.sn{background:#fbfdfce0}
 .amk{font-family:var(--font);font-size:12px;font-weight:700;color:#1c2a28;background:#fbfdfcf0;border:1px solid #b9cec4;border-radius:5px;padding:2px 7px;white-space:nowrap;pointer-events:none}
 .amk.pl{display:flex;align-items:center;gap:5px;font-weight:600}
 .amk.pl i{width:8px;height:8px;border-radius:50%;background:#3b7a66;border:1.5px solid #fff}
@@ -1563,7 +1576,107 @@ var HEAR = [["Do not hear it", "#3b7a66"], ["Hear it", "#d9a531"], ["Hear it cle
 function fewWords(x){ return x <= 0 ? "none" : x < .05 ? "a few" : x < .25 ? "some" : x < .6 ? "many" : x < .95 ? "most" : "nearly all"; }
 function about(n){ if (n < 10) return String(n); var p = Math.pow(10, Math.max(0, Math.floor(Math.log10(n)) - 1)); return (Math.round(n / p) * p).toLocaleString("en-US"); }
 var AXO = {map:null, el:null, ag:null, failed:false, loading:false, site:null, agSite:null, agents:[], seen:{}, boxes:[], busy:false, per:0, err:"", raf:0, marks:[], audio:null, on:false, earD:1e4, earL:0, orbit:false, hold:0, last:0};
-function axoHTML(){ return '<div class="card stage" data-view="axo"><div class="card akey" id="akey"></div><div class="zoomc"><button type="button" data-az="left" aria-label="Turn left">⟲</button><button type="button" data-az="right" aria-label="Turn right">⟳</button><button type="button" data-az="out" aria-label="Move away">−</button><button type="button" data-az="in" aria-label="Come closer">+</button><button type="button" data-az="reset" aria-label="Reset the view">⤢</button><button type="button" class="wide" data-az="imm" aria-pressed="' + document.body.classList.contains("imm") + '">Immersive</button></div></div>'; }
+// ---------- the same wall from the ground ----------
+// The eye is where the sound is being heard, looking at the plant, raised so that the ground and the rings can be read. The rings are the model's,
+// one for every 5 dBA. The ground is the aerial photograph (Esri World Imagery, the same as on the table), lying flat; buildings stand up where
+// OpenStreetMap has them, and woods are drawn as trees where it maps woodland, each one placed at random inside it. Only the trees planted on the
+// table count for the sound. The sky, its haze and the clouds are scenery.
+var GVFOV = 40, GVH = [2, 10, 30, 80], GVTILT = {2:88.3, 10:87, 30:84, 80:78};
+var GV = {on:true, h:30, b:0, tilt:84, auto:true, pos:null, to:null, from:null, t0:0, dur:0, bTo:null, mode:null, earKey:null, dirty:false, still:0, hz:0, foc:1000, rip:0, liveT:0, ct:0, drift:0, driftT:0, trees:{}, nTrees:0, treeSite:null, woodKey:"", lab:[]};
+try { var gv0 = JSON.parse(localStorage.getItem("dcscope-gv") || "null"); if (gv0){ GV.on = gv0.on !== false; if (GVH.indexOf(gv0.h) >= 0) GV.h = gv0.h; } } catch(e){}
+GV.tilt = GVTILT[GV.h];
+function gvOn(){ return GV.on; }
+function gvSave(){ try { localStorage.setItem("dcscope-gv", JSON.stringify({on:GV.on, h:GV.h})); } catch(e){} }
+function gvFace(q){ var c = AXO.sc ? AXO.sc.src[0].p : [0, 0]; return Math.atan2(c[0] - q[0], q[1] - c[1]) * 180 / Math.PI; }   // the bearing from a place to the plant
+function gvCam(){   // put the eye where the listener is
+  var map = AXO.map, q = GV.pos; if (!map || !q) return;
+  var th = GV.tilt * Math.PI / 180, br = GV.b * Math.PI / 180, run = GV.h * Math.tan(th), c = ll(q[0] + Math.sin(br) * run, q[1] - Math.cos(br) * run), foc = (AXO.el.clientHeight || 600) / 2 / Math.tan(GVFOV * Math.PI / 360);
+  // the map is centred on the ground the eye looks at; the zoom is the one that leaves the eye GV.h metres up (MapLibre's own helper lifts the centre off the ground above 84 degrees)
+  try { map.jumpTo({center:[c[1], c[0]], elevation:0, bearing:GV.b, pitch:GV.tilt, roll:0, zoom:Math.log2(foc * 40030173.6 * Math.cos(c[0] * Math.PI / 180) * Math.cos(th) / (GV.h * 512))}); } catch(e){ if (window.console) console.warn("Ground view", e); }
+  GV.dirty = true;
+}
+var GVPAINT = [["bg", "background-color", "#d9e3de", "#c2d3a6"], ["green", "fill-color", ["match", ["get", "class"], "wood", "#c3dbd0", "#d0e1d7"], ["match", ["get", "class"], "wood", "#a8c292", "#b7cc9d"]], ["park", "fill-color", "#c8ddd0", "#b0ca98"],
+  ["water", "fill-color", "#bcd3e2", "#a6c6dc"], ["stream", "line-color", "#a9c6da", "#9bbdd6"], ["road-small", "line-color", "#edf2ef", "#e9e6d6"], ["road-big", "line-color", "#f5f8f6", "#f1eee0"], ["bld", "fill-extrusion-color", "#b9c8d0", "#e6e8e2"]];
+function gvMode(){   // the lens, the hands and the colors of the view in use
+  var map = AXO.map, on = gvOn(), s = S(); if (!map) return;
+  AXO.el.classList.toggle("gv", on);
+  ["dragPan", "dragRotate", "scrollZoom", "doubleClickZoom", "touchZoomRotate", "touchPitch", "keyboard", "boxZoom"].forEach(function(h){ try { map[h][on ? "disable" : "enable"](); } catch(e){} });
+  GVPAINT.forEach(function(p){ if (map.getLayer(p[0])) map.setPaintProperty(p[0], p[1], p[on ? 3 : 2]); });
+  ["ring-line", "ring-glow", "ring-solid", "trees", "photo"].forEach(function(id, n){ if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", (n === 0) === on ? "none" : "visible"); });
+  try { if (on){ map.setMaxPitch(89); map.setVerticalFieldOfView(GVFOV); }
+    else { map.setVerticalFieldOfView(9); map.jumpTo({center:[s.center[1], s.center[0]], zoom:15.7, pitch:57, bearing:-28}); map.setMaxPitch(70); map.touchZoomRotate.enableRotation(); } } catch(e){}
+}
+function gvShow(){   // after the eye moves: hide the labels behind it or too far to read, and set the sky down on the horizon
+  var on = gvOn() && GV.pos, q = GV.pos, br = GV.b * Math.PI / 180, fx = Math.sin(br), fz = -Math.cos(br), c0 = S().center, mx = MXs();
+  [].concat(AXO.places || [], AXO.marks || [], GV.lab || []).forEach(function(m){ var v = true; if (on){ var p = m.getLngLat(), dx = (p.lng - c0[1]) * mx - q[0], dz = (c0[0] - p.lat) * MY - q[1]; v = dx * fx + dz * fz > 8 && Math.hypot(dx, dz) < 3000; } m.getElement().style.visibility = v ? "" : "hidden"; });
+  var sky = AXO.sky; if (!sky || !on) return; var H = AXO.el.clientHeight, foc = GV.foc = H / 2 / Math.tan(GVFOV * Math.PI / 360), up = (90 - GV.tilt) * Math.PI / 180;
+  GV.hz = H / 2 - foc * Math.min(.85 * Math.tan(up), Math.tan(up - .75 * Math.PI / 180));   // where MapLibre ends the ground
+  sky.style.height = Math.max(0, Math.round(GV.hz) + 1) + "px"; if (AXO.haze){ AXO.haze.style.top = Math.max(0, Math.round(GV.hz)) + "px"; AXO.haze.style.height = Math.round(foc * .04) + "px"; } var st = sky.firstChild.style; st.height = Math.round(foc * .66) + "px"; st.backgroundSize = Math.round(foc * Math.PI / 180 * 120) + "px 100%"; st.backgroundPositionX = Math.round(-GV.b * foc * Math.PI / 180 - GV.drift) + "px";
+}
+function gvLabels(){   // each ring named where it first crosses the line of sight
+  (GV.lab || []).forEach(function(m){ m.remove(); }); GV.lab = []; if (!gvOn() || !AXO.rings || !GV.pos) return;
+  var q = GV.pos, br = GV.b * Math.PI / 180, fx = Math.sin(br), fz = -Math.cos(br), near = GV.h * 2 + 12, picks = [];
+  AXO.rings.forEach(function(r){ var best = null, ba = 1e9; r.pts.forEach(function(p){ var dx = p[0] - q[0], dz = p[1] - q[1], al = dx * fx + dz * fz, la = dz * fx - dx * fz; if (al < near || al > 2600 || Math.abs(la / al) > .2 || al >= ba) return; ba = al; best = p; }); if (best) picks.push([ba, best, r.L]); });
+  var put = []; picks.sort(function(a, b){ return a[0] - b[0]; }).forEach(function(k){ var g = ll(k[1][0], k[1][1]), sp = AXO.map.project([g[1], g[0]]); if (put.some(function(o){ return Math.abs(o.y - sp.y) < 26 && Math.abs(o.x - sp.x) < 84; })) return; put.push(sp); GV.lab.push(amark(g, k[2] + " dBA", "sn", "center")); });
+}
+var TREEC = ["#7fa56f", "#8db27c", "#6f9a68", "#98b985"];
+function hash2(i, j){ var x = Math.sin(i * 127.1 + j * 311.7) * 43758.5453; return x - Math.floor(x); }
+function hexLL(e, s, r, rot){ var o = []; for (var i = 0; i < 6; i++){ var a = rot + i * 1.0472; o.push(ll(e + Math.cos(a) * r, s + Math.sin(a) * r)); } return o; }
+function treeAt(out, e, s, u, base, lite){   // a tree as two stacked prisms on a trunk; u, from 0 to 1, sets its size and its green
+  var r = 2.4 + u * 2.2, h = 7 + ((u * 7.3) % 1) * 5, c = TREEC[Math.floor(u * 3.999)], b = base || 0;
+  if (!lite) out.push(poly(hexLL(e, s, .4, 0), {h:b + h * .34, b:b, c:"#8b7b68"}));
+  out.push(poly(hexLL(e, s, r, u * 6), {h:b + h * .76, b:b + h * .3, c:c}), poly(hexLL(e, s, r * .6, u * 6 + .5), {h:b + h, b:b + h * .76, c:c}));
+}
+function beltTrees(out, a, b, w, base, seed){   // a planted belt as trees: about one for every 7 m square, fewer in a very large belt
+  var len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, step = Math.max(7, Math.sqrt(len * w / 500)), nx = Math.max(1, Math.round(len / step)), nz = Math.max(1, Math.round(w / step)), R = rng(seed), ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len;
+  for (var i = 0; i < nx; i++) for (var j = 0; j < nz; j++){ var t = (i + .2 + R() * .6) / nx * len, o = ((j + .2 + R() * .6) / nz - .5) * w; treeAt(out, a[0] + ux * t - uz * o, a[1] + uz * t + ux * o, R(), base); }
+}
+function gvWoods(){   // woods as trees: where OpenStreetMap maps woodland near the eye, one tree for each 26 m square, placed at random inside it
+  var map = AXO.map; if (!gvOn() || !map || !GV.pos || !map.getSource("omt")) return;
+  if (GV.treeSite !== ST.site){ GV.treeSite = ST.site; GV.trees = {}; GV.nTrees = 0; }
+  var G = 26, R = 1500, MAX = 5000, q = GV.pos, c0 = S().center, mx = MXs(), fs, added = 0;
+  try { fs = map.querySourceFeatures("omt", {sourceLayer:"landcover"}); } catch(e){ return; }
+  (fs || []).forEach(function(f){ if (!f.properties || f.properties["class"] !== "wood" || GV.nTrees >= MAX) return; var g = f.geometry, polys = !g ? [] : g.type === "Polygon" ? [g.coordinates] : g.type === "MultiPolygon" ? g.coordinates : [];
+    polys.forEach(function(pl){ if (!pl.length) return; var rings = pl.map(function(r){ return r.map(function(p){ return [(p[0] - c0[1]) * mx, (c0[0] - p[1]) * MY]; }); }), x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+      rings[0].forEach(function(p){ x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); z0 = Math.min(z0, p[1]); z1 = Math.max(z1, p[1]); });
+      x0 = Math.max(x0, q[0] - R); x1 = Math.min(x1, q[0] + R); z0 = Math.max(z0, q[1] - R); z1 = Math.min(z1, q[1] + R);
+      for (var i = Math.ceil(x0 / G); i * G <= x1; i++) for (var j = Math.ceil(z0 / G); j * G <= z1; j++){ var k = i + "," + j; if (GV.trees[k] || GV.nTrees >= MAX) continue;
+        var u = hash2(i, j), e = i * G + (u - .5) * G * .8, z = j * G + (((u * 13.7) % 1) - .5) * G * .8;
+        if (!inPoly([e, z], rings[0]) || rings.slice(1).some(function(h){ return inPoly([e, z], h); })) continue;
+        GV.trees[k] = [e, z, (u * 5.3) % 1]; GV.nTrees++; added++; } }); });
+  if (added) gvTreeData();
+}
+function gvTreeData(){   // the trees stand aside where the plant is
+  var map = AXO.map, out = [], sc = AXO.sc; if (!map || !map.getSource("trees")) return;
+  for (var k in GV.trees){ var t = GV.trees[k]; if (sc && sc.src.some(function(so){ return Math.hypot(t[0] - so.p[0], t[1] - so.p[1]) < 75; })) continue; treeAt(out, t[0], t[1], t[2], 0, true); }
+  map.getSource("trees").setData(gj(out));
+}
+function gvSettle(){   // the eye has stopped: name the rings, bring the residents and the woods of the ground now in sight
+  var map = AXO.map; if (!map || !gvOn() || !GV.pos) return; gvLabels(); gvShow(); moreBlocks();
+  var run = function(){ if (!GV.pos) return; var key = ST.site + "|" + Math.round(GV.pos[0] / 150) + "," + Math.round(GV.pos[1] / 150) + "," + Math.round(GV.b / 25); if (key !== GV.woodKey){ GV.woodKey = key; gvWoods(); } };
+  var n = 0; (function wait(){ if (!AXO.map || !gvOn()) return; if ((map.areTilesLoaded && map.areTilesLoaded()) || n++ > 25) run(); else setTimeout(wait, 400); })();
+}
+function gvGo(q, d){ if (!GV.pos) return; GV.from = GV.pos.slice(); GV.to = q; GV.t0 = performance.now(); GV.dur = Math.max(500, Math.min(2200, d * 3.5)); clearTimeout(GV.ct); GV.ct = 0; AXO.hold = GV.t0 + 6000; }   // walk there
+function gvAhead(m){ var p = GV.to || GV.pos, br = GV.b * Math.PI / 180; if (p) gvGo([p[0] + Math.sin(br) * m, p[1] - Math.cos(br) * m], Math.abs(m)); }
+function gvTurn(d){ GV.bTo = (GV.bTo == null ? GV.b : GV.bTo) + d; GV.auto = false; AXO.hold = performance.now() + 6000; }
+function gvStep(m){   // the wheel: walk while it turns, and settle where it stops
+  if (!GV.pos) return; var br = GV.b * Math.PI / 180, now = performance.now(); GV.to = null; GV.auto = false; GV.pos = [GV.pos[0] + Math.sin(br) * m, GV.pos[1] - Math.cos(br) * m]; gvCam(); AXO.hold = now + 6000;
+  if (now - GV.liveT > 120){ GV.liveT = now; AXO.live = GV.pos; axoEar(); }
+  clearTimeout(GV.ct); GV.ct = setTimeout(function(){ GV.ct = 0; if (GV.pos) standAt(GV.pos); }, 420);
+}
+function gvHands(map){   // drag to look around, the wheel to walk
+  var cc = map.getCanvasContainer(), dg = null;
+  cc.addEventListener("pointerdown", function(ev){ if (!gvOn() || ev.button || (ev.target.closest && ev.target.closest(".maplibregl-marker"))) return; dg = {x:ev.clientX, y:ev.clientY, b:GV.bTo == null ? GV.b : GV.bTo, t:GV.tilt, id:ev.pointerId, moved:false}; });
+  window.addEventListener("pointermove", function(ev){ if (!dg || ev.pointerId !== dg.id) return; var dx = ev.clientX - dg.x, dy = ev.clientY - dg.y; if (!dg.moved && Math.hypot(dx, dy) < 5) return;
+    dg.moved = true; var k = GVFOV / (AXO.el.clientHeight || 600); GV.bTo = null; GV.b = dg.b - dx * k; GV.tilt = Math.max(50, Math.min(88.6, dg.t + dy * k)); GV.auto = false; AXO.hold = performance.now() + 6000; gvCam(); });
+  ["pointerup", "pointercancel"].forEach(function(n){ window.addEventListener(n, function(ev){ if (dg && ev.pointerId === dg.id) dg = null; }); });
+  cc.addEventListener("wheel", function(ev){ if (!gvOn() || ev.ctrlKey) return; ev.preventDefault(); gvStep(-ev.deltaY * (ev.deltaMode === 1 ? 4 : .12)); }, {passive:false});
+}
+document.addEventListener("keydown", function(ev){   // the arrows walk and turn
+  if (!gvOn() || !AXO.map || !AXO.el || !AXO.el.isConnected || !GV.pos || ev.altKey || ev.ctrlKey || ev.metaKey || /INPUT|TEXTAREA|SELECT/.test(ev.target.tagName || "") || AXO.el.closest(".mini")) return;
+  var k = ev.key; if (k === "ArrowLeft" || k === "ArrowRight") gvTurn(k === "ArrowLeft" ? -15 : 15); else if (k === "ArrowUp" || k === "ArrowDown") gvAhead(k === "ArrowUp" ? 30 : -30); else return; ev.preventDefault();
+});
+function axoHTML(){ var g = gvOn(); return '<div class="card stage" data-view="axo"><div class="card akey" id="akey"></div><div class="zoomc"><button type="button" data-az="left" aria-label="Turn left" title="Turn left">⟲</button><button type="button" data-az="right" aria-label="Turn right" title="Turn right">⟳</button><button type="button" data-az="out" aria-label="' + (g ? "Step back" : "Move away") + '" title="' + (g ? "Step back" : "Move away") + '">' + (g ? "↓" : "−") + '</button><button type="button" data-az="in" aria-label="' + (g ? "Walk forward" : "Come closer") + '" title="' + (g ? "Walk forward" : "Come closer") + '">' + (g ? "↑" : "+") + '</button><button type="button" data-az="reset" aria-label="' + (g ? "Back to the first place, facing the plant" : "Reset the view") + '" title="' + (g ? "Back to the first place, facing the plant" : "Reset the view") + '">⤢</button><button type="button" class="wide" data-az="imm" aria-pressed="' + document.body.classList.contains("imm") + '">Immersive</button></div></div>'; }
 function metres(a, b){ return Math.hypot((a[1] - b[1]) * MY * Math.cos(a[0] * Math.PI / 180), (a[0] - b[0]) * MY); }   // [lat, lng] pairs
 function gj(features){ return {type:"FeatureCollection", features:features}; }
 function poly(pts, props){ var r = pts.map(function(q){ return [q[1], q[0]]; }); r.push(r[0]); return {type:"Feature", properties:props || {}, geometry:{type:"Polygon", coordinates:[r]}}; }
@@ -1578,9 +1691,9 @@ function dcBlocks(){
   else { blk(cx - 77, cz - 23.2, cx - 45, cz + 23.2, .5, 0, "#e9eeeb");
     for (i = 0; i < 6; i++){ var yx = cx - 68 + (i % 2) * 13, yz = cz - 14 + Math.floor(i / 2) * 14; blk(yx - 4, yz - 3, yx + 4, yz + 3, 6, 0, "#9fb0b5"); }
     blk(cx - 78, cz - 24.2, cx - 45, cz - 23.2, ST.hw, 0, "#c3ccc8"); blk(cx - 78, cz + 23.2, cx - 45, cz + 24.2, ST.hw, 0, "#c3ccc8"); blk(cx - 79, cz - 24.2, cx - 78, cz + 24.2, ST.hw, 0, "#c3ccc8"); }
-  if (ST.d === "D2"){ blk(cx - 72, cz + 32, cx + 72, cz + 44, ST.hb, 0, "#9cc0a0"); blk(cx - 72, cz + 34, cx + 72, cz + 42, ST.hb + 6, ST.hb, "#7db3a8"); }
+  if (ST.d === "D2"){ blk(cx - 72, cz + 32, cx + 72, cz + 44, ST.hb, 0, "#9cc0a0"); if (gvOn()) beltTrees(out, local(cx - 72, cz + 38, px, pz, ST.rot), local(cx + 72, cz + 38, px, pz, ST.rot), 8, ST.hb, 77); else blk(cx - 72, cz + 34, cx + 72, cz + 42, ST.hb + 6, ST.hb, "#7db3a8"); }
   if (ST.d !== "D3") blk(cx - 77, cz - 12, cx - 47, cz + 12, 3, 0, "#9fb0b5");   // the west yard of the reference plant
-  (ST.x || []).forEach(function(o){ var w = o.k === "trees" ? o.v : o.k === "wall" ? 1.4 : 9; out.push(poly(belt(o.a, o.b, w).map(function(q){ return ll(q[0], q[1]); }), {h:o.k === "trees" ? 8 : o.v, b:0, c:o.k === "trees" ? "#7db3a8" : o.k === "wall" ? "#c3ccc8" : "#9cc0a0"})); });
+  (ST.x || []).forEach(function(o, n){ if (o.k === "trees" && gvOn()) return beltTrees(out, o.a, o.b, o.v, 0, 31 + n); var w = o.k === "trees" ? o.v : o.k === "wall" ? 1.4 : 9; out.push(poly(belt(o.a, o.b, w).map(function(q){ return ll(q[0], q[1]); }), {h:o.k === "trees" ? 8 : o.v, b:0, c:o.k === "trees" ? "#7db3a8" : o.k === "wall" ? "#c3ccc8" : "#9cc0a0"})); });
   if (ST.t === "T3") blk(cx + 50, cz - 16, cx + 60, cz - 6, 11, 0, "#b9d0dc");
   if (ST.t === "T4") blk(cx - 34, cz + 25, cx - 26, cz + 31, 7, 0, "#d99a7c");
   if (ST.d === "D4"){ blk(-23, 31, 47, 65, .4, 0, "#eef2ef", true); blk(14, 37, 40, 49, .9, 0, "#9fd0dc", true);
@@ -1589,7 +1702,7 @@ function dcBlocks(){
   return out;
 }
 function axoStyle(light){
-  var st = {version:8, light:{anchor:"viewport", color:"#ffffff", intensity:.32, position:[1.3, 215, 38]}, sources:{}, layers:[{id:"bg", type:"background", paint:{"background-color":"#d9e3de"}}]};
+  var st = {version:8, light:{anchor:"viewport", color:"#ffffff", intensity:.32, position:[1.3, 215, 38]}, sky:{"sky-color":"#7fb1e4", "horizon-color":"#eaf2f6", "fog-color":"#e6efe6", "fog-ground-blend":.62, "horizon-fog-blend":.55, "sky-horizon-blend":.8, "atmosphere-blend":0}, sources:{}, layers:[{id:"bg", type:"background", paint:{"background-color":"#d9e3de"}}]};
   var k = light ? Object.keys(light.sources).filter(function(n){ return light.sources[n].type === "vector"; })[0] : null;
   if (!k) return st;
   st.sources.omt = JSON.parse(JSON.stringify(light.sources[k]));
@@ -1608,39 +1721,53 @@ function axoStyle(light){
 }
 function axoInit(stage, light){
   var s = S(), el = AXO.el = document.createElement("div"); el.className = "geomap axo"; stage.insertBefore(el, stage.firstChild);
-  var map = AXO.map = new maplibregl.Map({container:el, style:axoStyle(light), center:[s.center[1], s.center[0]], zoom:15.7, pitch:57, bearing:-28, maxPitch:70, fadeDuration:0, attributionControl:{compact:true}, canvasContextAttributes:{antialias:true}});
+  var map = AXO.map = new maplibregl.Map({container:el, style:axoStyle(light), center:[s.center[1], s.center[0]], zoom:15.7, pitch:57, bearing:-28, maxPitch:70, maxZoom:24, fadeDuration:0, attributionControl:{compact:true}, canvasContextAttributes:{antialias:true}});
   try { map.setVerticalFieldOfView(9); } catch(e){}   // a narrow lens: nearly parallel lines, as in an axonometric drawing
   map.dragRotate.enable(); map.touchZoomRotate.enableRotation(); map.keyboard.enable();
   var ac = AXO.ag = document.createElement("canvas"); ac.className = "aagents"; ac.setAttribute("aria-hidden", "true"); map.getCanvasContainer().appendChild(ac);
+  var sk = AXO.sky = document.createElement("div"); sk.className = "gsky"; sk.setAttribute("aria-hidden", "true"); sk.innerHTML = "<i></i>"; el.appendChild(sk); var hzd = AXO.haze = document.createElement("div"); hzd.className = "ghaze"; hzd.setAttribute("aria-hidden", "true"); el.appendChild(hzd); gvHands(map);
   map.on("load", function(){
-    map.addSource("site", {type:"geojson", data:gj([])}); map.addSource("ring", {type:"geojson", data:gj([])}); map.addSource("dc", {type:"geojson", data:gj([])});
+    map.addSource("site", {type:"geojson", data:gj([])}); map.addSource("ring", {type:"geojson", data:gj([])}); map.addSource("dc", {type:"geojson", data:gj([])}); map.addSource("trees", {type:"geojson", data:gj([])});
+    map.addSource("photo", {type:"raster", tiles:["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize:256, maxzoom:19, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"});
     var under = map.getLayer("bld") ? "bld" : undefined;   // flat things go under the raised ones
-    map.addLayer({id:"ring-fill", type:"fill", source:"ring", paint:{"fill-color":"#b0609a", "fill-opacity":["match", ["get", "k"], 55, .17, .07]}}, under);
+    map.addLayer({id:"photo", type:"raster", source:"photo", layout:{visibility:"none"}, paint:{"raster-fade-duration":0}}, under);   // from the ground the land is the aerial photograph, lying flat; if it does not load, the drawn ground stays
+    map.addLayer({id:"ring-fill", type:"fill", source:"ring", paint:{"fill-color":"#b0609a", "fill-opacity":["get", "o"]}}, under);
+    map.addLayer({id:"ring-glow", type:"line", source:"ring", layout:{visibility:"none"}, paint:{"line-color":"#ffd0f4", "line-width":16, "line-blur":9, "line-opacity":.5, "line-opacity-transition":{duration:0}}}, under);
+    map.addLayer({id:"ring-solid", type:"line", source:"ring", layout:{visibility:"none"}, paint:{"line-color":"#e069c9", "line-width":3.4, "line-opacity":.9, "line-opacity-transition":{duration:0}}}, under);
     map.addLayer({id:"ring-line", type:"line", source:"ring", paint:{"line-color":"#7d3a6c", "line-width":1.8, "line-dasharray":[3, 3]}}, under);
     map.addLayer({id:"site-line", type:"line", source:"site", paint:{"line-color":"#1c2a28", "line-width":2.2, "line-dasharray":[5, 4]}}, under);
+    map.addLayer({id:"trees", type:"fill-extrusion", source:"trees", layout:{visibility:"none"}, paint:{"fill-extrusion-color":["get", "c"], "fill-extrusion-height":["get", "h"], "fill-extrusion-base":["get", "b"], "fill-extrusion-opacity":1}});
     map.addLayer({id:"dc", type:"fill-extrusion", source:"dc", paint:{"fill-extrusion-color":["get", "c"], "fill-extrusion-height":["get", "h"], "fill-extrusion-base":["get", "b"], "fill-extrusion-opacity":1}});
     AXO.ready = true; axoSync();
   });
-  map.on("moveend", moreBlocks);
-  map.on("click", function(e){ var c0 = S().center; standAt([(e.lngLat.lng - c0[1]) * MXs(), (c0[0] - e.lngLat.lat) * MY]); });   // tap the ground: stand there and listen
+  map.on("moveend", function(){ if (!gvOn()) moreBlocks(); });
+  map.on("resize", function(){ if (gvOn()) gvCam(); });
+  map.on("click", function(e){ var c0 = S().center, q = [(e.lngLat.lng - c0[1]) * MXs(), (c0[0] - e.lngLat.lat) * MY];   // tap the ground: stand there and listen
+    if (!gvOn()) return standAt(q); if (!GV.pos || e.point.y < GV.hz + 8) return;   // from the ground: walk there, a kilometre and a half at most
+    var dx = q[0] - GV.pos[0], dz = q[1] - GV.pos[1], d = Math.hypot(dx, dz); if (!(d > 3)) return; if (d > 1500){ q = [GV.pos[0] + dx / d * 1500, GV.pos[1] + dz / d * 1500]; d = 1500; } gvGo(q, d); });
   ["dragstart", "zoomstart", "rotatestart", "pitchstart"].forEach(function(n){ map.on(n, function(e){ if (e && e.originalEvent) AXO.hold = performance.now() + 6000; }); });   // a hand on the view pauses the slow turn
 }
 function amark(ll2, html, cls, anchor){ var d = document.createElement("div"); d.className = "amk " + (cls || ""); d.innerHTML = html; return new maplibregl.Marker({element:d, anchor:anchor || "left", offset:anchor ? [0, 0] : [8, 0]}).setLngLat([ll2[1], ll2[0]]).addTo(AXO.map); }
 function axoSync(){   // everything that follows the table: the blocks, the rings, the labels, what each resident hears, the key, the sound
-  var map = AXO.map, s = S(); if (!map || !AXO.ready) return;
-  if (AXO.site !== ST.site){ AXO.site = ST.site; map.jumpTo({center:[s.center[1], s.center[0]], zoom:15.7, pitch:57, bearing:-28});
+  var map = AXO.map, s = S(), gon = gvOn(); if (!map || !AXO.ready) return;
+  if (AXO.site !== ST.site){ AXO.site = ST.site; GV.mode = null; GV.auto = true; GV.earKey = null; GV.tilt = GVTILT[GV.h]; if (!gon) map.jumpTo({center:[s.center[1], s.center[0]], zoom:15.7, pitch:57, bearing:-28});
     (AXO.places || []).forEach(function(m){ m.remove(); }); AXO.places = s.places.map(function(q){ return amark([q[1], q[2]], '<i></i>' + esc(q[0].split(" · ")[0]), "pl"); }); }
   var sc = AXO.sc = acScene(ST), c55 = contour(55, sc), c45 = contour(45, sc), cs = bldg(ST.px, ST.pz, ST.rot), q = ear(); AXO.scBase = acScene(ST, true);
   map.getSource("site").setData(gj(s.acres ? [poly(circleLL(s.center, Math.sqrt(s.acres * 4046.86 / Math.PI)))] : s.boundary ? [poly(s.boundary)] : []));
-  map.getSource("ring").setData(gj([poly(c45.map(function(p){ return ll(p[0], p[1]); }), {k:45}), poly(c55.map(function(p){ return ll(p[0], p[1]); }), {k:55})]));
+  AXO.rings = (gon ? [40, 45, 50, 55, 60, 65] : [45, 55]).map(function(L){ return {L:L, pts:L === 55 ? c55 : L === 45 ? c45 : contour(L, sc)}; }).filter(function(r){ return !gon || r.pts.some(function(p){ return Math.hypot(p[0] - sc.src[1].p[0], p[1] - sc.src[1].p[1]) > 25; }); });   // from the ground a ring for every 5 dBA, the louder ones inside
+  map.getSource("ring").setData(gj(AXO.rings.map(function(r){ return poly(r.pts.map(function(p){ return ll(p[0], p[1]); }), {k:r.L, o:gon ? .1 : r.L === 55 ? .17 : .07}); })));
   map.getSource("dc").setData(gj(dcBlocks()));
-  AXO.marks.forEach(function(m){ m.remove(); }); AXO.marks = [amark([Math.max(cs[0][0], cs[1][0]), (cs[0][1] + cs[1][1]) / 2], "Data center", "dk", "bottom"),
-    amark(ll(c55[45][0], c55[45][1]), "55 dBA contour", "sn", "center"), amark(ll(c45[27][0], c45[27][1]), "45 dBA", "sn", "center")];
+  AXO.marks.forEach(function(m){ m.remove(); }); AXO.marks = [amark([Math.max(cs[0][0], cs[1][0]), (cs[0][1] + cs[1][1]) / 2], "Data center", "dk", "bottom")];
+  if (!gon) AXO.marks.push(amark(ll(c55[45][0], c55[45][1]), "55 dBA contour", "sn", "center"), amark(ll(c45[27][0], c45[27][1]), "45 dBA", "sn", "center"));
   if (!AXO.you){ var d = document.createElement("div"); d.className = "you"; d.innerHTML = "<i></i><b>You</b>"; d.title = "Drag to stand somewhere else";
     AXO.you = new maplibregl.Marker({element:d, draggable:true, anchor:"bottom"}).setLngLat([0, 0]).addTo(map);
     AXO.you.on("drag", function(){ var p = AXO.you.getLngLat(), c0 = S().center; AXO.live = [(p.lng - c0[1]) * MXs(), (c0[0] - p.lat) * MY]; axoEar(); });
     AXO.you.on("dragend", function(){ if (AXO.live) standAt(AXO.live); AXO.live = null; }); }
   var ql = ll(q[0], q[1]); AXO.you.setLngLat([ql[1], ql[0]]); AXO.live = null;
+  if (GV.mode !== gon){ GV.mode = gon; gvMode(); }
+  if (gon){ var ek = ST.site + "|" + q[0] + "," + q[1]; if (GV.earKey !== ek || !GV.pos){ GV.earKey = ek; GV.pos = [q[0], q[1]]; GV.to = null; }   // the eye follows the listener, also when another screen moves it
+    if (GV.auto && nearSrc(GV.pos, sc) > 60) GV.b = gvFace(GV.pos); gvCam(); gvLabels(); gvTreeData(); } else { (GV.lab || []).forEach(function(m){ m.remove(); }); GV.lab = []; }
+  gvShow();
   loadBlocks(); axoHear(); axoEar(); axoKey();
   if (!AXO.raf) AXO.raf = requestAnimationFrame(axoFrame);
 }
@@ -1651,8 +1778,9 @@ function loadBlocks(){
   fetchBlocks(S().bbox.split(",").map(Number), site);
 }
 function moreBlocks(){   // the view has moved: residents for the ground now in sight
-  var map = AXO.map; if (!ST.ag || AXO.busy || !AXO.per || map.getZoom() < 13.6 || AXO.agents.length > 5000) return;
-  var b = map.getBounds(), bb = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()];
+  var map = AXO.map, bb; if (!map || !ST.ag || AXO.busy || !AXO.per || AXO.agents.length > 5000) return;
+  if (gvOn()){ if (!GV.pos) return; var sw = ll(GV.pos[0] - 1300, GV.pos[1] + 1300), ne = ll(GV.pos[0] + 1300, GV.pos[1] - 1300); bb = [sw[1], sw[0], ne[1], ne[0]]; }   // from the ground: the 1.3 km around the eye
+  else { if (map.getZoom() < 13.6) return; var b = map.getBounds(); bb = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()]; }
   if (AXO.boxes.some(function(c){ return bb[0] >= c[0] && bb[1] >= c[1] && bb[2] <= c[2] && bb[3] <= c[3]; })) return;
   var px = (bb[2] - bb[0]) * .15, py = (bb[3] - bb[1]) * .15; fetchBlocks([bb[0] - px, bb[1] - py, bb[2] + px, bb[3] + py], ST.site);
 }
@@ -1686,32 +1814,50 @@ function axoEar(){   // the level where the listener stands (or is being dragged
 }
 function earHTML(){ var k = hears(AXO.earL), nm = AXO.live ? null : earName(), d = AXO.earL - (AXO.earB || AXO.earL);
   return '<b style="color:' + ["#2f6957", "#8a5c08", "#9a3f36"][k] + '">' + ["Where you stand you do not hear it", "Where you stand you hear it", "Where you stand you hear it clearly"][k] + '</b>' +
-    '<small>' + (nm ? "At " + esc(nm) + " · " : "") + 'about ' + about(Math.round(AXO.earD)) + ' m from the plant · ' + Math.round(Math.max(0, AXO.earL)) + ' dBA, ' + dbWords(d) + ' with the conventional campus.</small><small>Drag the figure, or tap the ground, to stand somewhere else.</small>'; }
+    '<small>' + (nm ? "At " + esc(nm) + " · " : "") + 'about ' + about(Math.round(AXO.earD)) + ' m from the plant · ' + Math.round(Math.max(0, AXO.earL)) + ' dBA, ' + dbWords(d) + ' with the conventional campus.</small><small>' + (gvOn() ? "Tap the ground to walk there, drag to look around." : "Drag the figure, or tap the ground, to stand somewhere else.") + '</small>'; }
 function axoKey(){
   var el = $("akey"); if (!el) return; var n = [0, 0, 0], more = 0; AXO.agents.forEach(function(a){ n[a.cls < 0 ? 0 : a.cls]++; if (a.cls > 0 && !a.base) more++; if (!a.cls && a.base > 0) more--; });
   var tot = AXO.agents.length, wait = !tot && !AXO.err, sw = function(attr, list){ return '<span class="sw" role="group">' + list.map(function(x){ return '<button type="button" ' + attr + '="' + x[0] + '" aria-pressed="' + !!x[2] + '">' + x[1] + '</button>'; }).join("") + '</span>'; };
-  var o = '<div class="hd">' + esc(S().name === "Texas" ? "College Station" : S().name) + ' · axonometric</div>' +
+  var o = '<div class="hd">' + esc(S().name === "Texas" ? "College Station" : S().name) + (gvOn() ? ' · from the ground' : ' · axonometric') + '</div>' +
+    '<div class="arow"><span>View</span>' + sw("data-gv", [["on", "Ground", gvOn()], ["off", "Above", !gvOn()]]) + '</div>' +
+    (gvOn() ? '<div class="arow"><span>Eye height</span>' + sw("data-gh", GVH.map(function(h){ return [h, h + " m", GV.h === h]; })) + '</div>' : '') +
     '<div class="arow"><span>Residents</span>' + sw("data-ag", [["on", "On", ST.ag], ["off", "Off", !ST.ag]]) + '</div>';
   if (ST.ag) o += AXO.err ? '<p class="anote">' + AXO.err + '</p>' : wait ? '<p class="anote">Loading the census blocks…</p>' : !tot ? '<p class="anote">No residents counted in this area.</p>' :
     '<div class="alist">' + [2, 1, 0].map(function(k){ return '<div><i style="background:' + HEAR[k][1] + '"></i><b>' + HEAR[k][0] + '</b><span>' + fewWords(n[k] / tot) + (n[k] ? " · about " + about(n[k] * AXO.per) : "") + '</span></div>'; }).join("") + '</div>' +
     '<p class="anote">' + (more > 0 ? "About " + about(more * AXO.per) + " more residents hear it than with the conventional campus." : more < 0 ? "About " + about(-more * AXO.per) + " fewer residents hear it than with the conventional campus." : "The same residents hear it as with the conventional campus.") + '</p>' +
     '<p class="asrc">1 dot = ' + AXO.per + (AXO.per === 1 ? " resident" : " residents") + ' · 2020 Census blocks, for the ground seen so far.</p>';
   if (S().open) o += '<div class="arow"><span>Size</span>' + sw("data-big", [["ref", "Reference", !ST.big], ["big", "600 MW", ST.big]]) + '</div>' + (ST.big ? '<p class="asrc">What if: 600 MW heard as 23 reference plants in one place, 14 dB louder.</p>' : '');
-  o += '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table.</p><p class="asrc imh">Press H to hide or show the panels.</p>';
+  o += '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the aerial photograph, lying flat; buildings and woods stand up where OpenStreetMap maps them, each tree placed at random inside its wood. The sky is scenery. Only trees planted on the table count for the sound.</p>' : '') + '<p class="asrc imh">Press H to hide or show the panels.</p>';
   el.innerHTML = o;
 }
 function axoFrame(ts){
   AXO.raf = 0; var el = AXO.el, map = AXO.map; if (!el || !el.isConnected){ audioSet(); return; }
   var cv = AXO.ag, w = el.clientWidth, h = el.clientHeight; if (cv.width !== w || cv.height !== h){ cv.width = w; cv.height = h; }
-  if (AXO.orbit && ts > AXO.hold && AXO.last && !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) map.setBearing(map.getBearing() + Math.min(.1, (ts - AXO.last) / 1000) * 1.6);   // the slow turn of the immersive view
+  var still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches, dt = AXO.last ? Math.min(.1, (ts - AXO.last) / 1000) : 0, gon = gvOn() && !!GV.pos;
+  if (!gon && AXO.orbit && ts > AXO.hold && AXO.last && !still) map.setBearing(map.getBearing() + dt * 1.6);   // the slow turn of the immersive view
+  if (gon){ var mv = false;
+    if (GV.to){ var k = Math.min(1, (ts - GV.t0) / GV.dur), e2 = k < .5 ? 2 * k * k : 1 - Math.pow(2 - 2 * k, 2) / 2; if (!(k >= 0)) k = e2 = 1;   // walking
+      GV.pos = [GV.from[0] + (GV.to[0] - GV.from[0]) * e2, GV.from[1] + (GV.to[1] - GV.from[1]) * e2]; if (GV.auto && AXO.sc && nearSrc(GV.pos, AXO.sc) > 60) GV.b = gvFace(GV.pos); mv = true;
+      if (ts - GV.liveT > 120){ GV.liveT = ts; AXO.live = GV.pos; axoEar(); }   // the sound follows on the way
+      if (k >= 1){ var tq = GV.to; GV.to = null; setTimeout(function(){ standAt(tq); }, 0); } }
+    if (GV.bTo != null){ var db = GV.bTo - GV.b; if (Math.abs(db) < .08 || still){ GV.b = GV.bTo; GV.bTo = null; } else GV.b += db * Math.min(1, dt * 7); mv = true; }
+    else if (AXO.orbit && ts > AXO.hold && !still && !GV.to){ GV.b += Math.cos(ts / 1000 * .16) * 2.6 * dt; mv = true; }   // the immersive view looks slowly from side to side
+    if (mv) gvCam();
+    if (GV.dirty){ GV.dirty = false; GV.still = ts; gvShow(); } else if (GV.still && ts - GV.still > 350){ GV.still = 0; gvSettle(); }
+    if (!still && ts - GV.driftT > 250 && AXO.sky){ GV.drift += Math.min(1, (ts - GV.driftT) / 1000) * 2.5; GV.driftT = ts; AXO.sky.firstChild.style.backgroundPositionX = Math.round(-GV.b * GV.foc * Math.PI / 180 - GV.drift) + "px"; }
+    if (ts - GV.rip > 110 && map.getLayer("ring-solid")){ GV.rip = ts; var ph = ts / 1000 * 1.1, ex = ["match", ["get", "k"]], eg = ["match", ["get", "k"]];   // a brighter band travels outward from ring to ring
+      [65, 60, 55, 50, 45, 40].forEach(function(L, n){ var a = still ? .3 : Math.pow(Math.max(0, Math.sin(ph - n * .7)), 3); ex.push(L, .8 + .2 * a); eg.push(L, .35 + .65 * a); }); ex.push(.8); eg.push(.4);
+      try { map.setPaintProperty("ring-solid", "line-opacity", ex); map.setPaintProperty("ring-glow", "line-opacity", eg); } catch(e){} } }
   AXO.last = ts;
-  var c = cv.getContext("2d"), still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches, sec = still ? 0 : ts / 1000, sz = Math.max(3, Math.min(7.5, 3.6 * Math.pow(2, map.getZoom() - 15.7))); c.clearRect(0, 0, w, h);
+  var c = cv.getContext("2d"), sec = still ? 0 : ts / 1000, sz0 = Math.max(3, Math.min(7.5, 3.6 * Math.pow(2, map.getZoom() - 15.7))), gb = GV.b * Math.PI / 180, gfx = Math.sin(gb), gfz = -Math.cos(gb); c.clearRect(0, 0, w, h);
   if (ST.ag) for (var i = 0; i < AXO.agents.length; i++){
-    var a = AXO.agents[i], u = a.ph + sec * a.sp, q = ll(a.e + Math.cos(u) * a.rad, a.s + Math.sin(u * 1.3) * a.rad * .6), p = map.project([q[1], q[0]]); if (p.x < -20 || p.y < -20 || p.x > w + 20 || p.y > h + 20) continue;
+    var a = AXO.agents[i], u = a.ph + sec * a.sp, ae = a.e + Math.cos(u) * a.rad, as = a.s + Math.sin(u * 1.3) * a.rad * .6, sz = sz0;
+    if (gon){ var dx = ae - GV.pos[0], dz = as - GV.pos[1]; if (dx * gfx + dz * gfz < 10) continue; var dd = Math.hypot(dx, dz, GV.h); if (dd > 2400) continue; sz = Math.max(1.4, Math.min(9, 1.3 * GV.foc / dd)); }   // nearer residents are larger, those behind the eye are not drawn
+    var q = ll(ae, as), p = map.project([q[1], q[0]]); if (p.x < -20 || p.y < -20 || p.x > w + 20 || p.y > h + 20) continue;
     var col = HEAR[a.cls < 0 ? 0 : a.cls][1], age = (ts - a.t0) / 1000;
     if (a.t0 && age < 2.4 && !still){ c.strokeStyle = col; c.globalAlpha = 1 - age / 2.4; c.lineWidth = 2.2; c.beginPath(); c.arc(p.x, p.y - sz, sz + age * 13, 0, 6.2832); c.stroke(); c.globalAlpha = 1; }
     c.fillStyle = "rgba(20,30,28,.38)"; c.beginPath(); c.ellipse(p.x + sz * .5, p.y, sz * .95, sz * .36, 0, 0, 6.2832); c.fill();
-    c.strokeStyle = col; c.lineWidth = Math.max(1.6, sz * .7); c.lineCap = "round"; c.beginPath(); c.moveTo(p.x, p.y); c.lineTo(p.x, p.y - sz * .9); c.stroke();
+    c.strokeStyle = col; c.lineWidth = Math.max(1.2, sz * .7); c.lineCap = "round"; c.beginPath(); c.moveTo(p.x, p.y); c.lineTo(p.x, p.y - sz * .9); c.stroke();
     c.fillStyle = col; c.strokeStyle = "rgba(20,30,28,.75)"; c.lineWidth = 1; c.beginPath(); c.arc(p.x, p.y - sz * 1.75, sz, 0, 6.2832); c.fill(); c.stroke();
   }
   AXO.raf = requestAnimationFrame(axoFrame);
@@ -1968,9 +2114,12 @@ document.addEventListener("click", function(ev){
     return; }
   if ((b = T.closest("[data-ag]"))){ ST.ag = b.getAttribute("data-ag") === "on"; axoKey(); tell(); return; }
   if ((b = T.closest("[data-big]"))){ ST.big = b.getAttribute("data-big") === "big"; render(); tell(); return; }
+  if ((b = T.closest("[data-gv]"))){ GV.on = b.getAttribute("data-gv") === "on"; GV.auto = true; GV.bTo = null; GV.to = null; gvSave(); render(); return; }
+  if ((b = T.closest("[data-gh]"))){ GV.h = +b.getAttribute("data-gh"); GV.tilt = GVTILT[GV.h]; gvSave(); gvCam(); axoKey(); return; }
   if ((b = T.closest("[data-snd]"))){ AXO.on = b.getAttribute("data-snd") === "on" && audioStart(); axoEar(); axoKey(); return; }
   if ((b = T.closest("[data-az]")) && AXO.map){ var how = b.getAttribute("data-az"), m = AXO.map, c0 = S().center;
     if (how === "imm"){ immersive(!document.body.classList.contains("imm")); return; }
+    if (gvOn()){ if (how === "in" || how === "out") gvAhead(how === "in" ? 60 : -60); else if (how === "reset"){ GV.auto = true; GV.bTo = null; GV.tilt = GVTILT[GV.h]; GV.earKey = null; ST.ear = null; render(); tell(); } else gvTurn(how === "left" ? -30 : 30); return; }
     if (how === "in") m.zoomIn(); else if (how === "out") m.zoomOut(); else if (how === "reset") m.easeTo({center:[c0[1], c0[0]], zoom:15.7, pitch:57, bearing:-28}); else m.easeTo({bearing:m.getBearing() + (how === "left" ? -30 : 30)}); return; }
 });
 // The immersive view: the whole screen, no bar, a slow turn. H hides the panels for projection; Esc or the button leaves.
@@ -2006,7 +2155,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-001740";
+var BUILD = "20261123-004544";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
