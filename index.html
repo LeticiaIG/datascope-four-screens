@@ -884,30 +884,35 @@ html.checking .app{visibility:hidden}
 .measure.simple.film .bud.max .bb{fill-opacity:.26;stroke-dasharray:none}
 .measure.simple.film .bud.over .bb{fill:var(--loss);fill-opacity:.16;stroke:var(--loss);stroke-dasharray:1 5} .measure.simple.film .bud.over .bc{fill:var(--loss)} .measure.simple.film .bud.over .bn{fill:var(--loss)}
 .measure.simple.film .bud svg{filter:drop-shadow(0 0 22px #e85cb840)}
-.measure.simple.film > svg.thr{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}
-svg.thr path{fill:none;stroke-linecap:round;opacity:.5} svg.thr .g{stroke:var(--gain)} svg.thr .l{stroke:var(--loss)} svg.thr circle.g{fill:var(--gain);stroke:none} svg.thr circle.l{fill:var(--loss);stroke:none}
-/* ---------- flat ----------
-   The look of broadcast graphics: flat blocks of color, plain circles, nothing glowing. One color per chapter (blue, pink, mustard, mint), green and orange for
-   gained and given up, black and off-white for the words. The chapters are tiles; the budget is a target of flat bands, each band what that chapter took, the
-   middle what stays with the community; the three-second card takes the color of its chapter. */
-.measure.simple.film{--kD:#3a2bff;--kT:#e87bb3;--kE:#f2b63c;--kB:#a8f0cf;--gain:#a8f0cf;--loss:#ff6a2b}
-.measure.simple.film:not(.night){--kD:#3a2bff;--kT:#e87bb3;--kE:#f2b63c;--kB:#a8f0cf;--gain:#16663a;--loss:#f04e12}
-.measure.simple.film:not(.zz) .acts{gap:.5rem;align-items:stretch}
-.measure.simple.film:not(.zz) .acts button{background:var(--kD);color:#fff;border:0;border-image:none;border-radius:0;padding:.55rem .85rem .7rem;opacity:1;text-shadow:none;justify-content:flex-start}
-.measure.simple.film:not(.zz) .acts .kT{background:var(--kT);color:#0d0e0f} .measure.simple.film:not(.zz) .acts .kE{background:var(--kE);color:#0d0e0f} .measure.simple.film:not(.zz) .acts .kB{background:var(--kB);color:#0d0e0f}
-.measure.simple.film:not(.zz) .acts small{color:inherit;opacity:.8}
-.measure.simple.film:not(.zz) .acts button.now{border:0;padding-bottom:.7rem;box-shadow:inset 0 -8px 0 #0d0e0f} .measure.simple.film.night:not(.zz) .acts button.now{box-shadow:inset 0 -8px 0 #f4f2ea}
-.measure.simple.film:not(.zz) .acts button.mdb{background:#0d0e0f;color:#f4f2ea;border:0;padding:.55rem .9rem;align-self:stretch;justify-content:center} .measure.simple.film:not(.zz) .acts button.mdb:hover{background:#0d0e0f;color:#f4f2ea;padding:.55rem .9rem;border:0}
-.measure.simple.film .bud svg{filter:none}
-.measure.simple.film .bud .rg{fill:var(--kD);stroke:none;stroke-dasharray:none} .measure.simple.film .bud .rT{fill:var(--kT);stroke:none} .measure.simple.film .bud .rE{fill:var(--kE);stroke:none}
-.measure.simple.film .bud .rl{stroke:none;fill:#0d0e0f;font-weight:800;letter-spacing:.02em} .measure.simple.film .bud .rl.lD{fill:#fff} .measure.simple.film .bud .rl.lT,.measure.simple.film .bud .rl.lE{fill:#0d0e0f}
-.measure.simple.film .bud .bb{fill:#e9f7ef;fill-opacity:1;stroke:none} .measure.simple.film .bud .bc{fill:var(--kB);fill-opacity:1}
-.measure.simple.film .bud.max .bb{fill:#e9f7ef;fill-opacity:1} .measure.simple.film .bud.over .bb{fill:#ffd9c9;fill-opacity:1;stroke:none} .measure.simple.film .bud.over .bc{fill:var(--loss)}
-.measure.simple.film .bud .bn,.measure.simple.film .bud .bs{fill:#0d0e0f;stroke:none} .measure.simple.film .bud.over .bn{fill:#0d0e0f}
-.measure.simple.film > .reveal.kD,.measure.simple.film:not(.night) > .reveal.kD{background:#3a2bff;--fg:#fff;--dim:#ffffffb3;--c:#fff;color:#fff}
-.measure.simple.film > .reveal.kT,.measure.simple.film:not(.night) > .reveal.kT{background:#e87bb3;--fg:#0d0e0f;--dim:#0d0e0fb3;--c:#0d0e0f;color:#0d0e0f}
-.measure.simple.film > .reveal.kE,.measure.simple.film:not(.night) > .reveal.kE{background:#f2b63c;--fg:#0d0e0f;--dim:#0d0e0fb3;--c:#0d0e0f;color:#0d0e0f}
-.measure.simple.film > .reveal.kB,.measure.simple.film:not(.night) > .reveal.kB{background:#a8f0cf;--fg:#0d0e0f;--dim:#0d0e0fb3;--c:#0d0e0f;color:#0d0e0f}
+/* ---------- the field ----------
+   Over the landscape nothing is solid: the results are bubbles of translucent color, light at one side and deeper at the other, green for gained and red
+   for given up; the words are black or white with the ground. Solid, flat color is kept for what stands on its own ground: the chapter tiles and the card
+   that shows one choice. */
+.measure.simple.film .bubs{display:flex;perspective:none;gap:0} .measure.simple.film .faces{display:none}
+.film .fld{flex:1 1 auto;min-width:0;display:grid;grid-template-columns:1.2fr repeat(4,minmax(0,1fr));gap:1.3rem;align-items:stretch}
+.film .fcol{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;gap:.5rem;border-top:2px solid var(--fg);padding-top:.5rem}
+.film .fcol h4{margin:0;align-self:stretch;display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;font-size:.95rem;font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:1.05;color:var(--fg);text-shadow:0 0 3px var(--halo),0 0 14px var(--halo)}
+.film .fcol h4 i{flex:none;font-style:normal;font-size:.8rem;font-weight:800;opacity:.65} .film .fcol h4 i.g{color:var(--gain);opacity:1} .film .fcol h4 i.l{color:var(--loss);opacity:1}
+.film .fbs{flex:1 1 auto;min-height:0;align-self:stretch;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;align-items:center;gap:.5rem}
+.film .fb{--s:9rem;font:inherit;width:var(--s);height:var(--s);flex:none;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;padding:.9rem;text-align:center;cursor:pointer;color:var(--fg);border:1px solid #ffffffb3;background:radial-gradient(circle at 32% 26%,#eafff6e0 0,#74ddb3b8 46%,#1f9d74a8 100%);box-shadow:0 10px 30px #0d0e0f1f;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);text-shadow:0 0 8px var(--halo);transition:transform .15s,opacity .2s}
+.film .fb.l{background:radial-gradient(circle at 32% 26%,#fff0ebe0 0,#f79a87b8 46%,#d94a35a8 100%)}
+.film .fb.d0{--s:8rem;background:#ffffff14;border:1.5px dashed var(--gain);box-shadow:none} .film .fb.l.d0{border-color:var(--loss)}
+.film .fb.d1{--s:8rem} .film .fb.d2{--s:9.6rem} .film .fb.d3{--s:11.2rem}
+.film .fbs.many .fb{--s:6.9rem;padding:.5rem} .film .fbs.many .fb.d2{--s:7.6rem} .film .fbs.many .fb.d3{--s:8.6rem}
+.film .fb:hover{transform:scale(1.04)}
+.film .fb b{font-size:1.9rem;font-weight:800;letter-spacing:-.04em;line-height:1} .film .fb.d3 b{font-size:2.5rem} .film .fbs.many .fb b{font-size:1.45rem} .film .fbs.many .fb.d3 b{font-size:1.8rem}
+.film .fb span{font-size:.7rem;font-weight:700;text-transform:uppercase;line-height:1.08;max-width:100%} .film .fbs.many .fb span{font-size:.58rem}
+.film .bubs.frozen .fb:not(.sel){opacity:.3} .film .fb.sel{box-shadow:0 0 0 3px var(--fg)}
+.film.cut .fb{animation:snap .5s cubic-bezier(.2,1.5,.4,1) both;animation-delay:calc(140ms + var(--i, 0) * 80ms)} .film.cut.rev .fb{animation-delay:calc(2.9s + var(--i, 0) * 80ms)}
+@media (prefers-reduced-motion: reduce){ .film.cut .fb{animation:none} }
+/* the money bubble in the same hand: translucent discs one inside the other, each what that chapter took, and in the middle what stays with the community */
+.film .fmoney .bcol.q{flex:1 1 auto;min-height:0;align-self:stretch;justify-content:center}
+.measure.simple.film .fmoney .bud svg{width:100%;max-width:21rem;filter:none}
+.measure.simple.film .bud .rg{fill-opacity:.22;stroke:var(--kD);stroke-width:1} .measure.simple.film .bud .rT{stroke:var(--kT)} .measure.simple.film .bud .rE{stroke:var(--kE)}
+.measure.simple.film .bud .rl,.measure.simple.film .bud .rl.lD,.measure.simple.film .bud .rl.lT,.measure.simple.film .bud .rl.lE{fill:var(--fg);stroke:var(--halo);stroke-width:2.2px;paint-order:stroke}
+.measure.simple.film .bud .bb,.measure.simple.film .bud.max .bb{fill:#ffffff;fill-opacity:.45;stroke:#ffffff;stroke-width:1} .measure.simple.film .bud .bc{fill:url(#budfill);fill-opacity:.9}
+.measure.simple.film .bud .bn,.measure.simple.film .bud .bs{fill:var(--fg);stroke:var(--halo);stroke-width:2.6px;paint-order:stroke}
+.measure.simple.film .ph.q.bud .bl{font-size:.8rem;max-width:18rem}
 .measure.simple.film:not(.zz) .phs .nil{font-weight:800;text-transform:uppercase;letter-spacing:-.01em;font-size:1.4rem;opacity:.45}
 .film.cut .acts button.hit{animation:hit .7s ease-out both}
 @keyframes hit{0%{background:#f1eee3;color:#0d0e0f}100%{background:none}}
@@ -2038,9 +2043,7 @@ function bubblesHTML(st, un){
   function col(cls, n, title, list, empty){ var show = MD.all ? list : list.slice(0, TOP), more = list.length - show.length;
     return '<div class="bcol ' + cls + '"><h4>' + title + '<i>' + n + '</i></h4><div class="phs' + (show.length > 3 ? " many" : "") + '">' + (show.length ? show.map(line).join("") : '<p class="nil">' + empty + '</p>') + '</div>' +
       (more > 0 ? '<button type="button" class="bmore" data-ball="1">and ' + more + ' smaller</button>' : MD.all && list.length > TOP ? '<button type="button" class="bmore" data-ball="0">the largest only</button>' : '') + '</div>'; }
-  return col("g", g.length, "The neighborhood gains", g, "Nothing yet") +
-    budBubHTML(bi++) +
-    col("l", l.length, "The neighborhood gives up", l, "Nothing so far");   // gains and what is given up face each other across what is not known
+  return fieldHTML(st);   // the story in one picture
 }
 // The middle of the wall: the budget as one bubble, in the manner of the gas bubble of The Community Carbon Impact. It grows as the choices spend
 // the budget, says how much is left while there is room, turns amber and says MAX when nothing is left, and red when the choices ask for more.
@@ -2059,8 +2062,18 @@ function budBubHTML(i){   // the budget is the community's to share out. The bub
   var note = (q.over ? '<em>The choices ask for ' + (q.left0 < 0 ? money(-q.left0) : money(-q.left1) + " a year") + ' more than there is' + (outs.length ? ": " + outs.join(", ") + " does not fit" : "") + '.</em> ' : (ben ? money(ben) + " in benefits" : "No benefit chosen yet") + (free > 0 ? ", " + money(free) + " not allocated yet. " : ". Nothing is left to allocate. ")) +
     (q.left1 < 0 ? "" : money(q.left1) + ' of ' + money(q.b[1]) + ' a year left. ') + 'Example prices.';
   return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.freeze === "bud" ? " sel" : "") + '" style="--i:' + i + '" data-bud aria-label="The budget, ' + money(tot) + ' upfront, is the community’s to share out. ' + (parts.length ? "The choices about the plant take: " + parts.map(function(p){ return p[1] + " " + money(r2(p[2])); }).join(", ") + ". " : "") + money(comm) + ' stays with the community' + (ben ? ", " + money(ben) + " of it in benefits" : "") + '.">' +
-    '<svg viewBox="-112 -110 224 216" aria-hidden="true"><defs><radialGradient id="budfill" cx="34%" cy="28%" r="85%"><stop offset="0" stop-color="#ffd98a"/><stop offset=".5" stop-color="#f06aae"/><stop offset="1" stop-color="#6f6bff"/></radialGradient><linearGradient id="budedge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb057"/><stop offset=".5" stop-color="#e85cb8"/><stop offset="1" stop-color="#4f7dff"/></linearGradient></defs>' + o + '<circle class="bb" r="' + rb.toFixed(1) + '"/>' + (rc > 0 ? '<circle class="bc" r="' + rc.toFixed(1) + '"/>' : '') +
+    '<svg viewBox="-112 -110 224 216" aria-hidden="true"><defs><radialGradient id="budfill" cx="34%" cy="28%" r="85%"><stop offset="0" stop-color="#e3fff4"/><stop offset=".5" stop-color="#6fdcb0"/><stop offset="1" stop-color="#1f9d74"/></radialGradient><linearGradient id="budedge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb057"/><stop offset=".5" stop-color="#e85cb8"/><stop offset="1" stop-color="#4f7dff"/></linearGradient></defs>' + o + (n ? '<text class="rl" x="0" y="' + (R + 12) + '" text-anchor="middle" style="font-size:9.5px">The whole budget ' + money(tot) + '</text>' : '') + '<circle class="bb" r="' + rb.toFixed(1) + '"/>' + (rc > 0 ? '<circle class="bc" r="' + rc.toFixed(1) + '"/>' : '') +
     '<text class="bn" y="2" text-anchor="middle">' + (q.over ? "−" + (q.left0 < 0 ? money(-q.left0) : money(-q.left1)) : money(comm)) + '</text><text class="bs" y="14" text-anchor="middle">' + (q.over ? (q.left0 < 0 ? "over the budget" : "a year over the budget") : "for the community") + '</text></svg><span class="bl">' + note + '</span></button></div>';
+}
+// The story in one picture. On the left the money, as one bubble that has shrunk with every choice. Then one bubble for every result, floating over the
+// group it lands on: green where something is gained, red where it is given up, larger for more, an outline where the size is not known. Who gains and
+// who loses is read from where the bubbles gather and what color they are.
+function fieldHTML(st){
+  var i = 0, q = budState();
+  function bub(x){ var p = phraseOf(x); return '<button type="button" class="fb ' + (x.dir > 0 ? "g" : "l") + " d" + (x.deg || 0) + (MD.freeze === x.id ? " sel" : "") + '" style="--i:' + (i++) + '" data-stm="' + x.id + '"><b>' + p[1] + '</b><span>' + p[2] + '</span></button>'; }
+  var cols = GROUPS.map(function(G){ var list = st.filter(function(x){ return G[1](x); }), sc = 0; list.forEach(function(x){ sc += x.dir * (x.deg || 1); });
+    return '<div class="fcol"><h4>' + G[0] + '<i class="' + (sc > 0 ? "g" : sc < 0 ? "l" : "") + '">' + (!list.length ? "no change" : sc > 0 ? "better" : sc < 0 ? "worse" : "even") + '</i></h4><div class="fbs' + (list.length > 2 ? " many" : "") + '">' + list.map(bub).join("") + '</div></div>'; }).join("");
+  return '<div class="fld"><div class="fcol fmoney"><h4>The budget<i class="' + (q.over ? "l" : "") + '">' + (q.over ? "over" : money(q.b[0])) + '</i></h4>' + budBubHTML(i++) + '</div>' + cols + '</div>';
 }
 function sayYou(x){   // one bubble, said to the person looking at it
   var b = bigOf(x), n = b[0].replace(/^[−+]/, ""), up = b[0].charAt(0) === "+", t = TECH[x.code], en = ENERGY[x.code], pr;
@@ -2174,18 +2187,6 @@ function traceHTML(st, un){
   }
   return o + '<p class="ans" id="ans" aria-live="polite">' + esc(SEL.msg) + '</p>' + askRow();
 }
-// The threads, as in a data story: a fine line from each choice to each group its results touch. Green where that group gains, red where it gives
-// up; thicker for more, dotted where the size is not known. They hang behind the figures, from the row of choices down to the faces.
-function threads(){
-  var w = document.querySelector(".measure.simple.film"); if (!w) return; var old = w.querySelector("svg.thr"); if (old) old.remove();
-  var acts = w.querySelector(".acts"), faces = w.querySelector(".faces"), bg = w.querySelector(".rwbg"); if (!acts || !faces || !bg || getComputedStyle(faces).display === "none") return;
-  var fs = faces.querySelectorAll(".face"), o = "", cnt = {};
-  statements(ST).forEach(function(s){ var b = acts.querySelector('button[data-ch="' + CHOF[s.code.charAt(0)] + '"]'), gi = -1; GROUPS.forEach(function(G, i){ if (gi < 0 && G[1](s)) gi = i; }); var f = fs[gi]; if (!b || !f) return;
-    var k = s.code.charAt(0) + gi, n = cnt[k] = (cnt[k] || 0) + 1, x1 = acts.offsetLeft + b.offsetLeft + Math.min(b.offsetWidth - 8, 14 + (gi * 4 + n) * 9), y1 = acts.offsetTop + b.offsetTop + b.offsetHeight + 3, x2 = faces.offsetLeft + f.offsetLeft + 12 + n * 6, y2 = faces.offsetTop + f.offsetTop - 5, m = (y2 - y1) * .55;
-    o += '<path class="' + (s.dir > 0 ? "g" : "l") + '" d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + 'C' + x1.toFixed(1) + ' ' + (y1 + m).toFixed(1) + ' ' + x2.toFixed(1) + ' ' + (y2 - m).toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" stroke-width="' + (1.1 + (s.deg || 0) * .8).toFixed(1) + '"' + (s.deg ? '' : ' stroke-dasharray="1 5"') + '/><circle class="' + (s.dir > 0 ? "g" : "l") + '" cx="' + x2.toFixed(1) + '" cy="' + y2.toFixed(1) + '" r="2.6"/>'; });
-  if (!o) return; var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("class", "thr"); svg.setAttribute("aria-hidden", "true"); svg.innerHTML = o; w.insertBefore(svg, bg.nextSibling);
-}
-window.addEventListener("resize", function(){ try { threads(); } catch(e){} });
 function wordsFill(){
   var st = statements(ST), un = unknowns(ST), had = document.activeElement && document.activeElement.id === "askq";
   pickSel(st, un);
@@ -2198,7 +2199,6 @@ function wordsFill(){
   [].forEach.call(document.querySelectorAll('[data-w="bwhy"]'), function(el){ el.innerHTML = bwhyHTML(st, un); });
   if (had && $("askq")){ var i = $("askq"); i.focus(); try { i.setSelectionRange(i.value.length, i.value.length); } catch(e){} }
   runUp();
-  try { threads(); } catch(e){ if (window.console) console.warn("Threads", e); }
 }
 // Figures that run up to their value: each large figure on the staged wall counts from nothing the first time it shows and whenever it changes.
 function runUp(){
@@ -3121,7 +3121,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-232024";
+var BUILD = "20261123-232617";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
