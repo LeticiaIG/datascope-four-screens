@@ -884,6 +884,8 @@ html.checking .app{visibility:hidden}
 .measure.simple.film .bud.max .bb{fill-opacity:.26;stroke-dasharray:none}
 .measure.simple.film .bud.over .bb{fill:var(--loss);fill-opacity:.16;stroke:var(--loss);stroke-dasharray:1 5} .measure.simple.film .bud.over .bc{fill:var(--loss)} .measure.simple.film .bud.over .bn{fill:var(--loss)}
 .measure.simple.film .bud svg{filter:drop-shadow(0 0 22px #e85cb840)}
+.measure.simple.film > svg.thr{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}
+svg.thr path{fill:none;stroke-linecap:round;opacity:.5} svg.thr .g{stroke:var(--gain)} svg.thr .l{stroke:var(--loss)} svg.thr circle.g{fill:var(--gain);stroke:none} svg.thr circle.l{fill:var(--loss);stroke:none}
 .measure.simple.film:not(.zz) .phs .nil{font-weight:800;text-transform:uppercase;letter-spacing:-.01em;font-size:1.4rem;opacity:.45}
 .film.cut .acts button.hit{animation:hit .7s ease-out both}
 @keyframes hit{0%{background:#f1eee3;color:#0d0e0f}100%{background:none}}
@@ -2150,6 +2152,18 @@ function traceHTML(st, un){
   }
   return o + '<p class="ans" id="ans" aria-live="polite">' + esc(SEL.msg) + '</p>' + askRow();
 }
+// The threads, as in a data story: a fine line from each choice to each group its results touch. Green where that group gains, red where it gives
+// up; thicker for more, dotted where the size is not known. They hang behind the figures, from the row of choices down to the faces.
+function threads(){
+  var w = document.querySelector(".measure.simple.film"); if (!w) return; var old = w.querySelector("svg.thr"); if (old) old.remove();
+  var acts = w.querySelector(".acts"), faces = w.querySelector(".faces"), bg = w.querySelector(".rwbg"); if (!acts || !faces || !bg || getComputedStyle(faces).display === "none") return;
+  var fs = faces.querySelectorAll(".face"), o = "", cnt = {};
+  statements(ST).forEach(function(s){ var b = acts.querySelector('button[data-ch="' + CHOF[s.code.charAt(0)] + '"]'), gi = -1; GROUPS.forEach(function(G, i){ if (gi < 0 && G[1](s)) gi = i; }); var f = fs[gi]; if (!b || !f) return;
+    var k = s.code.charAt(0) + gi, n = cnt[k] = (cnt[k] || 0) + 1, x1 = acts.offsetLeft + b.offsetLeft + Math.min(b.offsetWidth - 8, 14 + (gi * 4 + n) * 9), y1 = acts.offsetTop + b.offsetTop + b.offsetHeight + 3, x2 = faces.offsetLeft + f.offsetLeft + 12 + n * 6, y2 = faces.offsetTop + f.offsetTop - 5, m = (y2 - y1) * .55;
+    o += '<path class="' + (s.dir > 0 ? "g" : "l") + '" d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + 'C' + x1.toFixed(1) + ' ' + (y1 + m).toFixed(1) + ' ' + x2.toFixed(1) + ' ' + (y2 - m).toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" stroke-width="' + (1.1 + (s.deg || 0) * .8).toFixed(1) + '"' + (s.deg ? '' : ' stroke-dasharray="1 5"') + '/><circle class="' + (s.dir > 0 ? "g" : "l") + '" cx="' + x2.toFixed(1) + '" cy="' + y2.toFixed(1) + '" r="2.6"/>'; });
+  if (!o) return; var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("class", "thr"); svg.setAttribute("aria-hidden", "true"); svg.innerHTML = o; w.insertBefore(svg, bg.nextSibling);
+}
+window.addEventListener("resize", function(){ try { threads(); } catch(e){} });
 function wordsFill(){
   var st = statements(ST), un = unknowns(ST), had = document.activeElement && document.activeElement.id === "askq";
   pickSel(st, un);
@@ -2162,6 +2176,7 @@ function wordsFill(){
   [].forEach.call(document.querySelectorAll('[data-w="bwhy"]'), function(el){ el.innerHTML = bwhyHTML(st, un); });
   if (had && $("askq")){ var i = $("askq"); i.focus(); try { i.setSelectionRange(i.value.length, i.value.length); } catch(e){} }
   runUp();
+  try { threads(); } catch(e){ if (window.console) console.warn("Threads", e); }
 }
 // Figures that run up to their value: each large figure on the staged wall counts from nothing the first time it shows and whenever it changes.
 function runUp(){
@@ -3084,7 +3099,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-230410";
+var BUILD = "20261123-231731";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}

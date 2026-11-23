@@ -42,6 +42,8 @@ On the Texas table, under Design, the heights of the D2 berm and the D3 walls ca
 
 **Color on the right wall.** Green and red say one thing only: gained and given up. Everything else is one gradient, blue through violet and magenta (the color of the sound rings on the map) to gold: it runs once along the row of chapters, each ring takes the color of its chapter's stretch, and the bubble, which is what stays with the community, is filled with the whole of it. Over budget, the bubble turns red.
 
+**Threads.** Behind the figures of the right wall a fine line runs from each choice, in the row at the top, to each group its results touch, in the row of faces at the foot: green where that group gains, red where it gives up, thicker for more, dotted where the size is not known. It is read from the same results as the faces and the figures.
+
 **Closing a scenario.** On the right wall, "Close this scenario as agreed" keeps the scenario with what it gains, gives up and leaves unknown. It then appears on the sentiment map (Texas), where people can say what they think of it; their answers are counted on the closed scenario on both walls. A closed scenario can be shown again or reopened.
 
 **Examples** (`#examples`): a photomontage of the room in use (a generated image) and the annotated captures of the four screens.
