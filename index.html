@@ -870,6 +870,21 @@ html.checking .app{visibility:hidden}
 .measure.simple.film .face b::after{font-weight:900;margin-left:.5em}
 .measure.simple.film .face.m2 b::after{content:"better";color:var(--gain)} .measure.simple.film .face.m0 b::after{content:"worse";color:var(--loss)} .measure.simple.film .face.m1 b::after{content:"same";opacity:.7}
 .measure.simple.film .face b{font-size:.74rem;font-weight:800}
+/* ---------- color ----------
+   Green and red say one thing only: gained, given up. Everything else is one gradient, the light of the last hour of the day: blue through violet and
+   magenta (the color of the sound rings on the map) to gold. It runs once along the row of chapters, each chapter taking its stretch of it; the rings take
+   the color of their chapter's stretch; the bubble, which is what stays with the community, glows with the whole of it. */
+.measure.simple.film{--g1:#4f7dff;--g2:#7f6bff;--g3:#b55cf0;--g4:#e85cb8;--g5:#ffb057;--kD:#6a74ff;--kT:#9a63f8;--kE:#cf5cd4}
+.measure.simple.film:not(.night){--kD:#4b57e6;--kT:#7d43e0;--kE:#b93bb4}
+.measure.simple.film:not(.zz) .acts button{border-image:linear-gradient(90deg,var(--ga,var(--g1)),var(--gb,var(--g2))) 1}
+.measure.simple.film:not(.zz) .acts .kT{--ga:var(--g2);--gb:var(--g3)} .measure.simple.film:not(.zz) .acts .kE{--ga:var(--g3);--gb:var(--g4)} .measure.simple.film:not(.zz) .acts .kB{--ga:var(--g4);--gb:var(--g5)}
+.measure.simple.film:not(.zz) .acts button.mdb{border-image:none}
+.measure.simple.film .bud .bc{fill:url(#budfill);fill-opacity:1;stroke:none}
+.measure.simple.film .bud .bb{fill:url(#budfill);fill-opacity:.26;stroke:url(#budedge);stroke-width:2.6;stroke-dasharray:none}
+.measure.simple.film .bud.max .bb{fill-opacity:.26;stroke-dasharray:none}
+.measure.simple.film .bud.over .bb{fill:var(--loss);fill-opacity:.16;stroke:var(--loss);stroke-dasharray:1 5} .measure.simple.film .bud.over .bc{fill:var(--loss)} .measure.simple.film .bud.over .bn{fill:var(--loss)}
+.measure.simple.film .bud svg{filter:drop-shadow(0 0 22px #e85cb840)}
+.measure.simple.film:not(.zz) .phs .nil{font-weight:800;text-transform:uppercase;letter-spacing:-.01em;font-size:1.4rem;opacity:.45}
 .film.cut .acts button.hit{animation:hit .7s ease-out both}
 @keyframes hit{0%{background:#f1eee3;color:#0d0e0f}100%{background:none}}
 @media (prefers-reduced-motion: reduce){ .film .whip{display:none} .film.cut .bub,.film.cut .acts button.hit,.stamp.slam{animation:none} }
@@ -2020,7 +2035,7 @@ function budBubHTML(i){   // the budget is the community's to share out. The bub
   var note = (q.over ? '<em>The choices ask for ' + (q.left0 < 0 ? money(-q.left0) : money(-q.left1) + " a year") + ' more than there is' + (outs.length ? ": " + outs.join(", ") + " does not fit" : "") + '.</em> ' : (ben ? money(ben) + " in benefits" : "No benefit chosen yet") + (free > 0 ? ", " + money(free) + " not allocated yet. " : ". Nothing is left to allocate. ")) +
     (q.left1 < 0 ? "" : money(q.left1) + ' of ' + money(q.b[1]) + ' a year left. ') + 'Example prices.';
   return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.freeze === "bud" ? " sel" : "") + '" style="--i:' + i + '" data-bud aria-label="The budget, ' + money(tot) + ' upfront, is the community’s to share out. ' + (parts.length ? "The choices about the plant take: " + parts.map(function(p){ return p[1] + " " + money(r2(p[2])); }).join(", ") + ". " : "") + money(comm) + ' stays with the community' + (ben ? ", " + money(ben) + " of it in benefits" : "") + '.">' +
-    '<svg viewBox="-112 -110 224 216" aria-hidden="true">' + (n ? '<line class="ax" x1="0" x2="0" y1="-' + R + '" y2="' + (-rb).toFixed(1) + '"/>' : '') + o + '<circle class="bb" r="' + rb.toFixed(1) + '"/>' + (rc > 0 ? '<circle class="bc" r="' + rc.toFixed(1) + '"/>' : '') +
+    '<svg viewBox="-112 -110 224 216" aria-hidden="true"><defs><radialGradient id="budfill" cx="34%" cy="28%" r="85%"><stop offset="0" stop-color="#ffd98a"/><stop offset=".5" stop-color="#f06aae"/><stop offset="1" stop-color="#6f6bff"/></radialGradient><linearGradient id="budedge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb057"/><stop offset=".5" stop-color="#e85cb8"/><stop offset="1" stop-color="#4f7dff"/></linearGradient></defs>' + (n ? '<line class="ax" x1="0" x2="0" y1="-' + R + '" y2="' + (-rb).toFixed(1) + '"/>' : '') + o + '<circle class="bb" r="' + rb.toFixed(1) + '"/>' + (rc > 0 ? '<circle class="bc" r="' + rc.toFixed(1) + '"/>' : '') +
     '<text class="bn" y="2" text-anchor="middle">' + (q.over ? "−" + (q.left0 < 0 ? money(-q.left0) : money(-q.left1)) : money(comm)) + '</text><text class="bs" y="14" text-anchor="middle">' + (q.over ? (q.left0 < 0 ? "over the budget" : "a year over the budget") : "for the community") + '</text></svg><span class="bl">' + note + '</span></button></div>';
 }
 function sayYou(x){   // one bubble, said to the person looking at it
@@ -3069,7 +3084,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-230150";
+var BUILD = "20261123-230410";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
