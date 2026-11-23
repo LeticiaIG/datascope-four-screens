@@ -699,13 +699,17 @@ html.checking .app{visibility:hidden}
 .measure.simple.film .moneybar{gap:.4rem 1.3rem} .film .mcap{grid-column:1 / -1;font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);opacity:.8}
 .film .pot,.film .lft{font-size:.95rem;white-space:nowrap;text-shadow:0 1px 3px #0d0e0fcc} .film .pot b,.film .lft b{font-size:1.6rem;font-weight:300;font-variant-numeric:tabular-nums} .film .lft{text-align:right} .film .lft.bad,.film .lft.bad b{color:var(--loss)}
 .film .moneybar .strip{height:1.5rem} .film .moneybar .strip i{justify-content:flex-start;padding:0 .45rem;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap} .film .moneybar .strip i b{line-height:1.5rem;padding:0}
-/* the middle of the wall: the budget as one bubble. It grows as the choices spend it, turns amber and says MAX when nothing is left, red when they ask for more */
-.measure.simple.film .ph.q.bud{--bc:var(--gain);width:calc(8rem + 6rem * var(--u,0));height:calc(8rem + 6rem * var(--u,0));border:1.5px solid var(--bc);background:radial-gradient(circle at 38% 32%,color-mix(in srgb,var(--bc) 50%,transparent),color-mix(in srgb,var(--bc) 14%,transparent) 72%),#0d0e0f80;animation:budgrow .7s cubic-bezier(.2,1.5,.4,1) both}
-.measure.simple.film .ph.q.bud.max{--bc:#ffc928} .measure.simple.film .ph.q.bud.over{--bc:var(--loss);animation:budgrow .7s cubic-bezier(.2,1.5,.4,1) both,budover 1.4s ease-in-out .7s infinite}
-.measure.simple.film .ph.q.bud b{font-size:3rem;font-weight:400;letter-spacing:.01em;text-shadow:0 1px 3px #0d0e0fcc} .measure.simple.film .ph.q.bud span{max-width:82%;text-shadow:0 1px 3px #0d0e0fcc}
-@keyframes budgrow{from{width:calc(8rem + 6rem * var(--u0,0));height:calc(8rem + 6rem * var(--u0,0))}}
-@keyframes budover{50%{box-shadow:0 0 0 10px #ff6a3d40}}
-@media (prefers-reduced-motion:reduce){ .measure.simple.film .ph.q.bud,.measure.simple.film .ph.q.bud.over{animation:none} }
+/* the middle of the wall: the budget as one bubble. What the choices take sits inside it as discs in the colors of the chapters; the ring turns amber
+   and the word under it says MAX when nothing is left, and red, with what does not fit left outside, when the choices ask for more */
+.measure.simple.film .ph.q.bud{--bc:var(--gain);width:auto;height:auto;border:0;border-radius:0;background:none;gap:.2rem;text-shadow:0 1px 3px #0d0e0fcc,0 2px 18px #0d0e0fcc}
+.measure.simple.film .ph.q.bud.max{--bc:#ffc928} .measure.simple.film .ph.q.bud.over{--bc:var(--loss)}
+.film .bud svg{display:block;width:min(21rem,30cqw,36vh);height:auto;overflow:visible}
+.film .bud .ring{fill:#0d0e0f80;stroke:var(--bc);stroke-width:2.5} .film .bud.over .ring{stroke-dasharray:7 5}
+.film .bud .pd{fill:var(--fg);stroke:#0d0e0f;stroke-width:1.5} .film .bud .pT{fill:#4aa3ff} .film .bud .pE{fill:#ffc928} .film .bud .pB{fill:var(--gain)}
+.film .bud .pd.out{fill-opacity:.25;stroke:var(--loss);stroke-width:2.5;stroke-dasharray:6 4}
+.film .bud text{font-family:"Space Mono",monospace;font-size:15px;font-weight:700;fill:#0d0e0f;text-shadow:none} .film .bud text.out{fill:var(--fg)}
+.measure.simple.film .ph.q.bud .bl,.measure.simple.film .ph.q.bud .bl span{display:flex;align-items:baseline;gap:.5rem;font-family:"Jost","Futura",var(--font);text-transform:none;letter-spacing:0;font-size:1.3rem;line-height:1} .measure.simple.film .ph.q.bud .bl b{font-size:2.6rem;font-weight:400;color:var(--bc)}
+.measure.simple.film .bubs.frozen .ph.q.bud.sel{background:none;color:var(--fg)} .measure.simple.film .bubs.frozen .ph.q.bud.sel .bl b{color:var(--bc)}
 .film .fqs{display:flex;gap:.5rem;justify-content:center;margin:.1rem 0} .film .fqs .go{margin:0;vertical-align:0} .film .fqs .go[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
 .film .alts2{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:.4rem} .film .alts2 .setb{display:inline-flex;align-items:center;gap:.45rem;background:#0d0e0f66;border:1px solid var(--fg);border-radius:999px;padding:.2rem .8rem .2rem .3rem;color:var(--fg);font-size:.9rem;cursor:pointer} .film .alts2 .setb b{font-size:.9rem;font-weight:400} .film .alts2 .setb small{display:none}
 .film .bubs.frozen:has(.ph.sel) ~ .faces{display:none}   /* a held figure takes the room of the faces for its questions */
@@ -1931,11 +1935,18 @@ function budState(){
   var b = bud(), l = leftOf(ST), f = funds(), left0 = r2(l[0] - (f.e > 0 ? f.e : 0)), left1 = l[1], over = left0 < 0 || left1 < 0;
   return {b:b, left0:left0, left1:left1, over:over, full:!over && (left0 <= 0 || left1 <= 0), used:Math.max(b[0] > 0 ? (b[0] - left0) / b[0] : 0, b[1] > 0 ? (b[1] - left1) / b[1] : 0)};   // used: the fuller of the two parts, upfront or yearly
 }
-function budBubHTML(i){
-  var q = budState(), k = Math.max(0, Math.min(1.15, q.used)), k0 = MD.budU == null ? k : MD.budU; MD.budU = k;
-  var sub = q.over ? "over the budget by " + [q.left0 < 0 ? money(-q.left0) : "", q.left1 < 0 ? money(-q.left1) + " a year" : ""].filter(function(x){ return x; }).join(" + ") :
-    q.full ? (q.left0 <= 0 && q.left1 <= 0 ? "the whole budget is spent" : q.left0 <= 0 ? "the upfront budget is all spent" : "the yearly budget is all spent") : "of the budget left, and " + money(q.left1) + " a year";
-  return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.freeze === "bud" ? " sel" : "") + '" style="--i:' + i + ';--u:' + k.toFixed(3) + ';--u0:' + k0.toFixed(3) + '" data-bud><b>' + (q.over || q.full ? "MAX" : money(q.left0)) + '</b><span>' + sub + '</span></button></div>';
+function budBubHTML(i){   // what the choices take sits inside as discs, one per chapter, piled from the bottom; what does not fit is left outside
+  var q = budState(), bens = modules(), f = funds(), en = ENERGY[ST.e], R = 100, tot = q.b[0] || 1, placed = [], o = "", n = 0;
+  var parts = [["D", "Design", price(ST.d)[0]], ["T", "Technology", price(ST.t)[0]], ["B", "Benefits", bens.reduce(function(a, c){ return a + price(c)[0]; }, 0)], ["E", en ? en.what.charAt(0).toUpperCase() + en.what.slice(1) : "", f.e > 0 ? f.e : 0]].filter(function(p){ return p[2] > 0; }).sort(function(x, y){ return y[2] - x[2]; });
+  parts.forEach(function(p){ var r = Math.min(R * 1.3, R * .62 * Math.sqrt(p[2] / tot)), best = null, bs = 1e9;   // a disc that grows with its share (kept small enough that a whole budget still fits side by side); it settles as low as it can without covering another
+    for (var ri = 0; ri <= 16; ri++) for (var ai = 0; ai < 48; ai++){ var d = Math.max(0, R - r - 3) * ri / 16, an = ai * Math.PI / 24, x = Math.cos(an) * d, y = Math.sin(an) * d, ov = 0;
+      placed.forEach(function(c){ ov = Math.max(ov, c.r + r + 3 - Math.hypot(x - c.x, y - c.y)); }); var sc = Math.max(0, ov) * 1000 - y; if (sc < bs){ bs = sc; best = {x:x, y:y, ov:ov}; } }
+    var out = q.over && (r > R - 3 || best.ov > .5); if (out){ best = {x:(n % 2 ? -1 : 1) * (R + r * .55), y:-R * .55 + n * 26}; n++; }
+    placed.push({x:best.x, y:best.y, r:r, k:p[0], name:p[1], v:p[2], out:out}); });
+  placed.forEach(function(c){ o += '<circle class="pd p' + c.k + (c.out ? " out" : "") + '" cx="' + c.x.toFixed(1) + '" cy="' + c.y.toFixed(1) + '" r="' + c.r.toFixed(1) + '"/>' + (c.r >= 20 ? '<text x="' + c.x.toFixed(1) + '" y="' + (c.y + 5).toFixed(1) + '" text-anchor="middle"' + (c.out ? ' class="out"' : '') + '>' + money(r2(c.v)) + '</text>' : ''); });
+  var lab = q.over ? '<b>MAX</b><span>+' + (q.left0 < 0 ? money(-q.left0) : money(-q.left1) + " a year") + '</span>' : q.full ? '<b>MAX</b>' : '<b>' + money(q.left0) + '</b><span>left</span>';
+  return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.freeze === "bud" ? " sel" : "") + '" style="--i:' + i + '" data-bud aria-label="The budget, ' + money(q.b[0]) + ' upfront: ' + (placed.length ? placed.map(function(c){ return c.name + " " + money(r2(c.v)) + (c.out ? ", which does not fit" : ""); }).join(", ") : "nothing spent yet") + '. ' + (q.over ? "Over the budget." : q.full ? "Nothing is left." : money(q.left0) + " left.") + '">' +
+    '<svg viewBox="-150 -112 300 224" aria-hidden="true"><circle class="ring" r="' + R + '"/>' + o + '</svg><span class="bl">' + lab + '</span></button></div>';
 }
 function sayYou(x){   // one bubble, said to the person looking at it
   var b = bigOf(x), n = b[0].replace(/^[−+]/, ""), up = b[0].charAt(0) === "+", t = TECH[x.code], en = ENERGY[x.code], pr;
@@ -2970,7 +2981,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-221542";
+var BUILD = "20261123-221938";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
