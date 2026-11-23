@@ -178,10 +178,7 @@ body.dark{background:var(--bg)}
 .rot{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.2rem .6rem;font-size:.9rem;font-weight:600;border-top:1px solid var(--line);padding-top:.5rem}
 .rot input{grid-column:1 / -1;width:100%;accent-color:var(--accent);margin:0}
 
-/* right wall: the chosen scenario and its alternatives on the left, the measures on the right, on a greyer ground */
-.grey{--bg:#c9cecd;--surface:#dde1e0;--sunk:#cfd4d3;--line:#b7bfbd;--muted:#4f5c58;--accent-soft:#cfe0d8}
-body.grey{background:var(--bg)}
-.scr:has(.mini.grey){background:#c9cecd}
+/* right wall: see "the right wall as a window" further down */
 .outcome{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1.45fr) minmax(0,1fr);gap:var(--gap);padding:12px}
 .outcome .say{max-width:calc(100% - 19.5rem)}
 .pick{position:absolute;bottom:.9rem;right:.9rem;width:17rem;max-width:calc(100% - 1.8rem);padding:.35rem}
@@ -421,24 +418,25 @@ body.inroom .scr{border-color:#2b3432;box-shadow:0 0 60px rgba(190,220,205,.13),
 .led{min-height:0;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
 .card.led{padding:4.3rem 1rem .8rem}
 .led .col{min-height:0;min-width:0;display:flex;flex-direction:column;gap:.45rem;--c:var(--accent)}
-.led .col.l{--c:var(--over)} .led .col.u{--c:var(--muted)}
-.led h3{margin:0;font-size:1.1rem;display:flex;align-items:center;gap:.45rem}
-.led h3::before{content:"";width:.75rem;height:.75rem;border-radius:50%;background:var(--c)}
-.led .col.u h3::before{background:none;border:2px dashed var(--c)}
+.led .col{--c:#6fd0ac} .led .col.l{--c:#e98176} .led .col.u{--c:#6b7873}
+.led h3{margin:0;align-self:flex-start;display:flex;align-items:center;gap:.5rem;font-size:1rem;font-weight:700;color:#fff;background:#1c2a28;border-radius:10px;padding:.28rem .75rem .28rem .5rem}
+.led h3::before{content:"";width:.8rem;height:.8rem;border-radius:3px;background:var(--c)}
+.led .col.u h3::before{background:none;box-shadow:inset 0 0 0 1.5px #fbfdfc;border-radius:50%}
 .led .rows{flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:.35rem}
 .nil{margin:0;font-size:.9rem;font-weight:600;color:var(--muted)}
-.stm{font:inherit;color:var(--ink);text-align:left;flex:0 0 auto;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.05rem .55rem;border:1px solid var(--line);border-left:5px solid var(--c);border-radius:10px;background:#f3f6f4;padding:.45rem .55rem;cursor:pointer;--c:var(--accent)}
-.stm.l{--c:var(--over)} .stm.u{--c:#8b9894}
+.stm{font:inherit;color:var(--ink);text-align:left;flex:0 0 auto;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.05rem .6rem;border:1px solid #1c2a2873;border-radius:10px;background:#fbfdfc;padding:.38rem .5rem .38rem .38rem;cursor:pointer;box-shadow:0 2px 0 #1c2a284d;--c:#3b7a66}
+.stm.l{--c:#c8493d} .stm.u{--c:#6b7873}
 .stm b{font-size:.98rem;font-weight:700;line-height:1.2}
 .stm small{grid-column:2 / -1;font-size:.76rem;font-weight:600;color:var(--muted)}
-.stm.sel{background:#fff;border-color:var(--ink);box-shadow:0 0 0 1.5px var(--ink)}
-.cd{font-size:.72rem;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:.12rem .35rem;white-space:nowrap}
-.dg{display:flex;align-items:flex-end;gap:2px;height:1.15rem;width:1.25rem;flex:0 0 auto}
-.dg i{flex:1 1 0;border-radius:2px;background:var(--line)}
+.stm.sel{background:#fff;border-color:#1c2a28;box-shadow:0 0 0 1.5px #1c2a28;transform:translateY(2px)}
+.cd{font-size:.72rem;font-weight:700;color:#fff;background:#1c2a28;border-radius:5px;padding:.14rem .36rem;white-space:nowrap}
+.cd.cT{background:#4f86a8} .cd.cE{background:#d9a531;color:#1c2a28} .cd.cB{background:#3b7a66} .cd.cA{background:none;color:#1c2a28;box-shadow:inset 0 0 0 1.5px #1c2a28}
+.dg{display:flex;align-items:flex-end;justify-content:center;gap:2px;width:1.9rem;height:1.9rem;padding:.4rem .36rem;border-radius:6px;background:var(--c);flex:0 0 auto}
+.dg i{flex:1 1 0;border-radius:1.5px;background:#ffffff59}
 .dg i:nth-child(1){height:40%} .dg i:nth-child(2){height:70%} .dg i:nth-child(3){height:100%}
-.dg i.on{background:var(--c)}
-.dg.q i{background:none;border:1.5px dashed var(--c)}
-.stm.u .dg.q{align-items:center;justify-content:center;font-weight:800;color:var(--muted);border:1.5px dashed var(--muted);border-radius:50%;width:1.2rem;height:1.2rem;font-size:.8rem}
+.dg i.on{background:#fff}
+.dg.q{background:none;box-shadow:inset 0 0 0 1.5px var(--c)} .dg.q i{background:none;border:1.2px dashed var(--c)}
+.stm.u .dg.q{align-items:center;padding:0;font-weight:800;color:var(--c);font-size:1rem;border-radius:50%}
 .askd{margin:0;font-size:.82rem;font-weight:600;font-style:italic;color:var(--muted);border-left:3px dashed var(--line);padding-left:.5rem}
 .lfoot{display:flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:700;color:var(--muted)}
 .lfoot span{flex:1 1 auto;min-width:0}
@@ -469,8 +467,8 @@ body.inroom .scr{border-color:#2b3432;box-shadow:0 0 60px rgba(190,220,205,.13),
 .trc{min-height:0;min-width:0;padding:.7rem .9rem;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);grid-template-rows:minmax(0,1fr);gap:.8rem}
 .trace{min-height:0;min-width:0;display:flex;flex-direction:column;gap:.4rem}
 .tq{display:flex;flex-wrap:wrap;gap:4px}
-.tq button{font:inherit;font-size:.8rem;font-weight:700;border:1px solid var(--line);border-radius:999px;background:none;color:var(--muted);padding:.25rem .7rem;cursor:pointer}
-.tq button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.tq button{font:inherit;font-size:.8rem;font-weight:700;border:1px solid #1c2a2873;border-radius:8px;background:#fbfdfc;color:var(--ink);padding:.25rem .7rem;cursor:pointer;box-shadow:0 2px 0 #1c2a284d}
+.tq button[aria-pressed="true"]{background:#1c2a28;border-color:#1c2a28;color:#fff;box-shadow:none;transform:translateY(2px)}
 .tbody{flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:.4rem}
 .chain{display:grid;grid-template-columns:minmax(0,1fr);gap:.95rem}
 .bx{position:relative;font:inherit;color:var(--ink);text-align:left;display:flex;flex-direction:column;gap:.1rem;border:1px solid var(--line);border-radius:12px;background:#f3f6f4;padding:.4rem .7rem}
@@ -525,6 +523,8 @@ body.nopanels .akey,body.nopanels .stage[data-view="axo"] .zoomc{display:none}
   radial-gradient(ellipse 6% 7.5% at 76% 58%,#fffffff0 0,#ffffff00 100%),radial-gradient(ellipse 4.5% 10% at 80% 51%,#ffffffeb 0,#ffffff00 100%),radial-gradient(ellipse 5.5% 6.5% at 84.5% 59%,#ffffffe0 0,#ffffff00 100%),
   radial-gradient(ellipse 9% 5% at 25% 16%,#ffffffb8 0,#ffffff00 100%),radial-gradient(ellipse 11% 4.5% at 66% 22%,#ffffffb0 0,#ffffff00 100%),radial-gradient(ellipse 3.5% 3.5% at 95% 84%,#ffffffd0 0,#ffffff00 100%)}
 .axo.gv .amk.sn{background:#fbfdfce0}
+/* film: darker corners and a warm top to cool foot over the view from the ground, as through a lens. Scenery, like the sky. */
+.axo.gv::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 125% 105% at 50% 44%,#0b161a00 52%,#0b161a4d 100%),linear-gradient(#ffdcae24,#ffdcae00 42%,#0d2a3a00 58%,#0d2a3a24)}
 /* night: the map is dimmed and turned blue, the clouds give way to stars, the lamps of the campus come on */
 .axo canvas.maplibregl-canvas{transition:filter .9s}
 .axo.night canvas.maplibregl-canvas{filter:brightness(.5) saturate(.7) contrast(1.08)}
@@ -636,8 +636,57 @@ html.checking .app{visibility:hidden}
 .gate button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:.65rem 1rem;background:var(--ink);color:#fff;cursor:pointer}
 .gate output{font-family:ui-monospace,Menlo,monospace;font-size:.72rem;word-break:break-all;background:var(--sunk);border-radius:8px;padding:.5rem;user-select:all}
 
+/* ---------- the right wall as a window ----------
+   The landscape of the center wall carries on behind the simple view: the same eye, the same horizon, looking one screen further to the right, by
+   day or by night as on that wall. The reading floats on it as the parts of an instrument: flat paper faces with a thin dark edge, keys that sit
+   lower once pressed, and one color for each chapter (design dark, technology the blue of the water, energy amber, benefits green), the same on the
+   keys, on the tag of every bubble and in the budget strips. The bubbles themselves stand in the open, over the sky and the ground. */
+.measure > .rwbg{display:none}
+.measure.simple{background:none;overflow:hidden}
+.measure.simple > *{position:relative;z-index:1}
+.measure.simple > .rwbg{display:block;position:absolute;inset:0;z-index:0;background:linear-gradient(#7fb1e4 0,#cfe2f1 30%,#eaf2f6 37.6%,#c2d3a6 38%,#a8c292 100%)}
+.rwmap{pointer-events:none} .axo.gv.rwmap canvas.maplibregl-canvas{cursor:default}
+.measure.simple > .rwattr{display:none;position:absolute;left:1.6rem;bottom:4px;margin:0;font-size:9px;line-height:12px;font-weight:600;white-space:nowrap;color:#1c2a28;background:#fbfdfcb8;border-radius:3px;padding:0 5px}   /* at the foot, as on a map */
+.rwattr a{color:inherit} .measure.simple.land > .rwattr{display:block}
+.measure.simple .hd{font-size:2rem;font-weight:600;letter-spacing:-.022em;line-height:1.1;color:#1c2a28;text-shadow:0 0 .7em #fbfdfc,0 0 .2em #fbfdfcb3}
+.measure.simple .hd::before{display:none}
+.measure.simple.night .hd{color:#fbfdfc;text-shadow:0 0 .7em #0b1b3a,0 0 .25em #0b1b3a}
+.measure.simple .hd .mdb{letter-spacing:0;text-shadow:none;font-weight:700;color:#1c2a28;background:#fbfdfc;border:1px solid #1c2a2873;border-radius:10px;padding:.4rem .9rem;box-shadow:0 2px 0 #1c2a284d}
+.measure.simple .hd .mdb:hover{background:#1c2a28;color:#fff}
+.measure.simple .chosen button{display:flex;align-items:center;gap:.5rem;color:#1c2a28;background:#fbfdfc;border:1px solid #1c2a2873;border-radius:10px;padding:.3rem .85rem .3rem .34rem;box-shadow:0 2px 0 #1c2a284d}
+.measure.simple .chosen button b{margin:0;color:#fff;background:#1c2a28;border-radius:5px;padding:.12rem .42rem;font-size:.82rem}
+.measure.simple .chosen button[data-ch="technology"] b{background:#4f86a8} .measure.simple .chosen button[data-ch="benefits"] b{background:#3b7a66} .measure.simple .chosen button[data-ch="energy"] b{background:#d9a531;color:#1c2a28}
+.measure.simple .chosen button.now{background:#1c2a28;border-color:#1c2a28;color:#fff;box-shadow:none;transform:translateY(2px)}
+.measure.simple .chosen button.now b{background:#fbfdfc;color:#1c2a28}
+.measure.simple .fcap{align-self:center;color:#fff;background:#1c2a28;border-radius:10px;padding:.45rem .7rem;max-width:7.6rem}
+.measure.simple .face{background:#fbfdfc;border:1px solid #1c2a2873;border-radius:12px;box-shadow:0 2px 0 #1c2a284d}
+.measure.simple .face span{color:#3d4b47}
+.measure.simple .bcol{background:none;border:0;padding:0;--c:#6fd0ac} .measure.simple .bcol.l{--c:#e98176}
+.measure.simple .bcol h4{align-self:flex-start;align-items:center;gap:.55rem;flex-wrap:nowrap;max-width:100%;font-size:1.05rem;color:#fff;background:#1c2a28;border-radius:10px;padding:.3rem .85rem .3rem .3rem}
+.bcol h4 i{flex:none;font-style:normal;min-width:1.8rem;height:1.8rem;padding:0 .3rem;border-radius:6px;display:flex;align-items:center;justify-content:center;background:var(--c,#6fd0ac);color:#1c2a28;font-variant-numeric:tabular-nums}
+.bcol.q h4 i{background:none;color:#fff;box-shadow:inset 0 0 0 1.5px #fbfdfc;border-radius:50%}
+.measure.simple .bcol h4 small{color:#cfd8d4;font-size:.74rem;line-height:1.15;min-width:0}
+.measure.simple .bfield .nil{color:#3d4b47;background:#fbfdfcdb;border:1.5px dashed #1c2a2866;border-radius:12px;padding:.6rem .8rem}
+.measure.simple .bub{box-shadow:0 3px 0 #1c2a2859}
+.measure.simple .bub.g{background:#dff0e7} .measure.simple .bub.l{background:#f8dfdb} .measure.simple .bub.q{background:#fbfdfcf2;border-color:#1c2a2880}
+.measure.simple .bub.sel{box-shadow:0 0 0 4px #1c2a28}
+.bub i{color:#fff;background:#1c2a28} .bub i.cT{background:#4f86a8} .bub i.cB{background:#3b7a66} .bub i.cE{background:#d9a531;color:#1c2a28} .bub i.cA{background:#fbfdfc;color:#1c2a28;box-shadow:inset 0 0 0 1.5px #1c2a28}
+.bmore em{font-style:normal;display:inline-block;color:#3d4b47;background:#fbfdfce6;border-radius:999px;padding:.2rem .8rem}
+.measure.simple .bwhy,.measure.simple .moneybar{background:#fbfdfc;border:1px solid #1c2a2873;border-radius:12px;box-shadow:0 3px 0 #1c2a284d}
+.measure.simple{gap:.62rem} .measure.simple .moneybar{grid-template-columns:minmax(0,1fr) auto minmax(0,1.7fr) auto minmax(0,1fr);padding:.5rem 1.1rem}
+.measure.simple .bfield.many .bub{--k:.9}
+/* the budget as two strips: a part for each choice that spends from it; the ticks are a million each upfront, a tenth of the year's money below */
+.strips{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:.22rem .5rem;margin:.15rem 0 .1rem;font-size:.68rem;font-weight:700;color:var(--muted)}
+.strip{position:relative;display:flex;height:1.05rem;border:1.5px solid #1c2a28;border-radius:5px;overflow:hidden;background:#e7eeea}
+.strip::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:repeating-linear-gradient(90deg,#fbfdfc00 0,#fbfdfc00 calc(100% / var(--n) - 1.5px),#fbfdfc73 calc(100% / var(--n) - 1.5px),#fbfdfc73 calc(100% / var(--n)))}
+.strip i{flex:0 0 auto;display:flex;align-items:center;justify-content:center;height:100%;min-width:0;overflow:hidden;font-style:normal;font-size:.64rem;font-weight:700;color:#fff;background:#1c2a28}
+.strip i b{position:relative;z-index:1;background:inherit;padding:0 .2rem;font-size:inherit;line-height:1.05rem;color:inherit}
+.strip .pT{background:#4f86a8} .strip .pB{background:#3b7a66} .strip .pE{background:#d9a531;color:#1c2a28}
+.strip.over{border-color:#c8493d}
+
 @media (max-width:900px), (max-height:520px){
   html,body{height:auto}
+  .rwmap{display:none}
   .app{height:auto}
   .stage{flex:0 0 auto;display:flex;flex-direction:column}
   .stage canvas{position:static;aspect-ratio:16/9;height:auto}
@@ -761,7 +810,7 @@ function priceWords(p, yr){ return !p[0] && !p[1] ? "no extra cost" : (p[0] ? mo
 function shortWords(sh){ return (sh[0] ? money(sh[0]) + " upfront" : "") + (sh[0] && sh[1] ? " and " : "") + (sh[1] ? money(sh[1]) + " a year" : "") + " short"; }
 function overBudget(){ var l = leftOf(ST); return l[0] < 0 || l[1] < 0; }
 var CH = ["design", "technology", "energy", "benefits"];
-var ST = {d:"D1", t:"T1", e:"E1", b:{B1:true, B2:false, B3:false, B4:false}, ch:"design", topic:"all", px:0, pz:0, rot:0, rw:"analysis", site:"mi", ag:true, big:false, hw:6, hb:4, x:[], ear:null, pan:[0, 0], bud:null, pr:{}};   // bud, pr: the budget and the prices once someone changes them on the table   // hw, hb: wall and berm heights set on the table; x: what was added there; ear: where the listener stands   // site: mi = Allen Park, Michigan; tx = College Station, Texas   // rw: what the right wall shows in the room view
+var ST = {d:"D1", t:"T1", e:"E1", b:{B1:true, B2:false, B3:false, B4:false}, ch:"design", topic:"all", px:0, pz:0, rot:0, rw:"analysis", site:"mi", ag:true, big:false, hw:6, hb:4, x:[], ear:null, pan:[0, 0], bud:null, pr:{}, look:null};   // look: the way the center wall faces once someone has turned it, for the wall beside it   // bud, pr: the budget and the prices once someone changes them on the table   // hw, hb: wall and berm heights set on the table; x: what was added there; ear: where the listener stands   // site: mi = Allen Park, Michigan; tx = College Station, Texas   // rw: what the right wall shows in the room view
 // The site, in metres: x runs east, z runs south. One list feeds the 3D model, the plan's labels and the measurements.
 var PARCEL = {x0:-156, x1:156, z0:-54, z1:50};
 var RIVER = [[-560, -96], [-340, -130], [-190, -104], [-60, -142], [70, -108], [200, -144], [340, -112], [560, -152]];
@@ -1660,7 +1709,7 @@ function pickSel(st, un){
   s = st.filter(function(x){ return x.dir < 0; })[0] || st[0] || un[0] || null; SEL.id = s ? s.id : null; if (!s || s.un) SEL.q = "why"; return s;
 }
 function dg(s){ return '<span class="dg' + (s.deg ? '' : ' q') + '" aria-hidden="true">' + [1, 2, 3].map(function(i){ return '<i' + (i <= s.deg ? ' class="on"' : '') + '></i>'; }).join("") + '</span>'; }
-function stmBtn(s){ return '<button type="button" class="stm ' + (s.un ? "u" : s.dir > 0 ? "g" : "l") + (SEL.id === s.id && !SEL.ax ? " sel" : "") + '" data-stm="' + s.id + '" aria-pressed="' + (SEL.id === s.id && !SEL.ax) + '">' + (s.un ? '<span class="dg q" aria-hidden="true">?</span>' : dg(s)) + '<b>' + s.t + '</b><span class="cd">' + s.code + '</span>' + (s.how ? '<small>' + s.how + '</small>' : '') + '</button>'; }
+function stmBtn(s){ return '<button type="button" class="stm ' + (s.un ? "u" : s.dir > 0 ? "g" : "l") + (SEL.id === s.id && !SEL.ax ? " sel" : "") + '" data-stm="' + s.id + '" aria-pressed="' + (SEL.id === s.id && !SEL.ax) + '">' + (s.un ? '<span class="dg q" aria-hidden="true">?</span>' : dg(s)) + '<b>' + s.t + '</b><span class="cd c' + s.code.charAt(0) + '">' + s.code + '</span>' + (s.how ? '<small>' + s.how + '</small>' : '') + '</button>'; }
 function asked(){ try { var o = JSON.parse(localStorage.getItem("dcscope-asked") || "{}"); return o && Array.isArray(o[ST.site]) ? o[ST.site].filter(function(a){ return a && typeof a.q === "string"; }) : []; } catch(e){ return []; } }
 function keepAsked(q, ok){ var o = {}; try { o = JSON.parse(localStorage.getItem("dcscope-asked") || "{}") || {}; } catch(e){} var l = Array.isArray(o[ST.site]) ? o[ST.site] : []; l.push({q:String(q).slice(0, 200), ok:!!ok, scenario:chosen(ST).join(" "), at:new Date().toISOString()}); o[ST.site] = l.slice(-300); try { localStorage.setItem("dcscope-asked", JSON.stringify(o)); } catch(e){} }
 // Closing a scenario: what the room agreed on is kept, and goes back to the sentiment map, where people can say what they think of it. A loop.
@@ -1703,8 +1752,8 @@ function bigOf(s){
   if (s.ax === "water" && t) return [signedPct(t.water, r.water), "cooling water"];
   if (s.ax === "power" && t) return [signedPct(t.gwh, r.gwh), "electricity"];
   if (s.ax === "quiet"){
-    if ((m = /about (\d+) dB (quieter|louder)/.exec(s.how || ""))) return [(m[2] === "quieter" ? "−" : "+") + m[1] + " dB", m[2] + " where you stand"];
-    if (/almost no change/.test(s.how || "")) return ["0 dB", "no change where you stand"];
+    if ((m = /about (\d+) dB (quieter|louder)/.exec(s.how || ""))) return [(m[2] === "quieter" ? "−" : "+") + m[1] + " dB", m[2] + " at the “You” pin"];
+    if (/almost no change/.test(s.how || "")) return ["0 dB", "no change at the “You” pin"];
     if (t && t.db !== r.db){ var d = t.db - r.db; return [(d > 0 ? "+" : "−") + Math.round(Math.abs(d)) + " dB", d > 0 ? "louder fans on hot days" : "quieter equipment"]; }
     return [s.dir > 0 ? "Quieter" : "Louder", "for the nearest neighbors"]; }
   if (s.ax === "clean") return [pct(funds().share), c === "E4" ? "of six microreactors paid for" : "of the power from new " + en.what];
@@ -1734,26 +1783,36 @@ function facesHTML(st){
 }
 function bubblesHTML(st, un){
   var g = st.filter(function(x){ return x.dir > 0; }), l = st.filter(function(x){ return x.dir < 0; }), sel = SEL.ax ? null : SEL.id;
-  function bub(x){ var b = bigOf(x), wordy = !/\d/.test(b[0]); return '<button type="button" class="bub ' + (x.dir > 0 ? "g" : "l") + " d" + (x.deg || 0) + (wordy ? " w" : "") + (x.id === sel ? " sel" : "") + '" data-stm="' + x.id + '"><i>' + x.code + '</i><b>' + b[0] + '</b><span>' + b[1] + '</span></button>'; }
-  function ask(u){ return '<button type="button" class="bub q' + (u.id === sel ? " sel" : "") + '" data-stm="' + u.id + '"><i>' + u.code + '</i><b>?</b><span>' + esc(u.t) + '</span></button>'; }
-  function col(cls, title, sub, items, empty){ return '<div class="bcol ' + cls + '"><h4>' + title + '<small>' + sub + '</small></h4><div class="bfield' + (items.length > 4 ? " many" : "") + '">' + (items.length ? items.join("") : '<p class="nil">' + empty + '</p>') + '</div></div>'; }
-  return col("g", "You gain", g.length + (g.length === 1 ? " thing" : " things") + ", against a conventional data center", g.map(bub), "Nothing yet. This is the conventional data center: choose an alternative on the table.") +
-    col("l", "You give up", l.length ? l.length + (l.length === 1 ? " thing" : " things") : "nothing so far", l.map(bub), "Nothing given up so far.") +
-    col("q", "Not known yet", un.length ? un.length + (un.length === 1 ? " question" : " questions") + " for the developer" : "no open question", un.slice(0, 4).map(ask).concat(un.length > 4 ? ['<span class="bmore">+ ' + (un.length - 4) + ' more, under “The wheel, the sources and questions”</span>'] : []), "No open question for these choices.");
+  function bub(x){ var b = bigOf(x), wordy = !/\d/.test(b[0]); return '<button type="button" class="bub ' + (x.dir > 0 ? "g" : "l") + " d" + (x.deg || 0) + (wordy ? " w" : "") + (x.id === sel ? " sel" : "") + '" data-stm="' + x.id + '"><i class="c' + x.code.charAt(0) + '">' + x.code + '</i><b>' + b[0] + '</b><span>' + b[1] + '</span></button>'; }
+  function ask(u){ return '<button type="button" class="bub q' + (u.id === sel ? " sel" : "") + '" data-stm="' + u.id + '"><i class="c' + u.code.charAt(0) + '">' + u.code + '</i><b>?</b><span>' + esc(u.t) + '</span></button>'; }
+  function col(cls, n, title, sub, items, empty){ return '<div class="bcol ' + cls + '"><h4><i>' + n + '</i>' + title + (sub ? '<small>' + sub + '</small>' : '') + '</h4><div class="bfield' + (items.length > 4 ? " many" : "") + '">' + (items.length ? items.join("") : '<p class="nil">' + empty + '</p>') + '</div></div>'; }
+  // "you" was nobody in particular: the lists say whose they are, as the title does
+  return col("g", g.length, "The neighborhood gains", "against a conventional data center", g.map(bub), "Nothing yet. This is the conventional data center: choose an alternative on the table.") +
+    col("l", l.length, "The neighborhood gives up", l.length ? "" : "nothing so far", l.map(bub), "Nothing given up so far.") +
+    col("q", un.length, "Not known yet", un.length ? (un.length === 1 ? "a question" : "questions") + " for the developer" : "no open question", un.slice(0, 4).map(ask).concat(un.length > 4 ? ['<span class="bmore"><em>+ ' + (un.length - 4) + ' more, under “The wheel, the sources and questions”</em></span>'] : []), "No open question for these choices.");
 }
 function bwhyHTML(st, un){   // the bubble in question, in one breath: what, because of which choice, why, the number, the source
   var all = st.concat(un), x = SEL.ax ? null : all.filter(function(y){ return y.id === SEL.id; })[0];
   if (!x) return '<p class="bw0">Tap a bubble to see why it is there and where its figure comes from.</p>';
-  var op = x.code === "ADD" ? ["", "What was added on the table"] : optOf(x.code), head = '<span class="cd">' + x.code + '</span> ' + op[1];
+  var op = x.code === "ADD" ? ["", "What was added on the table"] : optOf(x.code), head = '<span class="cd c' + x.code.charAt(0) + '">' + x.code + '</span> ' + op[1];
   if (x.un) return '<p><b>?</b> ' + esc(x.t) + '. <span class="bsrc">The brief asks the developer for this, for ' + head + '. No answer yet.</span></p>';
   var b = bigOf(x);
   return '<p><b class="' + (x.dir > 0 ? "g" : "l") + '">' + b[0] + '</b> ' + b[1] + ' <span class="bfrom">because of ' + head + '.</span> ' + x.why + (x.num ? ' ' + x.num : x.how ? ' How much: ' + x.how + '.' : '') + '</p><p class="bsrc">Source: ' + srcOf(x.src) + '</p>';
 }
+function stripsHTML(){   // the budget as two strips: a part for each choice that spends from it, and the energy that takes what is left upfront
+  var b = bud(), f = funds(), codes = [ST.d, ST.t].concat(modules());
+  function strip(i){ var tot = b[i], used = 0, parts = codes.map(function(c){ return [c, price(c)[i]]; }).filter(function(p){ return p[1] > 0; });
+    if (!i && f.e > 0) parts.push([ST.e, f.e]);
+    parts.forEach(function(p){ used += p[1]; }); var den = Math.max(tot, used) || 1, n = !i && tot === Math.round(tot) && tot >= 4 && tot <= 40 ? tot : 10;
+    return '<span class="strip' + (used > tot + 1e-9 ? " over" : "") + '" style="--n:' + n + '" role="img" aria-label="' + money(used) + " of " + money(tot) + (i ? " a year" : " upfront") + ' spent: ' + (parts.length ? parts.map(function(p){ return p[0] + " " + money(p[1]); }).join(", ") : "nothing yet") + '">' +
+      parts.map(function(p){ return '<i class="p' + p[0].charAt(0) + '" style="width:' + (p[1] / den * 100).toFixed(2) + '%" title="' + p[0] + " " + money(p[1]) + '"><b>' + p[0] + '</b></i>'; }).join("") + '</span>'; }
+  return '<div class="strips"><span>Upfront</span>' + strip(0) + '<span>A year</span>' + strip(1) + '</div>';
+}
 function moneyHTML(){   // the budget in three figures: what there is, what the choices take, what is left and where it goes
   var en = ENERGY[ST.e], b = bud(), sp = spentOf(ST), l = leftOf(ST), f = funds(), over = overBudget(), lines = chosen(ST).filter(function(c){ return c.charAt(0) !== "E" && (price(c)[0] || price(c)[1]); }).map(function(c){ return c + " " + priceWords(price(c)); });
-  function cell(k, v, sub, cls){ return '<div class="mcell ' + (cls || "") + '"><small>' + k + '</small><b>' + v + '</b><span>' + sub + '</span></div>'; }
+  function cell(k, v, sub, cls, more){ return '<div class="mcell ' + (cls || "") + '"><small>' + k + '</small><b>' + v + '</b>' + (more || "") + '<span>' + sub + '</span></div>'; }
   return '<div class="card moneybar">' + cell("The budget to share out", money(b[0]) + " + " + money(b[1]) + " a year", "The developer’s offer, for the community to allocate. Taxes come on top.") + '<i class="mop">−</i>' +
-    cell("What the choices cost", money(sp[0]) + " + " + money(sp[1]) + " a year", lines.length ? lines.join(" · ") + " · example prices" : "Nothing chosen costs extra yet.") + '<i class="mop">=</i>' +
+    cell("What the choices cost", money(sp[0]) + " + " + money(sp[1]) + " a year", lines.length ? lines.join(" · ") + " · example prices" : "Nothing chosen costs extra yet.", "", stripsHTML()) + '<i class="mop">=</i>' +
     cell(over ? "Over the budget by" : "What is left", over ? [l[0] < 0 ? money(-l[0]) + " upfront" : "", l[1] < 0 ? money(-l[1]) + " a year" : ""].filter(function(x){ return x; }).join(" + ") : money(l[0]) + " + " + money(l[1]) + " a year", over ? "Something has to go, or the budget has to grow on the table." : en ? (f.e > 0 ? "The " + money(f.e) + " upfront goes to " + en.what + ": " + shareWords(f.share) + " of the power." : "Nothing is left for " + en.what + ".") : "Not allocated yet.", over ? "bad" : "ok") + '</div>';
 }
 function ledgerHTML(st, un){
@@ -1800,7 +1859,7 @@ function lenWhy(s){   // why the wedge is as long as it is, or why it is dashed
   return '<b>Why this length</b> ' + LENW[s.deg] + ": " + (s.ax === "quiet" ? LENDB : LENPCT)[s.deg] + (s.ax === "clean" ? " of the power" : s.ax === "quiet" ? "" : " of the reference") + ". " + s.num;
 }
 var QS = [["why", "Why?"], ["else", "What else?"], ["change", "What would change it?"], ["source", "Source?"]];
-function setBtn(code, note, cls){ var o = optOf(code); return '<button type="button" class="setb ' + (cls || "") + '" data-set="' + code + '"><span class="cd">' + code + '</span><b>' + o[1] + '</b><small>' + note + '</small></button>'; }
+function setBtn(code, note, cls){ var o = optOf(code); return '<button type="button" class="setb ' + (cls || "") + '" data-set="' + code + '"><span class="cd c' + code.charAt(0) + '">' + code + '</span><b>' + o[1] + '</b><small>' + note + '</small></button>'; }
 function others(ax, skip){   // choices not made that would move this outcome
   var out = []; ["D2", "D3", "D4", "T2", "T3", "T4", "E2", "E3", "E4", "B1", "B2", "B3", "B4"].forEach(function(code){
     if (chosen(ST).indexOf(code) >= 0 || code === skip) return; stmOf(code).forEach(function(s){ if (s.ax === ax) out.push(setBtn(code, s.t + (s.how ? ", " + s.how : ""), s.dir > 0 ? "g" : "l")); }); });
@@ -1822,11 +1881,11 @@ function traceHTML(st, un){
     var head = '<div class="tq" role="group" aria-label="Questions about this result">' + (s.un ? '' : QS.map(function(x){ return '<button type="button" data-q="' + x[0] + '" aria-pressed="' + (q === x[0]) + '">' + x[1] + '</button>'; }).join("")) + '</div>';
     var chain = '<div class="chain"><div class="bx ' + cls + '"><small>' + (s.un ? "Not known yet" : (s.dir > 0 ? "Gained" : "Given up") + " · the " + (s.dir > 0 ? "green" : "red") + (s.deg ? "" : " dashed") + " wedge on " + axName(s.ax)) + '</small><b>' + s.t + '</b></div>' +
       '<div class="bx"><small>Because</small><span>' + (s.un ? "The brief asks the developer for this. No answer yet." : s.why) + '</span></div>' +
-      '<button type="button" class="bx ch" data-ch="' + ch + '"><small>' + (s.calc ? "It comes from what was added" : "It comes from this choice") + '</small><b><span class="cd">' + s.code + '</span>' + op[1] + '</b></button></div>';
+      '<button type="button" class="bx ch" data-ch="' + ch + '"><small>' + (s.calc ? "It comes from what was added" : "It comes from this choice") + '</small><b><span class="cd c' + s.code.charAt(0) + '">' + s.code + '</span>' + op[1] + '</b></button></div>';
     if (q === "why") body = chain + '<p class="tnum">' + (s.un ? '<button type="button" class="keep" data-keep="' + esc(s.code + " " + op[1] + ": " + s.t + "?") + '">Keep this question for the developer</button>' : lenWhy(s)) + '</p>';
     else if (q === "else"){ var same = st.concat(un).filter(function(x){ return x.code === s.code && x.id !== s.id; });
-      body = '<p class="tmsg"><span class="cd">' + s.code + '</span> <b>' + op[1] + '</b> also brings:</p><div class="sets">' + (same.length ? same.map(stmBtn).join("") : '<p class="nil">Nothing else that is known.</p>') + '</div>'; }
-    else if (q === "change"){ var g = s.code.charAt(0), undo = s.calc ? '' : g === "B" ? '<button type="button" class="setb" data-set="' + s.code + '"><span class="cd">' + s.code + '</span><b>Leave it out</b><small>removes this result</small></button>' : setBtn(g + "1", "back to the baseline: removes this result");
+      body = '<p class="tmsg"><span class="cd c' + s.code.charAt(0) + '">' + s.code + '</span> <b>' + op[1] + '</b> also brings:</p><div class="sets">' + (same.length ? same.map(stmBtn).join("") : '<p class="nil">Nothing else that is known.</p>') + '</div>'; }
+    else if (q === "change"){ var g = s.code.charAt(0), undo = s.calc ? '' : g === "B" ? '<button type="button" class="setb" data-set="' + s.code + '"><span class="cd c' + s.code.charAt(0) + '">' + s.code + '</span><b>Leave it out</b><small>removes this result</small></button>' : setBtn(g + "1", "back to the baseline: removes this result");
       body = '<p class="tmsg">Choices that would change <b>' + WAX.filter(function(a){ return a[0] === s.ax; })[0][1].toLowerCase() + '</b>:</p><div class="sets">' + undo + others(s.ax, s.code).join("") + '</div>'; }
     else body = '<p class="tmsg">' + srcOf(s.src) + (ST.site === "tx" && (s.src === "dry" || s.src === "efficient") ? " The College Station proposal was for 600 MW in another climate: there are no figures for it yet." : "") + '</p>' + (s.num ? '<p class="tnum"><b>The number behind it</b> ' + s.num + '</p>' : '');
     o = head + '<div class="tbody">' + body + '</div>';
@@ -1943,13 +2002,13 @@ function heard2(st){   // what is heard where the listener stands: now, with the
 }
 function dbWords(d){ var a = Math.abs(d); return a < 1 ? "the same as" : DEGW[degDb(d)].toLowerCase() + (d < 0 ? " quieter than" : " louder than"); }
 function earTag(out, st){   // at a site where the sound is computed, each statement about quiet says what it comes to where the listener stands
-  var h = heard2(st), line = "Where you stand, about " + Math.round(h.far) + " m from the plant: about " + Math.round(h.now) + " dBA, against " + Math.round(h.base) + " with the conventional campus.";
-  function tag(d){ return Math.abs(d) < 1 ? "where you stand: almost no change" : "where you stand: about " + Math.round(Math.abs(d)) + " dB " + (d < 0 ? "quieter" : "louder"); }
+  var h = heard2(st), nm = earName(), line = "At the “You” pin on the table" + (nm ? " (" + nm + ")" : "") + ", about " + Math.round(h.far) + " m from the plant: about " + Math.round(h.now) + " dBA, against " + Math.round(h.base) + " with the conventional campus.";   // "you" is a place, the pin anyone can move on the table: the right wall names it, because the pin is not on it
+  function tag(d){ return Math.abs(d) < 1 ? "at the “You” pin: almost no change" : "at the “You” pin: about " + Math.round(Math.abs(d)) + " dB " + (d < 0 ? "quieter" : "louder"); }
   out.forEach(function(s){ if (s.ax !== "quiet") return; var g = s.code.charAt(0), d = g === "D" ? h.d : h.t;
     if (g === "D"){ s.deg = d <= -1 ? degDb(d) : 0; s.src = "calc"; s.ask = ""; s.num = line + " This design accounts for " + (Math.abs(d) < 1 ? "almost none of the difference." : "about " + Math.round(Math.abs(d)) + " dB of it."); }
     else s.num += " " + line;
     s.how = tag(d); });
-  if ((st.x || []).length && Math.abs(h.x) >= 1) out.push({id:"ADD.0", code:"ADD", calc:true, ax:"quiet", dir:h.x < 0 ? 1 : -1, deg:degDb(h.x), t:DEGW[degDb(h.x)] + (h.x < 0 ? " quieter" : " louder") + " with what was added", why:"The trees, walls and berms added on the table stand between the plant and where you stand.", num:line + " What was added accounts for about " + Math.round(Math.abs(h.x)) + " dB of it.", src:"calc", how:tag(h.x), ask:""});
+  if ((st.x || []).length && Math.abs(h.x) >= 1) out.push({id:"ADD.0", code:"ADD", calc:true, ax:"quiet", dir:h.x < 0 ? 1 : -1, deg:degDb(h.x), t:DEGW[degDb(h.x)] + (h.x < 0 ? " quieter" : " louder") + " with what was added", why:"The trees, walls and berms added on the table stand between the plant and the “You” pin.", num:line + " What was added accounts for about " + Math.round(Math.abs(h.x)) + " dB of it.", src:"calc", how:tag(h.x), ask:""});
   return out;
 }
 // ---------- center wall of a site with no original to show: the real place in axonometric ----------
@@ -1978,10 +2037,12 @@ function gvCam(){   // put the eye where the listener is
   var th = GV.tilt * Math.PI / 180, br = GV.b * Math.PI / 180, run = GV.h * Math.tan(th), c = ll(q[0] + Math.sin(br) * run, q[1] - Math.cos(br) * run), foc = (AXO.el.clientHeight || 600) / 2 / Math.tan(GVFOV * Math.PI / 360);
   // the map is centred on the ground the eye looks at; the zoom is the one that leaves the eye GV.h metres up (MapLibre's own helper lifts the centre off the ground above 84 degrees)
   try { map.jumpTo({center:[c[1], c[0]], elevation:0, bearing:GV.b, pitch:GV.tilt, roll:0, zoom:Math.log2(foc * 40030173.6 * Math.cos(c[0] * Math.PI / 180) * Math.cos(th) / (GV.h * 512))}); } catch(e){ if (window.console) console.warn("Ground view", e); }
-  GV.dirty = true;
+  GV.dirty = true; if (RWB.map) rwbCam();   // the wall beside it carries the same view on
 }
-var GVPAINT = [["bg", "background-color", "#d9e3de", "#c2d3a6"], ["green", "fill-color", ["match", ["get", "class"], "wood", "#c3dbd0", "#d0e1d7"], ["match", ["get", "class"], "wood", "#a8c292", "#b7cc9d"]], ["park", "fill-color", "#c8ddd0", "#b0ca98"],
-  ["water", "fill-color", "#bcd3e2", "#a6c6dc"], ["stream", "line-color", "#a9c6da", "#9bbdd6"], ["road-small", "line-color", "#edf2ef", "#e9e6d6"], ["road-big", "line-color", "#f5f8f6", "#f1eee0"], ["bld", "fill-extrusion-color", "#b9c8d0", "#e6e8e2"]];
+// From the ground the land is the table's map (its pale ground, green, water and white roads) with the aerial photograph mixed into it, half strength and
+// less saturated: the roads and the water stay drawn, the photograph gives the grain of the place. The photograph alone, lying flat, read as a smear.
+var GVPAINT = [["bg", "background-color", "#d9e3de", "#dfe6da"], ["green", "fill-color", ["match", ["get", "class"], "wood", "#c3dbd0", "#d0e1d7"], ["match", ["get", "class"], "wood", "#c3d6bd", "#cfdfc8"]], ["park", "fill-color", "#c8ddd0", "#c6dabd"],
+  ["water", "fill-color", "#bcd3e2", "#a9cbe0"], ["stream", "line-color", "#a9c6da", "#9bbdd6"], ["road-small", "line-color", "#edf2ef", "#fbfdfc"], ["road-big", "line-color", "#f5f8f6", "#ffffff"], ["bld", "fill-extrusion-color", "#b9c8d0", "#eef1ee"]];
 function gvMode(){   // the lens, the hands and the colors of the view in use
   var map = AXO.map, on = gvOn(), s = S(); if (!map) return;
   AXO.el.classList.toggle("gv", on);
@@ -2019,7 +2080,7 @@ function gvSettle(){   // the eye has stopped: name the rings and bring the resi
 }
 function gvGo(q, d){ if (!GV.pos) return; GV.silent = GV.nf = false; GV.from = GV.pos.slice(); GV.to = q; GV.t0 = performance.now(); GV.dur = Math.max(500, Math.min(2200, d * 3.5)); clearTimeout(GV.ct); GV.ct = 0; AXO.hold = GV.t0 + 6000; }   // walk there
 function gvAhead(m){ var p = GV.to || GV.pos, br = GV.b * Math.PI / 180; if (p) gvGo([p[0] + Math.sin(br) * m, p[1] - Math.cos(br) * m], Math.abs(m)); }
-function gvTurn(d){ GV.bTo = (GV.bTo == null ? GV.b : GV.bTo) + d; GV.auto = false; AXO.hold = performance.now() + 6000; }
+function gvTurn(d){ GV.bTo = (GV.bTo == null ? GV.b : GV.bTo) + d; GV.auto = false; AXO.hold = performance.now() + 6000; lookTell(GV.bTo); }
 function gvStep(m){   // the wheel: walk while it turns, and settle where it stops
   if (!GV.pos) return; var br = GV.b * Math.PI / 180, now = performance.now(); GV.to = null; GV.auto = false; GV.pos = [GV.pos[0] + Math.sin(br) * m, GV.pos[1] - Math.cos(br) * m]; gvCam(); AXO.hold = now + 6000;
   if (now - GV.liveT > 120){ GV.liveT = now; AXO.live = GV.pos; axoEar(); }
@@ -2030,7 +2091,7 @@ function gvHands(map){   // drag to look around, the wheel to walk
   cc.addEventListener("pointerdown", function(ev){ if (!gvOn() || ev.button || (ev.target.closest && ev.target.closest(".maplibregl-marker"))) return; dg = {x:ev.clientX, y:ev.clientY, b:GV.bTo == null ? GV.b : GV.bTo, t:GV.tilt, id:ev.pointerId, moved:false}; });
   window.addEventListener("pointermove", function(ev){ if (!dg || ev.pointerId !== dg.id) return; var dx = ev.clientX - dg.x, dy = ev.clientY - dg.y; if (!dg.moved && Math.hypot(dx, dy) < 5) return;
     dg.moved = true; var k = GVFOV / (AXO.el.clientHeight || 600); GV.bTo = null; GV.b = dg.b - dx * k; GV.tilt = Math.max(50, Math.min(88.6, dg.t + dy * k)); GV.auto = false; AXO.hold = performance.now() + 6000; gvCam(); });
-  ["pointerup", "pointercancel"].forEach(function(n){ window.addEventListener(n, function(ev){ if (dg && ev.pointerId === dg.id) dg = null; }); });
+  ["pointerup", "pointercancel"].forEach(function(n){ window.addEventListener(n, function(ev){ if (dg && ev.pointerId === dg.id){ var mv = dg.moved; dg = null; if (mv) lookTell(); } }); });
   cc.addEventListener("wheel", function(ev){ if (!gvOn() || ev.ctrlKey) return; ev.preventDefault(); gvStep(-ev.deltaY * (ev.deltaMode === 1 ? 4 : .12)); }, {passive:false});
 }
 document.addEventListener("keydown", function(ev){   // the arrows walk and turn
@@ -2200,7 +2261,7 @@ function axoInit(stage, light){
     map.addSource("site", {type:"geojson", data:gj([])}); map.addSource("ring", {type:"geojson", data:gj([])}); map.addSource("dc", {type:"geojson", data:gj([])});
     map.addSource("photo", {type:"raster", tiles:["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize:256, maxzoom:19, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"});
     var under = map.getLayer("bld") ? "bld" : undefined;   // flat things go under the raised ones
-    map.addLayer({id:"photo", type:"raster", source:"photo", layout:{visibility:"none"}, paint:{"raster-fade-duration":0}}, under);   // from the ground the land is the aerial photograph, lying flat; if it does not load, the drawn ground stays
+    map.addLayer({id:"photo", type:"raster", source:"photo", layout:{visibility:"none"}, paint:{"raster-fade-duration":0, "raster-opacity":.52, "raster-saturation":-.3, "raster-contrast":.1}}, map.getLayer("water") ? "water" : under);   // mixed into the map: over its ground and green, under its water and roads   // from the ground the land is the aerial photograph, lying flat; if it does not load, the drawn ground stays
     map.addLayer({id:"ring-fill", type:"fill", source:"ring", paint:{"fill-color":"#b0609a", "fill-opacity":["get", "o"]}}, under);
     map.addLayer({id:"ring-glow", type:"line", source:"ring", layout:{visibility:"none"}, paint:{"line-color":"#ffd0f4", "line-width":16, "line-blur":9, "line-opacity":.5, "line-opacity-transition":{duration:0}}}, under);
     map.addLayer({id:"ring-solid", type:"line", source:"ring", layout:{visibility:"none"}, paint:{"line-color":"#e069c9", "line-width":3.4, "line-opacity":.9, "line-opacity-transition":{duration:0}}}, under);
@@ -2309,7 +2370,7 @@ function axoKey(){
     '<p class="asrc">1 dot = ' + AXO.per + (AXO.per === 1 ? " resident" : " residents") + ' · 2020 Census blocks, for the ground seen so far.</p>';
   if (S().open) o += '<div class="arow"><span>Size</span>' + sw("data-big", [["ref", "Reference", !ST.big], ["big", "600 MW", ST.big]]) + '</div>' + (ST.big ? '<p class="asrc">What if: 600 MW heard as 23 reference plants in one place, 14 dB louder.</p>' : '');
   o += '<div class="arow"><span>Time</span>' + sw("data-tod", [["day", "Day", !AXO.night], ["night", "Night", AXO.night]]) + '</div>' + (AXO.night ? '<p class="asrc">At night the same sound counts as 10 dB more, as in the day-night level (DNL) of US noise rules, which adds 10 dB between 10 pm and 7 am: more residents hear it, and the background you listen against is 10 dB lower. The dark, the stars and the lamps are scenery.</p>' : '') +
-    '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table. With Listen on, a soft background plays behind the plant (as 45 dBA by day, 10 dB less at night): it is for the ear, not measured.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the aerial photograph, lying flat, so trees and roofs are seen as they are from the air; buildings stand up where OpenStreetMap has them. The sky is scenery. The maps are linked: move the table or the sentiment map and this wall goes with them.</p>' : '') + '<p class="asrc imh">Press H to hide or show the panels.</p>';
+    '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table. With Listen on, a soft background plays behind the plant (as 45 dBA by day, 10 dB less at night): it is for the ear, not measured.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the table’s map with the aerial photograph mixed into it; buildings stand up where OpenStreetMap has them. The sky is scenery. The maps are linked: move the table or the sentiment map and this wall goes with them.</p>' : '') + '<p class="asrc imh">Press H to hide or show the panels.</p>';
   el.innerHTML = o;
 }
 function axoFrame(ts){
@@ -2466,16 +2527,80 @@ function metricsHTML(bare){
   if (MD.detail) return '<div class="card measure"><div class="hd">Live analysis · what this scenario gives and takes<button type="button" class="pbtn mdb" data-md="0">‹ Back to the simple view</button></div>' + chips +
     '<div class="mbody"><div class="mleft"><div class="whl" data-w="wheel" data-size="big"></div><div class="smalls">' + altCards("sm") + '</div></div>' +
     '<div class="mright"><div class="led" data-w="ledger"></div><div class="trace" data-w="trace"></div></div></div>' + offerHTML() + '</div>';
-  return '<div class="card measure simple"><div class="hd">What this plan means for the neighborhood<button type="button" class="pbtn mdb" data-md="1">The wheel, the sources and questions ›</button></div>' + chips +
-    '<div class="faces" data-w="faces"></div><div class="bubs" data-w="bubbles"></div><div class="bwhy" data-w="bwhy"></div>' + moneyHTML() + '</div>';
+  return '<div class="card measure simple"><div class="rwbg" aria-hidden="true"></div><div class="hd">What this plan means for the neighborhood<button type="button" class="pbtn mdb" data-md="1">The wheel, the sources and questions ›</button></div>' + chips +
+    '<div class="faces" data-w="faces"></div><div class="bubs" data-w="bubbles"></div><div class="bwhy" data-w="bwhy"></div>' + moneyHTML() +
+    '<p class="rwattr">Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community. Buildings © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="https://openmaptiles.org/">OpenMapTiles</a>, <a href="https://openfreemap.org/">OpenFreeMap</a></p></div>';
 }
+// ---------- the landscape behind the right wall ----------
+// A second view of the same ground, for looking at only: the eye of the center wall (the listener, at the same height), turned to the right by the
+// width of one screen, so the horizon and the rings run on from one wall to the next. Where the center wall is not in this window it takes the
+// listener and the way that wall was last turned from the shared state, and day or night from what that wall last saved. The ground is the aerial
+// photograph lying flat, the rings are the model's (only where the sound is computed), the plant and OpenStreetMap's buildings stand up, the sky is
+// scenery. If the map cannot load, a drawn sky and ground stay.
+var RWB = {map:null, el:null, ready:false, loading:false, failed:false, key:null, sky:null, haze:null};
+function rwbEye(){
+  if (AXO.map && AXO.el && AXO.el.isConnected && gvOn() && GV.pos) return {p:GV.pos, b:GV.b, h:GV.h};
+  var h = 30, q = ear(); try { var g = JSON.parse(localStorage.getItem("dcscope-gv") || "null"); if (g && GVH.indexOf(g.h) >= 0) h = g.h; } catch(e){}
+  return {p:q, b:ST.look != null ? ST.look : gvFace(q), h:h};
+}
+function rwbCam(){
+  var map = RWB.map, el = RWB.el; if (!map || !RWB.ready || !el.isConnected) return; var H = el.clientHeight, W = el.clientWidth; if (!H || !W) return;
+  var e = rwbEye(), tilt = GVTILT[e.h] || 84, foc = H / 2 / Math.tan(GVFOV * Math.PI / 360), b = e.b + 2 * Math.atan(W / 2 / foc) * 180 / Math.PI;   // one screen to the right
+  var th = tilt * Math.PI / 180, br = b * Math.PI / 180, run = e.h * Math.tan(th), c = ll(e.p[0] + Math.sin(br) * run, e.p[1] - Math.cos(br) * run);
+  try { map.jumpTo({center:[c[1], c[0]], elevation:0, bearing:b, pitch:tilt, roll:0, zoom:Math.log2(foc * 40030173.6 * Math.cos(c[0] * Math.PI / 180) * Math.cos(th) / (e.h * 512))}); } catch(err){ if (window.console) console.warn("Right wall landscape", err); return; }
+  var up = (90 - tilt) * Math.PI / 180, hz = H / 2 - foc * Math.min(.85 * Math.tan(up), Math.tan(up - .75 * Math.PI / 180)), st = RWB.sky.firstChild.style;   // the sky is set down on the horizon, as on the center wall
+  RWB.sky.style.height = Math.max(0, Math.round(hz) + 1) + "px"; RWB.haze.style.top = Math.max(0, Math.round(hz)) + "px"; RWB.haze.style.height = Math.round(foc * .04) + "px";
+  st.height = Math.round(foc * .66) + "px"; st.backgroundSize = Math.round(foc * Math.PI / 180 * 120) + "px 100%"; st.backgroundPositionX = Math.round(-b * foc * Math.PI / 180 - GV.drift) + "px";
+}
+function rwbNight(){   // day or night as on the center wall, which keeps it in this browser
+  if (!RWB.el) return; var n = false; try { n = !!localStorage.getItem("dcscope-night"); } catch(e){} if (AXO.map) n = !!AXO.night;
+  RWB.el.classList.toggle("night", n); var m = RWB.el.closest(".measure"); if (m) m.classList.toggle("night", n);
+}
+function rwbSync(){
+  var map = RWB.map, s = S(); if (!map || !RWB.ready) return;
+  var key = JSON.stringify([ST.site, ST.d, ST.t, ST.e, ST.px, ST.pz, ST.rot, ST.x, ST.big, ST.hw, ST.hb, gvOn()]);
+  if (RWB.key !== key){ RWB.key = key; var rings = [];
+    if (s.open){ var sc = acScene(ST); rings = [40, 45, 50, 55, 60, 65].map(function(L){ return {L:L, pts:contour(L, sc)}; }).filter(function(r){ return r.pts.some(function(p){ return Math.hypot(p[0] - sc.src[1].p[0], p[1] - sc.src[1].p[1]) > 25; }); }); }
+    map.getSource("ring").setData(gj(rings.map(function(r){ return poly(r.pts.map(function(p){ return ll(p[0], p[1]); }), {k:r.L}); }))); map.getSource("dc").setData(gj(dcBlocks())); }
+  rwbNight(); rwbCam();
+}
+function rwbDraw(host){
+  if (RWB.failed) return;
+  if (RWB.map){ if (RWB.el.parentNode !== host) host.appendChild(RWB.el); if (RWB.ready) host.parentNode.classList.add("land"); RWB.map.resize(); rwbSync(); rwbNight(); return; }
+  if (RWB.loading) return; RWB.loading = true;
+  glLib().then(function(){ return lightStyle().catch(function(){ return null; }); }).then(function(light){
+    RWB.loading = false; var h = document.querySelector(".rwbg"); if (!h || RWB.map) return;
+    var s = S(), el = RWB.el = document.createElement("div"); el.className = "geomap axo gv rwmap"; h.appendChild(el);
+    var st = axoStyle(light); GVPAINT.forEach(function(p){ st.layers.forEach(function(l){ if (l.id === p[0]) l.paint[p[1]] = p[3]; }); });   // the colors of the ground view
+    var map = RWB.map = new maplibregl.Map({container:el, style:st, center:[s.center[1], s.center[0]], zoom:15, pitch:60, maxPitch:89, maxZoom:24, fadeDuration:0, interactive:false, attributionControl:false, canvasContextAttributes:{antialias:true}});
+    try { map.setVerticalFieldOfView(GVFOV); } catch(e){}
+    var sk = RWB.sky = document.createElement("div"); sk.className = "gsky"; sk.innerHTML = "<i></i>"; el.appendChild(sk); var hzd = RWB.haze = document.createElement("div"); hzd.className = "ghaze"; el.appendChild(hzd);
+    var gn = document.createElement("div"); gn.className = "gnight"; el.appendChild(gn); rwbNight();
+    map.on("load", function(){
+      map.addSource("ring", {type:"geojson", data:gj([])}); map.addSource("dc", {type:"geojson", data:gj([])});
+      map.addSource("photo", {type:"raster", tiles:["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize:256, maxzoom:19});
+      var under = map.getLayer("bld") ? "bld" : undefined;
+      map.addLayer({id:"photo", type:"raster", source:"photo", paint:{"raster-fade-duration":0, "raster-opacity":.52, "raster-saturation":-.3, "raster-contrast":.1}}, map.getLayer("water") ? "water" : under);   // mixed into the map: over its ground and green, under its water and roads
+      map.addLayer({id:"ring-fill", type:"fill", source:"ring", paint:{"fill-color":"#b0609a", "fill-opacity":.1}}, under);
+      map.addLayer({id:"ring-glow", type:"line", source:"ring", paint:{"line-color":"#ffd0f4", "line-width":16, "line-blur":9, "line-opacity":.5}}, under);
+      map.addLayer({id:"ring-solid", type:"line", source:"ring", paint:{"line-color":"#e069c9", "line-width":3.4, "line-opacity":.9}}, under);
+      map.addLayer({id:"dc", type:"fill-extrusion", source:"dc", paint:{"fill-extrusion-color":["get", "c"], "fill-extrusion-height":["get", "h"], "fill-extrusion-base":["get", "b"], "fill-extrusion-opacity":1}});
+      RWB.ready = true; var o = RWB.el.closest(".measure"); if (o) o.classList.add("land"); rwbSync();
+    });
+    map.on("resize", rwbCam);
+  }).catch(function(e){ RWB.loading = false; RWB.failed = true; if (window.console) console.warn("Right wall landscape unavailable", e); });
+}
+function lookTell(b){   // the center wall was turned by hand: the wall beside it turns with it, also in another window
+  var v = Math.round((((b == null ? GV.b : b) % 360) + 360) % 360); if (ST.look === v) return; ST.look = v; tell(); rwbCam();
+}
+window.addEventListener("storage", function(ev){ if (ev.key === "dcscope-night") rwbNight(); if (ev.key === "dcscope-gv") rwbCam(); });
 function render(){
   var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:metricsHTML, examples:examplesHTML};
   $("views").innerHTML = VIEWS.map(function(v){ return '<a class="tab" href="#' + v[0] + '"' + (v[0] === VIEW ? ' aria-current="page"' : '') + '>' + v[1] + '</a>'; }).join("");
-  function mini(k){ return '<div class="mini' + (k === "analysis" ? " grey" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
+  function mini(k){ return '<div class="mini"><div class="main">' + H[k](true) + '</div></div>'; }
   var own = (VIEW === "sentiment" || VIEW === "view") && ST.site === "mi", shown = main.getAttribute("data-shown"), key = VIEW + "|" + ST.site;
   $("sites").innerHTML = ["mi", "tx"].map(function(k){ return '<button type="button" data-site="' + k + '" aria-pressed="' + (ST.site === k) + '">' + SITES[k].name + '</button>'; }).join("");
-  document.body.classList.toggle("grey", VIEW === "analysis"); document.body.classList.toggle("inroom", VIEW === "all"); document.body.classList.toggle("embed", own && LIVE);
+  document.body.classList.toggle("inroom", VIEW === "all"); document.body.classList.toggle("embed", own && LIVE);
   if (shown === key && (own || VIEW === "sentiment")){ if (!own && VO.map) panSync(VO.map); return; }   // the embedded original keeps running; nothing on it follows the choices made here
   function right(){ return '<a class="lab" href="#analysis">Right wall · Live analysis</a>' + mini("analysis"); }
   function table(){ return '<a class="lab" href="#editor">Table · Scenario Editor</a>' + mini("editor"); }
@@ -2493,6 +2618,7 @@ function render(){
   var vs = main.querySelector('.stage[data-view="voices"]'); if (vs && window.L){ try { voDraw(vs); } catch(e){ if (window.console) console.warn("Voices map failed", e); } }
   var ss = main.querySelector('.stage[data-view="sat"]'); if (ss && window.L){ try { satDraw(ss); } catch(e){ if (window.console) console.warn("Aerial view failed", e); } }
   var gs = main.querySelector('.stage[data-view="geo"]'); if (gs){ try { geoInit(gs); gs.insertBefore(GEO.el, gs.firstChild); GEO.map.invalidateSize(false); geoSite(); panSync(GEO.map); geoDraw(); } catch(e){ if (window.console) console.warn("Map failed", e); GEO.failed = true; return render(); } }
+  var bg = main.querySelector(".measure.simple > .rwbg"); if (bg && !RWB.failed){ try { rwbDraw(bg); } catch(e){ RWB.failed = true; if (window.console) console.warn("Right wall landscape failed", e); } }
   fit(); wordsFill(); cancelAnimationFrame(agRaf); agRaf = requestAnimationFrame(drawAgents); if (keep && $(keep)) $(keep).focus();
 }
 function fit(){
@@ -2516,7 +2642,7 @@ function adopt(raw){
     if (typeof o.ag === "boolean") ST.ag = o.ag; if (typeof o.big === "boolean") ST.big = o.big;
     if ([3, 6, 9].indexOf(o.hw) >= 0) ST.hw = o.hw; if ([2, 4, 6].indexOf(o.hb) >= 0) ST.hb = o.hb;
     function pt(q){ return Array.isArray(q) && isFinite(q[0]) && isFinite(q[1]) && Math.abs(q[0]) < 30000 && Math.abs(q[1]) < 30000; }
-    ST.ear = pt(o.ear) ? [+o.ear[0], +o.ear[1]] : null; ST.pan = pt(o.pan) ? [+o.pan[0], +o.pan[1]] : [0, 0];
+    ST.ear = pt(o.ear) ? [+o.ear[0], +o.ear[1]] : null; ST.pan = pt(o.pan) ? [+o.pan[0], +o.pan[1]] : [0, 0]; ST.look = typeof o.look === "number" && isFinite(o.look) ? o.look : null;
     function pp(q){ return Array.isArray(q) && isFinite(q[0]) && isFinite(q[1]) && q[0] >= 0 && q[1] >= 0 && q[0] <= 100000 && q[1] <= 100000; }
     ST.bud = pp(o.bud) ? [+o.bud[0], +o.bud[1]] : null; ST.pr = {}; if (o.pr) PRICED.forEach(function(k){ if (pp(o.pr[k])) ST.pr[k] = [+o.pr[k][0], +o.pr[k][1]]; });
     ST.x = Array.isArray(o.x) ? o.x.filter(function(e){ return e && OWNS[e.k] && pt(e.a) && pt(e.b) && OWNS[e.k][1].indexOf(e.v) >= 0; }).slice(-12).map(function(e){ return {k:e.k, a:[+e.a[0], +e.a[1]], b:[+e.b[0], +e.b[1]], v:e.v}; }) : [];
@@ -2607,16 +2733,16 @@ document.addEventListener("click", function(ev){
   if ((b = T.closest("[data-budback]"))){ ST.bud = null; render(); tell(); note("Back to the starting budget: " + money(BUD0[0]) + " upfront and " + money(BUD0[1]) + " a year." + (overBudget() ? " The choices no longer fit: something has to go." : "")); return; }
   if ((b = T.closest("[data-prices-reset]"))){ ST.bud = null; ST.pr = {}; render(); tell(); return; }
   if ((b = T.closest("[data-prices]"))){ PRED = !PRED; render(); return; }
-  if ((b = T.closest("[data-gv]"))){ GV.on = b.getAttribute("data-gv") === "on"; GV.auto = true; GV.bTo = null; GV.to = null; gvSave(); render(); return; }
-  if ((b = T.closest("[data-gh]"))){ GV.h = +b.getAttribute("data-gh"); GV.tilt = GVTILT[GV.h]; gvSave(); gvCam(); axoKey(); return; }
+  if ((b = T.closest("[data-gv]"))){ GV.on = b.getAttribute("data-gv") === "on"; GV.auto = true; GV.bTo = null; GV.to = null; gvSave(); if (ST.look != null){ ST.look = null; tell(); } render(); return; }
+  if ((b = T.closest("[data-gh]"))){ GV.h = +b.getAttribute("data-gh"); GV.tilt = GVTILT[GV.h]; gvSave(); gvCam(); axoKey(); return; }   // the wall beside it, in another window, hears of the new eye height through the saved setting
   if ((b = T.closest("[data-snd]"))){ AXO.on = b.getAttribute("data-snd") === "on" && audioStart(); axoEar(); axoKey(); return; }
-  if ((b = T.closest("[data-tod]"))){ AXO.night = b.getAttribute("data-tod") === "night"; try { localStorage.setItem("dcscope-night", AXO.night ? "1" : ""); } catch(e){} nightSync(); axoHear(); axoEar(); axoKey(); return; }
+  if ((b = T.closest("[data-tod]"))){ AXO.night = b.getAttribute("data-tod") === "night"; try { localStorage.setItem("dcscope-night", AXO.night ? "1" : ""); } catch(e){} nightSync(); rwbNight(); axoHear(); axoEar(); axoKey(); return; }
   if ((b = T.closest("[data-hot]"))){ var hk = b.getAttribute("data-hot"); hotPick(HOT.list.map(function(x){ return x.k; }).indexOf(hk), false); AXO.hold = performance.now() + 15000; return; }
   if ((b = T.closest("[data-tour]"))){ var tw = b.getAttribute("data-tour");
     if (tw === "x"){ HOT.i = -1; HOT.k = null; tourFill(); } else if (tw === "go"){ if (HOT.list[HOT.i]) hotGo(HOT.list[HOT.i]); } else hotPick(HOT.i < 0 ? 0 : HOT.i + (tw === "next" ? 1 : -1), true); return; }
   if ((b = T.closest("[data-az]")) && AXO.map){ var how = b.getAttribute("data-az"), m = AXO.map, c0 = S().center;
     if (how === "imm"){ immersive(!document.body.classList.contains("imm")); return; }
-    if (gvOn()){ if (how === "in" || how === "out") gvAhead(how === "in" ? 60 : -60); else if (how === "reset"){ GV.auto = true; GV.bTo = null; GV.tilt = GVTILT[GV.h]; GV.earKey = null; GV.rel = null; ST.ear = null; ST.pan = [0, 0]; render(); tell(); } else gvTurn(how === "left" ? -30 : 30); return; }
+    if (gvOn()){ if (how === "in" || how === "out") gvAhead(how === "in" ? 60 : -60); else if (how === "reset"){ GV.auto = true; GV.bTo = null; GV.tilt = GVTILT[GV.h]; GV.earKey = null; GV.rel = null; ST.ear = null; ST.pan = [0, 0]; ST.look = null; render(); tell(); } else gvTurn(how === "left" ? -30 : 30); return; }
     if (how === "in") m.zoomIn(); else if (how === "out") m.zoomOut(); else if (how === "reset"){ ST.ear = null; ST.pan = [0, 0]; render(); tell(); m.easeTo({center:[c0[1], c0[0]], zoom:15.7, pitch:57, bearing:-28}); } else m.easeTo({bearing:m.getBearing() + (how === "left" ? -30 : 30)}); return; }
 });
 // The immersive view: the whole screen, no bar, a slow turn. H hides the panels for projection; Esc or the button leaves.
@@ -2634,7 +2760,7 @@ document.addEventListener("keydown", function(ev){ if ((ev.key === "Enter" || ev
 window.addEventListener("storage", function(ev){ if (ev.key === "dcscope-asked") wordsFill(); });
 document.addEventListener("click", function(ev){   // the case study switch sits in the header
   var si = ev.target.closest ? ev.target.closest("[data-site]") : null; if (!si) return;
-  var site2 = si.getAttribute("data-site"); if (site2 !== ST.site){ ST.ear = null; ST.pan = [0, 0]; } ST.site = site2; MAPV = null; render(); tell();
+  var site2 = si.getAttribute("data-site"); if (site2 !== ST.site){ ST.ear = null; ST.pan = [0, 0]; ST.look = null; } ST.site = site2; MAPV = null; render(); tell();
 });
 $("main").addEventListener("click", function(ev){
   var z = ev.target.closest ? ev.target.closest("[data-zoom]") : null;
@@ -2651,7 +2777,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-194108";
+var BUILD = "20261123-212828";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
