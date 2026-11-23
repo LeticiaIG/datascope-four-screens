@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Jost:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* Layout idea: the Scenario Editor's screen, repeated. One large picture of the site, a floating list of alternatives at top right, a live analysis bar underneath. Light only. */
 :root{
@@ -683,6 +683,81 @@ html.checking .app{visibility:hidden}
 .strip i b{position:relative;z-index:1;background:inherit;padding:0 .2rem;font-size:inherit;line-height:1.05rem;color:inherit}
 .strip .pT{background:#4f86a8} .strip .pB{background:#3b7a66} .strip .pE{background:#d9a531;color:#1c2a28}
 .strip.over{border-color:#c8493d}
+/* the staged wall, for a large screen. A small instrument's panel shown like a film: a dark ground, thin lines, a few flat colors, very large light
+   figures, small spaced capitals in a monospace for every label, one sentence set like a subtitle, crop marks at the corners.
+   Two typefaces: Jost (light) for figures and sentences, Space Mono for labels. Three colors carry meaning: mint for what is gained, orange for
+   what is given up, grey for what is not known. */
+.measure.simple.film{--bg:#0d0e0f;--fg:#f1eee3;--dim:#8e8c84;--gain:#8df0bd;--loss:#ff6a3d;--line:#f1eee333;font-family:"Jost","Futura","Century Gothic",var(--font);color:var(--fg);gap:1rem;padding:4.9rem 2.4rem 1.2rem}
+.measure.simple.film > .rwbg::after{content:"";position:absolute;inset:0;background:#0d0e0feb}
+.film button{font-family:inherit;color:inherit}
+.film .slate,.film .acts small,.film .bcol h4,.film .fcap,.film .face b,.film .bub span,.film .mcell small,.film .strips,.film .frz,.film .go,.film .bmore,.film .mdb{font-family:"Space Mono",ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.14em;font-weight:400}
+.film .slate{display:flex;align-items:center;gap:1.6rem;font-size:.68rem;color:var(--dim);border-bottom:1px solid var(--line);padding-bottom:.5rem}
+.film .slate span:first-child{color:var(--fg)} .film .slate .scn{color:var(--fg)}
+.film .slate span + span::before{content:"/";margin-right:1.6rem;color:var(--dim)}
+.measure.simple.film .mdb{margin-left:auto;font-size:.68rem;background:none;border:1px solid var(--fg);border-radius:999px;padding:.25rem .8rem;cursor:pointer;box-shadow:none;color:var(--fg)}
+.measure.simple.film .mdb:hover{background:var(--fg);color:var(--bg)}
+.measure.simple.film .hd{justify-content:flex-start;font-size:2.7rem;font-weight:300;letter-spacing:-.01em;line-height:1.05;text-shadow:none;color:var(--fg);text-transform:none}
+.film .acts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem}
+.measure.simple.film .acts button{display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;min-width:0;padding:.5rem .8rem .55rem;background:none;border:1px solid var(--line);border-radius:10px;box-shadow:none;transform:none;color:var(--fg);cursor:pointer;position:relative}
+.film .acts small{font-size:.62rem;color:var(--dim)} .film .acts em{font-style:normal;font-size:1.15rem;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.film .acts button::after{content:"";position:absolute;right:.7rem;top:.6rem;width:.55rem;height:.55rem;border-radius:50%;background:var(--fg)}
+.film .acts .kT::after{background:#4aa3ff} .film .acts .kE::after{background:#ffc928} .film .acts .kB::after{background:var(--gain)}
+.measure.simple.film .acts button.now{border-color:var(--fg);background:none}
+.film .bubs{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:2rem;align-items:stretch}
+.measure.simple.film .bcol{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:.6rem 0 0;align-items:flex-start;gap:.5rem;--c:var(--gain)} .measure.simple.film .bcol.l{--c:var(--loss);align-items:flex-end}
+.measure.simple.film .bcol.q{border:0;padding:0;justify-content:center;align-items:center}
+.measure.simple.film .bcol h4{align-self:auto;background:none;color:var(--c);padding:0;border-radius:0;font-size:.74rem;gap:.7rem;align-items:center}
+.film .bcol h4 i{min-width:0;height:auto;padding:0;background:none;color:var(--c);font-size:.74rem;border-radius:0} .film .bcol h4 i::before{content:"× "}
+.film .bcol{container-type:inline-size} .film .bcol.q{container-type:normal}
+.film .bfield{gap:1.2rem 3cqw;overflow:visible;align-self:stretch;justify-content:flex-start;flex-wrap:nowrap} .film .bcol.l .bfield{justify-content:flex-end} .film .bfield.many{flex-wrap:wrap;gap:.8rem 2cqw}
+.measure.simple.film .bub{--s:12rem;width:min(calc(var(--s) * var(--k, 1)),31cqw);height:auto;aspect-ratio:1;background:none;border:1.5px solid var(--c);box-shadow:none;color:var(--fg);padding:1rem;gap:.35rem;transition:transform .15s,background .15s,color .15s}
+.film .bub:nth-child(even){margin-top:0}
+.film .bub.d0,.film .bub.d1{--s:10.4rem} .film .bub.d2{--s:12rem} .film .bub.d3{--s:13.8rem}
+.film .bub.d0{border-style:dashed} .film .bub.d2{border-width:3px} .film .bub.d3{border-width:5px}
+.measure.simple.film .bub b{font-size:min(3.1rem,7.4cqw);font-weight:300;letter-spacing:-.02em;line-height:.95;color:var(--c);font-variant-numeric:tabular-nums} .measure.simple.film .bub.d3 b{font-size:min(4rem,8.6cqw)} .measure.simple.film .bub.d2 b{font-size:min(3.4rem,7.8cqw)} .measure.simple.film .bub.w b{font-size:min(1.7rem,4.4cqw);line-height:1.05}
+.film .bub span{font-size:.62rem;line-height:1.35;letter-spacing:.1em;color:var(--fg);max-width:92%}
+.measure.simple.film .bub.q{--s:10.4rem;width:10.4rem;--c:var(--dim);background:none;border:1.5px dashed var(--dim)} .measure.simple.film .bub.q b{color:var(--fg);font-size:3.4rem}
+.measure.simple.film .bfield.many .bub{width:min(8.2rem,22cqw);padding:.5rem} .measure.simple.film .bfield.many .bub b{font-size:min(2rem,5.4cqw)} .measure.simple.film .bfield.many .bub.w b{font-size:min(1.1rem,3cqw)} .film .bfield.many .bub span{font-size:.5rem}
+.measure.simple.film .bfield .nil{background:none;border:0;border-radius:0;padding:0;font-size:1.8rem;font-weight:300;color:var(--dim);max-width:none}
+.film .bmore{flex:none;font-size:.62rem;color:var(--dim);background:none;border:0;border-bottom:1px solid var(--dim);padding:0 0 1px;cursor:pointer}
+.measure.simple.film .bub.sel{box-shadow:none}
+.measure.simple.film .bubs.frozen .bub.sel{background:var(--c)} .measure.simple.film .bubs.frozen .bub.sel b,.measure.simple.film .bubs.frozen .bub.sel span{color:var(--bg)}
+.measure.simple.film .bubs.frozen .bub.q.sel{background:var(--fg)}
+.film .bubs.frozen .bub:not(.sel){opacity:.28} .film .bubs.frozen h4,.film .bubs.frozen .bmore{opacity:.3}
+.film .faces{display:flex;justify-content:space-between;align-items:center;gap:1rem;border-top:1px solid var(--line);padding-top:.7rem}
+.measure.simple.film .fcap{position:static;transform:none;max-width:none;background:none;color:var(--dim);padding:0;font-size:.68rem;border-radius:0}
+.measure.simple.film .face{display:flex;flex-direction:row;align-items:center;gap:.6rem;background:none;border:0;box-shadow:none;border-radius:0;padding:0;cursor:pointer;min-width:0;color:var(--fg)}
+.film .face svg{width:2.1rem;height:2.1rem} .film .face svg circle:first-child{fill:none;stroke-width:1.5} .film .face.m2 svg *{stroke:var(--gain)} .film .face.m0 svg *{stroke:var(--loss)} .film .face.m1 svg *{stroke:var(--dim)}
+.film .face.m2 svg circle + circle,.film .face.m2 svg circle + circle + circle{fill:var(--gain)} .film .face.m0 svg circle + circle,.film .face.m0 svg circle + circle + circle{fill:var(--loss)} .film .face.m1 svg circle + circle,.film .face.m1 svg circle + circle + circle{fill:var(--dim)}
+.film .face b{font-size:.68rem;line-height:1.3;text-align:left} .film .face.sel b{text-decoration:underline;text-underline-offset:4px}
+.measure.simple.film .bwhy{flex:0 0 auto;min-height:5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.3rem;background:none;border:0;border-radius:0;box-shadow:none;padding:.2rem 0}
+.film .bwhy p{display:block;overflow:visible;max-width:74rem;margin:0}
+.film .sayl{font-size:2rem;font-weight:300;line-height:1.2;color:var(--fg)} .film .sayl b{font-weight:400;font-size:inherit;margin:0} .film .sayl b.g{color:var(--gain)} .film .sayl b.l{color:var(--loss)}
+.film .frz{font-style:normal;font-size:.62rem;color:var(--bg);background:var(--loss);padding:.25rem .55rem;margin-right:1rem;vertical-align:.55em;border-radius:3px}
+.film .go{font-size:.62rem;background:none;border:1px solid var(--fg);border-radius:999px;padding:.2rem .7rem;margin-left:1rem;vertical-align:.55em;cursor:pointer}
+.film .saywhy{font-size:1.05rem;font-weight:400;color:var(--dim)} .film .saywhy .cd{background:none;color:var(--fg);border:1px solid var(--fg);border-radius:4px;padding:0 .3rem;font-family:"Space Mono",monospace;font-size:.8em}
+.measure.simple.film .moneybar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:1.8rem;position:relative;background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding:.8rem 0 0}
+.film .mcell{align-items:flex-start;gap:.15rem} .film .mcell:last-of-type{align-items:flex-end}
+.film .mcell small{font-size:.62rem;color:var(--dim)} .measure.simple.film .mcell b{font-size:1.9rem;font-weight:300;color:var(--fg);font-variant-numeric:tabular-nums} .measure.simple.film .mcell.bad b{color:var(--loss)}
+.film .strips{margin:0;font-size:.6rem;color:var(--dim);gap:.35rem .8rem}
+.film .strip{border:0;border-radius:0;height:1.1rem;background:none;gap:3px;overflow:visible;box-shadow:inset 0 -1px 0 var(--dim)} .film .strip::after{display:none}
+.film .strip i{background:var(--fg);color:var(--bg);font-family:"Space Mono",monospace;font-size:.58rem;font-weight:700;border-radius:2px} .film .strip i b{background:none;font-size:inherit;line-height:1.1rem}
+.film .strip .pT{background:#4aa3ff} .film .strip .pE{background:#ffc928;color:var(--bg)} .film .strip .pB{background:var(--gain);color:var(--bg)} .film .strip.over{box-shadow:inset 0 -2px 0 var(--loss)}
+.measure.simple.film > .rwattr{color:var(--dim);background:none}
+.film .crop{position:absolute;inset:4.2rem 1.1rem .5rem;pointer-events:none;z-index:1;background:linear-gradient(var(--fg),var(--fg)) 0 0/1.1rem 1px,linear-gradient(var(--fg),var(--fg)) 0 0/1px 1.1rem,linear-gradient(var(--fg),var(--fg)) 100% 0/1.1rem 1px,linear-gradient(var(--fg),var(--fg)) 100% 0/1px 1.1rem,linear-gradient(var(--fg),var(--fg)) 0 100%/1.1rem 1px,linear-gradient(var(--fg),var(--fg)) 0 100%/1px 1.1rem,linear-gradient(var(--fg),var(--fg)) 100% 100%/1.1rem 1px,linear-gradient(var(--fg),var(--fg)) 100% 100%/1px 1.1rem;background-repeat:no-repeat;opacity:.55}
+.measure.simple.film.night .hd{color:var(--fg);text-shadow:none}
+/* DOES NOT FIT */
+.stamp{position:absolute;right:0;top:-1.5rem;font-family:"Space Mono",monospace;font-style:normal;font-size:1.05rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#0d0e0f;background:#ff6a3d;padding:.15rem .7rem;transform:rotate(-4deg);white-space:nowrap;pointer-events:none}
+.stamp.slam{animation:slam .5s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes slam{0%{transform:rotate(-4deg) scale(3.4);opacity:0}55%{transform:rotate(-4deg) scale(.92);opacity:1}75%{transform:rotate(-6deg) scale(1.06)}100%{transform:rotate(-4deg) scale(1)}}
+/* the cut: a choice on the table sweeps the wall and the circles snap in, one after the other */
+.film .whip{position:absolute;z-index:3;top:0;bottom:0;left:0;width:30%;pointer-events:none;background:linear-gradient(90deg,#f1eee300,#f1eee340 55%,#f1eee300);transform:translateX(-110%) skewX(-14deg);animation:whip .38s cubic-bezier(.5,0,.2,1) both}
+@keyframes whip{to{transform:translateX(380%) skewX(-14deg)}}
+.film.cut .bub{animation:snap .3s cubic-bezier(.2,1.7,.4,1) both;animation-delay:calc(140ms + var(--i, 0) * 70ms)}
+@keyframes snap{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+.film.cut .acts button.hit{animation:hit .7s ease-out both}
+@keyframes hit{0%{background:#f1eee3;color:#0d0e0f}100%{background:none}}
+@media (prefers-reduced-motion: reduce){ .film .whip{display:none} .film.cut .bub,.film.cut .acts button.hit,.stamp.slam{animation:none} }
 
 @media (max-width:900px), (max-height:520px){
   html,body{height:auto}
@@ -1773,26 +1848,53 @@ var GROUPS = [["Nearest neighbors", function(x){ return x.ax === "quiet" || x.ax
   ["The grid and the climate", function(x){ return x.ax === "power" || x.ax === "clean"; }]];
 function faceSVG(m){ var c = ["#b5534a", "#7b8a85", "#3b7a66"][m], d = ["M11 24 Q18 18 25 24", "M11 22 L25 22", "M11 20 Q18 27 25 20"][m];
   return '<svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" fill="' + ["#f6d9d5", "#eef1ef", "#d5ebe1"][m] + '" stroke="' + c + '" stroke-width="2"/><circle cx="12.5" cy="14" r="1.9" fill="' + c + '"/><circle cx="23.5" cy="14" r="1.9" fill="' + c + '"/><path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="2.2" stroke-linecap="round"/></svg>'; }
-function facesHTML(st){
-  function few(list){ return list.slice(0, 3).map(function(x){ var b = bigOf(x); return b[0] + (/\d/.test(b[0]) ? " " + b[1].split("<br>")[0].split(",")[0] : ""); }).join(" · ") + (list.length > 3 ? " · …" : ""); }
-  var cells = GROUPS.map(function(g){ var list = st.filter(g[1]), sc = 0; list.forEach(function(x){ sc += x.dir * (x.deg || 1); }); var m = sc > 0 ? 2 : sc < 0 ? 0 : 1;
-    return '<div class="face m' + m + '">' + faceSVG(m) + '<div><b>' + g[0] + '</b><span>' + (list.length ? ["More given up than gained", "As much gained as given up", "More gained than given up"][m] + ": " + few(list) : "No change for them") + '</span></div></div>'; });
-  var sp = spentOf(ST), over = overBudget(), any = sp[0] || sp[1], dm = over ? 0 : any ? 2 : 1;
-  cells.push('<div class="face m' + dm + '">' + faceSVG(dm) + '<div><b>The developer</b><span>' + (over ? "Asked for more than it offered" : any ? "Pays " + money(sp[0]) + " + " + money(sp[1]) + " a year, within its offer" : "Nothing asked of it yet") + '</span></div></div>');
-  return '<span class="fcap">Who is it good for?</span>' + cells.join("");
+function facesData(st){
+  function few(list){ return list.slice(0, 3).map(function(x){ var b = bigOf(x); return b[0] + (/\d/.test(b[0]) ? " " + b[1].split("<br>")[0].split(",")[0] : ""); }).join(", ") + (list.length > 3 ? " and more" : ""); }
+  var out = GROUPS.map(function(g){ var list = st.filter(g[1]), sc = 0; list.forEach(function(x){ sc += x.dir * (x.deg || 1); }); var m = sc > 0 ? 2 : sc < 0 ? 0 : 1;
+    return {n:g[0], m:m, why:list.length ? ["More is given up than gained", "As much is gained as given up", "More is gained than given up"][m] + ": " + few(list) + "." : "Nothing changes for them with these choices."}; });
+  var sp = spentOf(ST), over = overBudget(), any = sp[0] || sp[1];
+  out.push({n:"The developer", m:over ? 0 : any ? 2 : 1, why:over ? "The choices ask for more than it offered." : any ? "It pays " + money(sp[0]) + " and " + money(sp[1]) + " a year, within its offer." : "Nothing is asked of it yet."});
+  return out;
 }
+function facesHTML(st){   // a face and a name; the reason comes when the face is tapped
+  return '<span class="fcap">Who is it good for?</span>' + facesData(st).map(function(f, i){ return '<button type="button" class="face m' + f.m + (MD.freeze === "face:" + i ? " sel" : "") + '" data-face="' + i + '">' + faceSVG(f.m) + '<b>' + f.n + '</b></button>'; }).join("");
+}
+function counted(st){ return st.filter(function(x){ var b = bigOf(x)[0]; return !/^(0 dB|0%|\$0M?)$/.test(b); }); }   // on the staged wall
 function bubblesHTML(st, un){
-  var g = st.filter(function(x){ return x.dir > 0; }), l = st.filter(function(x){ return x.dir < 0; }), sel = SEL.ax ? null : SEL.id;
-  function bub(x){ var b = bigOf(x), wordy = !/\d/.test(b[0]); return '<button type="button" class="bub ' + (x.dir > 0 ? "g" : "l") + " d" + (x.deg || 0) + (wordy ? " w" : "") + (x.id === sel ? " sel" : "") + '" data-stm="' + x.id + '"><i class="c' + x.code.charAt(0) + '">' + x.code + '</i><b>' + b[0] + '</b><span>' + b[1] + '</span></button>'; }
-  function ask(u){ return '<button type="button" class="bub q' + (u.id === sel ? " sel" : "") + '" data-stm="' + u.id + '"><i class="c' + u.code.charAt(0) + '">' + u.code + '</i><b>?</b><span>' + esc(u.t) + '</span></button>'; }
-  function col(cls, n, title, sub, items, empty){ return '<div class="bcol ' + cls + '"><h4><i>' + n + '</i>' + title + (sub ? '<small>' + sub + '</small>' : '') + '</h4><div class="bfield' + (items.length > 4 ? " many" : "") + '">' + (items.length ? items.join("") : '<p class="nil">' + empty + '</p>') + '</div></div>'; }
-  // "you" was nobody in particular: the lists say whose they are, as the title does
-  return col("g", g.length, "The neighborhood gains", "against a conventional data center", g.map(bub), "Nothing yet. This is the conventional data center: choose an alternative on the table.") +
-    col("l", l.length, "The neighborhood gives up", l.length ? "" : "nothing so far", l.map(bub), "Nothing given up so far.") +
-    col("q", un.length, "Not known yet", un.length ? (un.length === 1 ? "a question" : "questions") + " for the developer" : "no open question", un.slice(0, 4).map(ask).concat(un.length > 4 ? ['<span class="bmore"><em>+ ' + (un.length - 4) + ' more, under “The wheel, the sources and questions”</em></span>'] : []), "No open question for these choices.");
+  var sel = SEL.ax ? null : SEL.id, bi = 0, TOP = 3; st = counted(st);
+  function rank(list){ return list.map(function(x, i){ return [x, i]; }).sort(function(a, b){ return (b[0].deg || 0) - (a[0].deg || 0) || (/\d/.test(bigOf(b[0])[0]) ? 1 : 0) - (/\d/.test(bigOf(a[0])[0]) ? 1 : 0) || a[1] - b[1]; }).map(function(a){ return a[0]; }); }
+  var g = rank(st.filter(function(x){ return x.dir > 0; })), l = rank(st.filter(function(x){ return x.dir < 0; }));
+  function bub(x){ var b = bigOf(x), wordy = !/\d/.test(b[0]); return '<button type="button" class="bub ' + (x.dir > 0 ? "g" : "l") + " d" + (x.deg || 0) + (wordy ? " w" : "") + (x.id === sel ? " sel" : "") + '" style="--i:' + (bi++) + '" data-stm="' + x.id + '"><b>' + b[0] + '</b><span>' + b[1].split("<br>")[0] + '</span></button>'; }
+  function col(cls, n, title, list, empty){ var show = MD.all ? list : list.slice(0, TOP), more = list.length - show.length;
+    return '<div class="bcol ' + cls + '"><h4>' + title + '<i>' + n + '</i></h4><div class="bfield' + (show.length > 4 ? " many" : "") + '">' + (show.length ? show.map(bub).join("") : '<p class="nil">' + empty + '</p>') + '</div>' +
+      (more > 0 ? '<button type="button" class="bmore" data-ball="1">and ' + more + ' smaller</button>' : MD.all && list.length > TOP ? '<button type="button" class="bmore" data-ball="0">show the largest only</button>' : '') + '</div>'; }
+  return col("g", g.length, "The neighborhood gains", g, "Nothing yet") +
+    '<div class="bcol q"><button type="button" class="bub q' + (MD.freeze === "q" ? " sel" : "") + '" style="--i:' + (bi++) + '" data-qs><b>' + un.length + '</b><span>' + (un.length === 1 ? "question" : "questions") + ' not answered yet</span></button></div>' +
+    col("l", l.length, "The neighborhood gives up", l, "Nothing so far");   // gains and what is given up face each other across what is not known
+}
+function sayYou(x){   // one bubble, said to the person looking at it
+  var b = bigOf(x), n = b[0].replace(/^[−+]/, ""), up = b[0].charAt(0) === "+", t = TECH[x.code], en = ENERGY[x.code], pr;
+  if (x.ax === "water" && t) return "This is the water that cools the servers. The plant would use " + n + (up ? " more" : " less") + " of it.";
+  if (x.ax === "power" && t) return "This is the electricity the plant draws: " + n + (up ? " more" : " less") + " than a conventional one.";
+  if (x.ax === "quiet") return /pin/.test(b[1]) ? (n === "0 dB" ? "This is you, the “You” pin. For you the sound stays as it is." : "This is you, the “You” pin. Where you stand it gets " + n + (up ? " louder." : " quieter.")) : /\d/.test(n) ? "This is the sound of the equipment: " + n + (up ? " louder on hot days." : " quieter.") : "This is the sound for the nearest neighbors. " + (x.dir > 0 ? "Quieter" : "Louder") + ", and nobody has said by how much.";
+  if (x.ax === "clean") return "This is new clean power. The money left pays for " + n + " of what the plant needs.";
+  if (x.ax === "money" && x.code.charAt(0) === "B"){ pr = price(x.code); return "This is " + money(pr[0] || pr[1]) + " of the budget. It goes to " + b[1].split("<br>")[0].replace(/^for /, "") + "."; }
+  if (x.ax === "money" && en) return "This is " + n + " of the budget. It goes to " + en.what + ", so it cannot go to benefits.";
+  if (x.ax === "money") return "This is the heat the servers throw off. It would warm customers nearby.";
+  if (x.ax === "places") return "These are places you could walk into: a pool, a spa, community rooms and cafes.";
+  if (x.ax === "views") return "This is what you see from your street. There would be less of the building in it.";
+  return x.t + ".";
 }
 function bwhyHTML(st, un){   // the bubble in question, in one breath: what, because of which choice, why, the number, the source
-  var all = st.concat(un), x = SEL.ax ? null : all.filter(function(y){ return y.id === SEL.id; })[0];
+  var all = st.concat(un), x = SEL.ax ? null : all.filter(function(y){ return y.id === SEL.id; })[0], fr = !!x && MD.freeze === x.id, cs = counted(st), g = cs.filter(function(y){ return y.dir > 0; }).length, l = cs.length - g;
+  if (document.querySelector(".measure.film")){   // on the staged wall the picture runs until something is tapped; then it holds, and one line speaks to you
+    var go = '<button type="button" class="go" data-unfreeze>▶ Go on</button>', fz = '<i class="frz">Freeze</i>';
+    if (MD.freeze === "q") return '<p class="sayl">' + fz + (un.length ? "These are questions. Nobody has answered them yet." : "There is no open question for these choices.") + go + '</p>' + (un.length ? '<p class="saywhy">' + un.slice(0, 3).map(function(u){ return esc(u.t); }).join(" · ") + (un.length > 3 ? " · and " + (un.length - 3) + " more, under “The wheel, the sources and questions”." : ".") + '</p>' : "");
+    if (/^face:/.test(MD.freeze || "")){ var f = facesData(st)[+MD.freeze.slice(5)]; return '<p class="sayl">' + fz + ["These are the nearest neighbors.", "This is the wider community.", "This is the water.", "This is the grid, and the climate.", "This is the developer."][+MD.freeze.slice(5)] + go + '</p><p class="saywhy">' + f.why + '</p>'; }
+    if (!fr) return '<p class="sayl run">' + (st.length || un.length ? "This is the bargain: <b class=\"g\">" + g + " gained</b>, <b class=\"l\">" + l + " given up</b>, <b>" + un.length + " not known yet</b>." : "This is the conventional data center. Nothing gained, nothing given up.") + '</p>';
+    var op0 = x.code === "ADD" ? ["", "what was added on the table"] : optOf(x.code);
+    return '<p class="sayl">' + fz + sayYou(x) + go + '</p><p class="saywhy">Because of <span class="cd c' + x.code.charAt(0) + '">' + x.code + '</span> ' + op0[1] + '. ' + (x.un ? esc(x.t) + ": the brief asks the developer for this." : x.why) + '</p>';
+  }
   if (!x) return '<p class="bw0">Tap a bubble to see why it is there and where its figure comes from.</p>';
   var op = x.code === "ADD" ? ["", "What was added on the table"] : optOf(x.code), head = '<span class="cd c' + x.code.charAt(0) + '">' + x.code + '</span> ' + op[1];
   if (x.un) return '<p><b>?</b> ' + esc(x.t) + '. <span class="bsrc">The brief asks the developer for this, for ' + head + '. No answer yet.</span></p>';
@@ -1808,12 +1910,11 @@ function stripsHTML(){   // the budget as two strips: a part for each choice tha
       parts.map(function(p){ return '<i class="p' + p[0].charAt(0) + '" style="width:' + (p[1] / den * 100).toFixed(2) + '%" title="' + p[0] + " " + money(p[1]) + '"><b>' + p[0] + '</b></i>'; }).join("") + '</span>'; }
   return '<div class="strips"><span>Upfront</span>' + strip(0) + '<span>A year</span>' + strip(1) + '</div>';
 }
-function moneyHTML(){   // the budget in three figures: what there is, what the choices take, what is left and where it goes
-  var en = ENERGY[ST.e], b = bud(), sp = spentOf(ST), l = leftOf(ST), f = funds(), over = overBudget(), lines = chosen(ST).filter(function(c){ return c.charAt(0) !== "E" && (price(c)[0] || price(c)[1]); }).map(function(c){ return c + " " + priceWords(price(c)); });
-  function cell(k, v, sub, cls, more){ return '<div class="mcell ' + (cls || "") + '"><small>' + k + '</small><b>' + v + '</b>' + (more || "") + '<span>' + sub + '</span></div>'; }
-  return '<div class="card moneybar">' + cell("The budget to share out", money(b[0]) + " + " + money(b[1]) + " a year", "The developer’s offer, for the community to allocate. Taxes come on top.") + '<i class="mop">−</i>' +
-    cell("What the choices cost", money(sp[0]) + " + " + money(sp[1]) + " a year", lines.length ? lines.join(" · ") + " · example prices" : "Nothing chosen costs extra yet.", "", stripsHTML()) + '<i class="mop">=</i>' +
-    cell(over ? "Over the budget by" : "What is left", over ? [l[0] < 0 ? money(-l[0]) + " upfront" : "", l[1] < 0 ? money(-l[1]) + " a year" : ""].filter(function(x){ return x; }).join(" + ") : money(l[0]) + " + " + money(l[1]) + " a year", over ? "Something has to go, or the budget has to grow on the table." : en ? (f.e > 0 ? "The " + money(f.e) + " upfront goes to " + en.what + ": " + shareWords(f.share) + " of the power." : "Nothing is left for " + en.what + ".") : "Not allocated yet.", over ? "bad" : "ok") + '</div>';
+function moneyHTML(){   // the money in one line: what there is, how the choices fill it, what is left
+  var en = ENERGY[ST.e], b = bud(), l = leftOf(ST), f = funds(), over = overBudget(), left0 = Math.max(0, r2(l[0] - (f.e > 0 ? f.e : 0)));
+  var res = over ? '<small>Over by</small><b>' + [l[0] < 0 ? money(-l[0]) : "", l[1] < 0 ? money(-l[1]) + " a year" : ""].filter(function(x){ return x; }).join(" + ") + '</b>' : '<small>Left</small><b>' + money(left0) + ' + ' + money(Math.max(0, l[1])) + ' a year</b>';
+  var out = '<div class="card moneybar"><div class="mcell"><small>The budget</small><b>' + money(b[0]) + ' + ' + money(b[1]) + ' a year</b></div>' + stripsHTML() + '<div class="mcell ' + (over ? "bad" : "ok") + '">' + res + '</div>' + (over ? '<em class="stamp' + (MD.wasOver ? "" : " slam") + '">Does not fit</em>' : "") + '</div>';
+  MD.wasOver = over; return out;
 }
 function ledgerHTML(st, un){
   function col(cls, title, rows, empty, foot){ return '<div class="col ' + cls + '"><h3>' + title + '</h3><div class="rows">' + (rows.length ? rows.join("") : '<p class="nil">' + empty + '</p>') + '</div>' + (foot || "") + '</div>'; }
@@ -1898,10 +1999,21 @@ function wordsFill(){
   [].forEach.call(document.querySelectorAll('[data-w="ledger"]'), function(el){ el.innerHTML = ledgerHTML(st, un); });
   [].forEach.call(document.querySelectorAll('[data-w="wheel"]'), function(el){ var big = el.getAttribute("data-size") === "big"; el.innerHTML = (big ? WTAP : "") + wheelSVG(st, SEL.ax ? null : SEL.id, el.getAttribute("data-size")) + (big ? WHOW : WKEY); });
   [].forEach.call(document.querySelectorAll('[data-w="trace"]'), function(el){ el.innerHTML = traceHTML(st, un); });
-  [].forEach.call(document.querySelectorAll('[data-w="bubbles"]'), function(el){ el.innerHTML = bubblesHTML(st, un); });
+  if (MD.freeze && MD.freeze !== "q" && !/^face:/.test(MD.freeze) && st.concat(un).filter(function(y){ return y.id === MD.freeze; }).length === 0) MD.freeze = null;
+  [].forEach.call(document.querySelectorAll('[data-w="bubbles"]'), function(el){ el.innerHTML = bubblesHTML(st, un); el.classList.toggle("frozen", !!MD.freeze); });
   [].forEach.call(document.querySelectorAll('[data-w="faces"]'), function(el){ el.innerHTML = facesHTML(st); });
   [].forEach.call(document.querySelectorAll('[data-w="bwhy"]'), function(el){ el.innerHTML = bwhyHTML(st, un); });
   if (had && $("askq")){ var i = $("askq"); i.focus(); try { i.setSelectionRange(i.value.length, i.value.length); } catch(e){} }
+  runUp();
+}
+// Figures that run up to their value: each large figure on the staged wall counts from nothing the first time it shows and whenever it changes.
+function runUp(){
+  var film = document.querySelector(".measure.film"); if (!film || film.closest(".mini")) return; var seen = MD.seen || (MD.seen = {}), still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches, now = {};
+  [].forEach.call(film.querySelectorAll(".bub > b, .mcell > b"), function(el, n){ var k = el.parentNode.getAttribute("data-stm") || (el.parentNode.hasAttribute("data-qs") ? "q" : "m" + n), txt = el.textContent; now[k] = txt; if (seen[k] === txt || still || !/\d/.test(txt)) return;
+    var t0 = performance.now(), D = 620; (function tick(ts){ var u = Math.min(1, (ts - t0) / D), e = 1 - Math.pow(1 - u, 3); if (!el.isConnected) return;
+      el.textContent = u >= 1 ? txt : txt.replace(/\d+(\.\d+)?/g, function(m){ var dec = (m.split(".")[1] || "").length; return (parseFloat(m) * e).toFixed(dec); }); if (u < 1) requestAnimationFrame(tick); })(t0); });
+  MD.seen = now;
+  if (film.classList.contains("cut")) setTimeout(function(){ if (film.isConnected) film.classList.remove("cut"); }, 1100);
 }
 // A question typed or spoken: find the result it is about and the kind of answer wanted. What cannot be traced is kept for the developer.
 var AXKEY = [["quiet", /nois|loud|quiet|sound|hear|hum\b|decibel|\bdb\b/], ["views", /view|sight|visible|look|ugly|skyline|hide|screen|\bsee\b/], ["water", /water|drought|aquifer|gallon|\bwell\b/], ["clean", /solar|wind|clean|renewable|nuclear|reactor|carbon|emission|climate/],
@@ -2527,8 +2639,12 @@ function metricsHTML(bare){
   if (MD.detail) return '<div class="card measure"><div class="hd">Live analysis · what this scenario gives and takes<button type="button" class="pbtn mdb" data-md="0">‹ Back to the simple view</button></div>' + chips +
     '<div class="mbody"><div class="mleft"><div class="whl" data-w="wheel" data-size="big"></div><div class="smalls">' + altCards("sm") + '</div></div>' +
     '<div class="mright"><div class="led" data-w="ledger"></div><div class="trace" data-w="trace"></div></div></div>' + offerHTML() + '</div>';
-  return '<div class="card measure simple"><div class="rwbg" aria-hidden="true"></div><div class="hd">What this plan means for the neighborhood<button type="button" class="pbtn mdb" data-md="1">The wheel, the sources and questions ›</button></div>' + chips +
-    '<div class="faces" data-w="faces"></div><div class="bubs" data-w="bubbles"></div><div class="bwhy" data-w="bwhy"></div>' + moneyHTML() +
+  var key = chosen(ST).join(" ") + "|" + ST.site, was = MD.key, cut = !bare && was != null && was !== key, hit = ""; MD.key = bare && was != null ? was : key;
+  if (cut){ var a0 = was.split("|")[0].split(" "), a1 = chosen(ST); hit = ["D", "T", "E", "B"].filter(function(g){ return a0.filter(function(c){ return c.charAt(0) === g; }).join() !== a1.filter(function(c){ return c.charAt(0) === g; }).join(); })[0] || ""; }
+  var acts = '<div class="chosen acts">' + [["design", "D", "Design", chosenName("d")], ["technology", "T", "Technology", chosenName("t")], ["energy", "E", "Energy", chosenName("e")], ["benefits", "B", "Benefits", [b.length ? b.join(" ") : "B", b.length ? b.map(function(c){ return optOf(c)[1]; }).join(" · ") : "No benefit yet"]]].map(function(c, i){
+    return '<button type="button" data-ch="' + c[0] + '" class="k' + c[1] + (ST.ch === c[0] ? " now" : "") + (hit === c[1] ? " hit" : "") + '"><small>' + (i + 1) + ' · ' + c[2] + '</small><em>' + c[3][1] + '</em></button>'; }).join("") + '</div>';
+  return '<div class="card measure simple film' + (cut ? " cut" : "") + '"><div class="rwbg" aria-hidden="true"></div>' + (cut ? '<i class="whip" aria-hidden="true"></i>' : '') + '<div class="slate"><span>A better bargain</span><span>Live analysis</span><span class="scn">' + chosen(ST).join(" · ") + '</span><button type="button" class="mdb" data-md="1">Wheel · sources · questions ›</button></div><div class="hd"><span>What this plan means for the neighborhood</span></div>' + acts +
+    '<div class="bubs" data-w="bubbles"></div><div class="faces" data-w="faces"></div><div class="bwhy" data-w="bwhy"></div>' + moneyHTML() + '<i class="crop" aria-hidden="true"></i>' +
     '<p class="rwattr">Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community. Buildings © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="https://openmaptiles.org/">OpenMapTiles</a>, <a href="https://openfreemap.org/">OpenFreeMap</a></p></div>';
 }
 // ---------- the landscape behind the right wall ----------
@@ -2705,7 +2821,11 @@ $("main").addEventListener("wheel", function(ev){
 document.addEventListener("click", function(ev){
   var T = ev.target.closest ? ev.target : null; if (!T) return; var b;
   if ((b = T.closest("[data-mic]"))){ listen(b.getAttribute("data-mic"), b); return; }
-  if ((b = T.closest("[data-stm]"))){ SEL.id = b.getAttribute("data-stm"); SEL.ax = null; SEL.msg = ""; wordsFill(); return; }
+  if ((b = T.closest("[data-unfreeze]"))){ MD.freeze = null; wordsFill(); return; }
+  if ((b = T.closest("[data-face]"))){ var fk = "face:" + b.getAttribute("data-face"); MD.freeze = MD.freeze === fk ? null : fk; wordsFill(); return; }
+  if ((b = T.closest("[data-qs]"))){ MD.freeze = MD.freeze === "q" ? null : "q"; wordsFill(); return; }
+  if ((b = T.closest("[data-ball]"))){ MD.all = b.getAttribute("data-ball") === "1"; wordsFill(); return; }
+  if ((b = T.closest("[data-stm]"))){ var sid = b.getAttribute("data-stm"); if (b.closest(".measure.film")) MD.freeze = MD.freeze === sid ? null : sid; SEL.id = sid; SEL.ax = null; SEL.msg = ""; wordsFill(); return; }
   if ((b = T.closest("[data-wax]"))){ pickSpoke(b.getAttribute("data-wax")); return; }
   if ((b = T.closest("[data-md]"))){ MD.detail = b.getAttribute("data-md") === "1"; render(); return; }
   if ((b = T.closest("[data-q]"))){ SEL.q = b.getAttribute("data-q"); SEL.msg = ""; wordsFill(); return; }
@@ -2780,7 +2900,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-213214";
+var BUILD = "20261123-215643";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
