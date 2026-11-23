@@ -1578,11 +1578,12 @@ function about(n){ if (n < 10) return String(n); var p = Math.pow(10, Math.max(0
 var AXO = {map:null, el:null, ag:null, failed:false, loading:false, site:null, agSite:null, agents:[], seen:{}, boxes:[], busy:false, per:0, err:"", raf:0, marks:[], audio:null, on:false, earD:1e4, earL:0, orbit:false, hold:0, last:0};
 // ---------- the same wall from the ground ----------
 // The eye is where the sound is being heard, looking at the plant, raised so that the ground and the rings can be read. The rings are the model's,
-// one for every 5 dBA. The ground is the aerial photograph (Esri World Imagery, the same as on the table), lying flat; buildings stand up where
-// OpenStreetMap has them, and woods are drawn as trees where it maps woodland, each one placed at random inside it. Only the trees planted on the
-// table count for the sound. The sky, its haze and the clouds are scenery.
+// one for every 5 dBA. The ground is the aerial photograph (Esri World Imagery, the same as on the table), lying flat, so trees and roofs are seen
+// as they are from the air; buildings stand up where OpenStreetMap has them, and the belts planted on the table stand up as trees. No other tree is
+// raised: OpenStreetMap maps the whole Texas tract as woodland, and trees scattered over it hid the photograph, the plant and the rings.
+// The sky, its haze and the clouds are scenery.
 var GVFOV = 40, GVH = [2, 10, 30, 80], GVTILT = {2:88.3, 10:87, 30:84, 80:78};
-var GV = {on:true, h:30, b:0, tilt:84, auto:true, pos:null, to:null, from:null, t0:0, dur:0, bTo:null, mode:null, earKey:null, dirty:false, still:0, hz:0, foc:1000, rip:0, liveT:0, ct:0, drift:0, driftT:0, trees:{}, nTrees:0, treeSite:null, woodKey:"", lab:[]};
+var GV = {on:true, h:30, b:0, tilt:84, auto:true, pos:null, to:null, from:null, t0:0, dur:0, bTo:null, mode:null, earKey:null, dirty:false, still:0, hz:0, foc:1000, rip:0, liveT:0, ct:0, drift:0, driftT:0, lab:[]};
 try { var gv0 = JSON.parse(localStorage.getItem("dcscope-gv") || "null"); if (gv0){ GV.on = gv0.on !== false; if (GVH.indexOf(gv0.h) >= 0) GV.h = gv0.h; } } catch(e){}
 GV.tilt = GVTILT[GV.h];
 function gvOn(){ return GV.on; }
@@ -1602,7 +1603,7 @@ function gvMode(){   // the lens, the hands and the colors of the view in use
   AXO.el.classList.toggle("gv", on);
   ["dragPan", "dragRotate", "scrollZoom", "doubleClickZoom", "touchZoomRotate", "touchPitch", "keyboard", "boxZoom"].forEach(function(h){ try { map[h][on ? "disable" : "enable"](); } catch(e){} });
   GVPAINT.forEach(function(p){ if (map.getLayer(p[0])) map.setPaintProperty(p[0], p[1], p[on ? 3 : 2]); });
-  ["ring-line", "ring-glow", "ring-solid", "trees", "photo"].forEach(function(id, n){ if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", (n === 0) === on ? "none" : "visible"); });
+  ["ring-line", "ring-glow", "ring-solid", "photo"].forEach(function(id, n){ if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", (n === 0) === on ? "none" : "visible"); });
   try { if (on){ map.setMaxPitch(89); map.setVerticalFieldOfView(GVFOV); }
     else { map.setVerticalFieldOfView(9); map.jumpTo({center:[s.center[1], s.center[0]], zoom:15.7, pitch:57, bearing:-28}); map.setMaxPitch(70); map.touchZoomRotate.enableRotation(); } } catch(e){}
 }
@@ -1620,41 +1621,17 @@ function gvLabels(){   // each ring named where it first crosses the line of sig
   var put = []; picks.sort(function(a, b){ return a[0] - b[0]; }).forEach(function(k){ var g = ll(k[1][0], k[1][1]), sp = AXO.map.project([g[1], g[0]]); if (put.some(function(o){ return Math.abs(o.y - sp.y) < 26 && Math.abs(o.x - sp.x) < 84; })) return; put.push(sp); GV.lab.push(amark(g, k[2] + " dBA", "sn", "center")); });
 }
 var TREEC = ["#7fa56f", "#8db27c", "#6f9a68", "#98b985"];
-function hash2(i, j){ var x = Math.sin(i * 127.1 + j * 311.7) * 43758.5453; return x - Math.floor(x); }
 function hexLL(e, s, r, rot){ var o = []; for (var i = 0; i < 6; i++){ var a = rot + i * 1.0472; o.push(ll(e + Math.cos(a) * r, s + Math.sin(a) * r)); } return o; }
-function treeAt(out, e, s, u, base, lite){   // a tree as two stacked prisms on a trunk; u, from 0 to 1, sets its size and its green
+function treeAt(out, e, s, u, base){   // a planted tree as two stacked prisms on a trunk; u, from 0 to 1, sets its size and its green
   var r = 2.4 + u * 2.2, h = 7 + ((u * 7.3) % 1) * 5, c = TREEC[Math.floor(u * 3.999)], b = base || 0;
-  if (!lite) out.push(poly(hexLL(e, s, .4, 0), {h:b + h * .34, b:b, c:"#8b7b68"}));
-  out.push(poly(hexLL(e, s, r, u * 6), {h:b + h * .76, b:b + h * .3, c:c}), poly(hexLL(e, s, r * .6, u * 6 + .5), {h:b + h, b:b + h * .76, c:c}));
+  out.push(poly(hexLL(e, s, .4, 0), {h:b + h * .34, b:b, c:"#8b7b68"}), poly(hexLL(e, s, r, u * 6), {h:b + h * .76, b:b + h * .3, c:c}), poly(hexLL(e, s, r * .6, u * 6 + .5), {h:b + h, b:b + h * .76, c:c}));
 }
 function beltTrees(out, a, b, w, base, seed){   // a planted belt as trees: about one for every 7 m square, fewer in a very large belt
   var len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, step = Math.max(7, Math.sqrt(len * w / 500)), nx = Math.max(1, Math.round(len / step)), nz = Math.max(1, Math.round(w / step)), R = rng(seed), ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len;
   for (var i = 0; i < nx; i++) for (var j = 0; j < nz; j++){ var t = (i + .2 + R() * .6) / nx * len, o = ((j + .2 + R() * .6) / nz - .5) * w; treeAt(out, a[0] + ux * t - uz * o, a[1] + uz * t + ux * o, R(), base); }
 }
-function gvWoods(){   // woods as trees: where OpenStreetMap maps woodland near the eye, one tree for each 26 m square, placed at random inside it
-  var map = AXO.map; if (!gvOn() || !map || !GV.pos || !map.getSource("omt")) return;
-  if (GV.treeSite !== ST.site){ GV.treeSite = ST.site; GV.trees = {}; GV.nTrees = 0; }
-  var G = 26, R = 1500, MAX = 5000, q = GV.pos, c0 = S().center, mx = MXs(), fs, added = 0;
-  try { fs = map.querySourceFeatures("omt", {sourceLayer:"landcover"}); } catch(e){ return; }
-  (fs || []).forEach(function(f){ if (!f.properties || f.properties["class"] !== "wood" || GV.nTrees >= MAX) return; var g = f.geometry, polys = !g ? [] : g.type === "Polygon" ? [g.coordinates] : g.type === "MultiPolygon" ? g.coordinates : [];
-    polys.forEach(function(pl){ if (!pl.length) return; var rings = pl.map(function(r){ return r.map(function(p){ return [(p[0] - c0[1]) * mx, (c0[0] - p[1]) * MY]; }); }), x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
-      rings[0].forEach(function(p){ x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); z0 = Math.min(z0, p[1]); z1 = Math.max(z1, p[1]); });
-      x0 = Math.max(x0, q[0] - R); x1 = Math.min(x1, q[0] + R); z0 = Math.max(z0, q[1] - R); z1 = Math.min(z1, q[1] + R);
-      for (var i = Math.ceil(x0 / G); i * G <= x1; i++) for (var j = Math.ceil(z0 / G); j * G <= z1; j++){ var k = i + "," + j; if (GV.trees[k] || GV.nTrees >= MAX) continue;
-        var u = hash2(i, j), e = i * G + (u - .5) * G * .8, z = j * G + (((u * 13.7) % 1) - .5) * G * .8;
-        if (!inPoly([e, z], rings[0]) || rings.slice(1).some(function(h){ return inPoly([e, z], h); })) continue;
-        GV.trees[k] = [e, z, (u * 5.3) % 1]; GV.nTrees++; added++; } }); });
-  if (added) gvTreeData();
-}
-function gvTreeData(){   // the trees stand aside where the plant is
-  var map = AXO.map, out = [], sc = AXO.sc; if (!map || !map.getSource("trees")) return;
-  for (var k in GV.trees){ var t = GV.trees[k]; if (sc && sc.src.some(function(so){ return Math.hypot(t[0] - so.p[0], t[1] - so.p[1]) < 75; })) continue; treeAt(out, t[0], t[1], t[2], 0, true); }
-  map.getSource("trees").setData(gj(out));
-}
-function gvSettle(){   // the eye has stopped: name the rings, bring the residents and the woods of the ground now in sight
-  var map = AXO.map; if (!map || !gvOn() || !GV.pos) return; gvLabels(); gvShow(); moreBlocks();
-  var run = function(){ if (!GV.pos) return; var key = ST.site + "|" + Math.round(GV.pos[0] / 150) + "," + Math.round(GV.pos[1] / 150) + "," + Math.round(GV.b / 25); if (key !== GV.woodKey){ GV.woodKey = key; gvWoods(); } };
-  var n = 0; (function wait(){ if (!AXO.map || !gvOn()) return; if ((map.areTilesLoaded && map.areTilesLoaded()) || n++ > 25) run(); else setTimeout(wait, 400); })();
+function gvSettle(){   // the eye has stopped: name the rings and bring the residents of the ground now in sight
+  if (!AXO.map || !gvOn() || !GV.pos) return; gvLabels(); gvShow(); moreBlocks();
 }
 function gvGo(q, d){ if (!GV.pos) return; GV.from = GV.pos.slice(); GV.to = q; GV.t0 = performance.now(); GV.dur = Math.max(500, Math.min(2200, d * 3.5)); clearTimeout(GV.ct); GV.ct = 0; AXO.hold = GV.t0 + 6000; }   // walk there
 function gvAhead(m){ var p = GV.to || GV.pos, br = GV.b * Math.PI / 180; if (p) gvGo([p[0] + Math.sin(br) * m, p[1] - Math.cos(br) * m], Math.abs(m)); }
@@ -1727,7 +1704,7 @@ function axoInit(stage, light){
   var ac = AXO.ag = document.createElement("canvas"); ac.className = "aagents"; ac.setAttribute("aria-hidden", "true"); map.getCanvasContainer().appendChild(ac);
   var sk = AXO.sky = document.createElement("div"); sk.className = "gsky"; sk.setAttribute("aria-hidden", "true"); sk.innerHTML = "<i></i>"; el.appendChild(sk); var hzd = AXO.haze = document.createElement("div"); hzd.className = "ghaze"; hzd.setAttribute("aria-hidden", "true"); el.appendChild(hzd); gvHands(map);
   map.on("load", function(){
-    map.addSource("site", {type:"geojson", data:gj([])}); map.addSource("ring", {type:"geojson", data:gj([])}); map.addSource("dc", {type:"geojson", data:gj([])}); map.addSource("trees", {type:"geojson", data:gj([])});
+    map.addSource("site", {type:"geojson", data:gj([])}); map.addSource("ring", {type:"geojson", data:gj([])}); map.addSource("dc", {type:"geojson", data:gj([])});
     map.addSource("photo", {type:"raster", tiles:["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize:256, maxzoom:19, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"});
     var under = map.getLayer("bld") ? "bld" : undefined;   // flat things go under the raised ones
     map.addLayer({id:"photo", type:"raster", source:"photo", layout:{visibility:"none"}, paint:{"raster-fade-duration":0}}, under);   // from the ground the land is the aerial photograph, lying flat; if it does not load, the drawn ground stays
@@ -1736,7 +1713,6 @@ function axoInit(stage, light){
     map.addLayer({id:"ring-solid", type:"line", source:"ring", layout:{visibility:"none"}, paint:{"line-color":"#e069c9", "line-width":3.4, "line-opacity":.9, "line-opacity-transition":{duration:0}}}, under);
     map.addLayer({id:"ring-line", type:"line", source:"ring", paint:{"line-color":"#7d3a6c", "line-width":1.8, "line-dasharray":[3, 3]}}, under);
     map.addLayer({id:"site-line", type:"line", source:"site", paint:{"line-color":"#1c2a28", "line-width":2.2, "line-dasharray":[5, 4]}}, under);
-    map.addLayer({id:"trees", type:"fill-extrusion", source:"trees", layout:{visibility:"none"}, paint:{"fill-extrusion-color":["get", "c"], "fill-extrusion-height":["get", "h"], "fill-extrusion-base":["get", "b"], "fill-extrusion-opacity":1}});
     map.addLayer({id:"dc", type:"fill-extrusion", source:"dc", paint:{"fill-extrusion-color":["get", "c"], "fill-extrusion-height":["get", "h"], "fill-extrusion-base":["get", "b"], "fill-extrusion-opacity":1}});
     AXO.ready = true; axoSync();
   });
@@ -1766,7 +1742,7 @@ function axoSync(){   // everything that follows the table: the blocks, the ring
   var ql = ll(q[0], q[1]); AXO.you.setLngLat([ql[1], ql[0]]); AXO.live = null;
   if (GV.mode !== gon){ GV.mode = gon; gvMode(); }
   if (gon){ var ek = ST.site + "|" + q[0] + "," + q[1]; if (GV.earKey !== ek || !GV.pos){ GV.earKey = ek; GV.pos = [q[0], q[1]]; GV.to = null; }   // the eye follows the listener, also when another screen moves it
-    if (GV.auto && nearSrc(GV.pos, sc) > 60) GV.b = gvFace(GV.pos); gvCam(); gvLabels(); gvTreeData(); } else { (GV.lab || []).forEach(function(m){ m.remove(); }); GV.lab = []; }
+    if (GV.auto && nearSrc(GV.pos, sc) > 60) GV.b = gvFace(GV.pos); gvCam(); gvLabels(); } else { (GV.lab || []).forEach(function(m){ m.remove(); }); GV.lab = []; }
   gvShow();
   loadBlocks(); axoHear(); axoEar(); axoKey();
   if (!AXO.raf) AXO.raf = requestAnimationFrame(axoFrame);
@@ -1827,7 +1803,7 @@ function axoKey(){
     '<p class="anote">' + (more > 0 ? "About " + about(more * AXO.per) + " more residents hear it than with the conventional campus." : more < 0 ? "About " + about(-more * AXO.per) + " fewer residents hear it than with the conventional campus." : "The same residents hear it as with the conventional campus.") + '</p>' +
     '<p class="asrc">1 dot = ' + AXO.per + (AXO.per === 1 ? " resident" : " residents") + ' · 2020 Census blocks, for the ground seen so far.</p>';
   if (S().open) o += '<div class="arow"><span>Size</span>' + sw("data-big", [["ref", "Reference", !ST.big], ["big", "600 MW", ST.big]]) + '</div>' + (ST.big ? '<p class="asrc">What if: 600 MW heard as 23 reference plants in one place, 14 dB louder.</p>' : '');
-  o += '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the aerial photograph, lying flat; buildings and woods stand up where OpenStreetMap maps them, each tree placed at random inside its wood. The sky is scenery. Only trees planted on the table count for the sound.</p>' : '') + '<p class="asrc imh">Press H to hide or show the panels.</p>';
+  o += '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the aerial photograph, lying flat, so trees and roofs are seen as they are from the air; buildings stand up where OpenStreetMap has them. The sky is scenery.</p>' : '') + '<p class="asrc imh">Press H to hide or show the panels.</p>';
   el.innerHTML = o;
 }
 function axoFrame(ts){
@@ -2155,7 +2131,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-004544";
+var BUILD = "20261123-004842";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
