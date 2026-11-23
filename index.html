@@ -221,7 +221,25 @@ a.lab{text-decoration:none}
 .sites button{font:inherit;font-size:.82rem;font-weight:700;color:var(--muted);background:none;border:0;border-radius:999px;padding:.3rem .7rem;cursor:pointer}
 .sites button[aria-pressed="true"]{background:var(--ink);color:#fff}
 .vadd,.vpanel{position:absolute;z-index:2;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 6px 22px rgba(20,40,34,.16)}
-.vadd{left:.9rem;top:4.6rem;width:21rem;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;margin:0}
+.vleft{position:absolute;z-index:2;left:.9rem;top:4.6rem;bottom:.9rem;width:21rem;display:flex;flex-direction:column;gap:.6rem;overflow:auto;pointer-events:none;scrollbar-width:thin}
+.vleft > *{pointer-events:auto;flex:none}
+.vadd{position:static;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;margin:0}
+.vfilt{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 6px 22px rgba(20,40,34,.16);padding:.8rem .9rem;display:flex;flex-direction:column;gap:.5rem}
+.vfh{display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap} .vfh b{font-size:1.05rem}
+.vchips{display:flex;flex-wrap:wrap;gap:4px}
+.vchip{font:inherit;font-size:.78rem;font-weight:700;display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);padding:.22rem .6rem;cursor:pointer}
+.vchip b{font-weight:700;color:var(--muted)} .vchip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff} .vchip[aria-pressed="true"] b{color:#cfd8d4}
+.vlab{font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.vmeta{display:flex;gap:.4rem;align-items:center} .vmeta input,.vmeta select{font:inherit;font-size:.82rem;flex:1 1 0;min-width:0;border:1px solid var(--line);border-radius:9px;padding:.35rem .5rem;background:#fff;color:var(--ink)}
+.vtags{display:flex;flex-wrap:wrap;gap:4px;padding:.5rem .65rem 0}
+.vtag{font-size:.66rem;font-weight:700;letter-spacing:.02em;border-radius:999px;padding:.08rem .5rem;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.vtag.net{background:#1c2a28;color:#fff} .vtag.syn{background:#f3e7c9;color:#7a5606} .vtag.ses{background:var(--accent-soft, #dcebe5);color:#2f6957} .vtag.tp{background:none;border:1px solid var(--line)}
+.vcard .vtags + p{padding-top:.3rem}
+.vsum{margin:0;padding:0 .9rem .6rem;font-size:.76rem;font-weight:600;color:var(--muted)}
+.vdot{display:inline-block;width:.7rem;height:.7rem;border-radius:50%;margin-right:.3rem;vertical-align:-1px;background:#5d6d69} .vdot.r{background:#fff;border:2.5px solid #5d6d69}
+.leaflet-vheat-pane{filter:blur(16px)}
+.stage[data-view="voices"] .leaflet-bottom.leaflet-left{left:22.4rem}
+.vleft .vadd textarea{height:3.7rem} .vleft .vadd{gap:.5rem;padding:.8rem .9rem}
 .vadd h3{margin:0;font-size:1.15rem}
 .stances{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
 .stances label{position:relative;display:flex}
@@ -1319,15 +1337,67 @@ function embedHTML(img, alt, title){ return '<div class="card stage embed"><img 
 // The window stays open for the people in the room: a position, one sentence, a picture if they wish, and a pin. What they leave is kept on this device only.
 var STANCE = {support:["Support", "#3b7a66"], cond:["With conditions", "#b07a12"], concern:["Concerned", "#b5534a"]};
 var VOICES = { tx:[
-  {s:"concern", t:"Care homes beside the site look after “the most vulnerable in our community.”", src:"Resident at the council meeting · BCS Chronicle", ll:[30.5717751, -96.2689578]},
-  {s:"concern", t:"The petition against the sale cites noise pollution and water use.", src:"Residents' petition · Chron", ll:[30.57223, -96.26517]},
-  {s:"concern", t:"The sale is being rushed, and the neighbors were not asked.", src:"Residents near Midtown · KBTX", ll:[30.5707219, -96.2647921]},
-  {s:"concern", t:"450 households bought into the Midtown plan; a data center could change it completely.", src:"Developer of Midtown · KBTX", ll:[30.56828, -96.26215]},
-  {s:"concern", t:"The business park as first platted would likely bring hundreds more jobs.", src:"A council member · TexAgs forum", ll:[30.57565, -96.25954]},
-  {s:"cond", t:"City staff recommended the sale, while listing power, water and noise as challenges.", src:"City of College Station · KBTX", ll:[30.57367, -96.26142]},
-  {s:"support", t:"The sale would bring the city about $30 million.", src:"Terms of the contract · KXXV", ll:[30.57277, -96.25808]},
-  {s:"support", t:"The project is meant for AI computing, not Bitcoin mining.", src:"The company's CEO · KBTX", ll:[30.57124, -96.26016]}
+  {s:"concern", tp:["care"], t:"Care homes beside the site look after “the most vulnerable in our community.”", src:"Resident at the council meeting · BCS Chronicle", ll:[30.5717751, -96.2689578]},
+  {s:"concern", tp:["noise", "water"], t:"The petition against the sale cites noise pollution and water use.", src:"Residents' petition · Chron", ll:[30.57223, -96.26517]},
+  {s:"concern", tp:["process"], t:"The sale is being rushed, and the neighbors were not asked.", src:"Residents near Midtown · KBTX", ll:[30.5707219, -96.2647921]},
+  {s:"concern", tp:["land"], t:"450 households bought into the Midtown plan; a data center could change it completely.", src:"Developer of Midtown · KBTX", ll:[30.56828, -96.26215]},
+  {s:"concern", tp:["money"], t:"The business park as first platted would likely bring hundreds more jobs.", src:"A council member · TexAgs forum", ll:[30.57565, -96.25954]},
+  {s:"cond", tp:["power", "water", "noise"], t:"City staff recommended the sale, while listing power, water and noise as challenges.", src:"City of College Station · KBTX", ll:[30.57367, -96.26142]},
+  {s:"support", tp:["money"], t:"The sale would bring the city about $30 million.", src:"Terms of the contract · KXXV", ll:[30.57277, -96.25808]},
+  {s:"support", tp:["future"], t:"The project is meant for AI computing, not Bitcoin mining.", src:"The company's CEO · KBTX", ll:[30.57124, -96.26016]}
 ] };
+// A synthetic sample, so that the map can be read with many voices before there are any to collect. Every remark below is invented for this page:
+// none is a real post, and together they are not a survey. Each is shown as synthetic wherever it appears. They are spread over six kinds of
+// social media and web, eight topics and the three positions (more concerned than supportive, as the reported voices are), and set at random
+// around the landmarks of the map, not where anyone lives. What people add in a session is kept apart from them and is never mixed in.
+var NETS = [["x", "X", 20], ["fb", "Facebook", 22], ["rd", "Reddit", 14], ["nd", "Nextdoor", 20], ["ig", "Instagram", 8], ["wf", "Web forum", 16]];
+var TOPICS = [["noise", "Noise"], ["water", "Water"], ["power", "Power and the grid"], ["money", "Jobs and money"], ["process", "Process and say"], ["land", "Land and the Midtown plan"], ["care", "Care homes and schools"], ["future", "AI, heat and what comes after"]];
+var SYN = {
+  noise:{concern:["You can already hear the highway. I do not want a hum on top of it every night.", "Cooling fans run day and night. Who measures the noise once it is built?", "Low, steady noise carries further than the studies say.", "My kid's school is close by. Constant noise is not a small thing."],
+    cond:["Write a noise limit into the contract, measured at the fence, and I could live with it.", "Put the loud equipment behind walls and show us the numbers first.", "Fine, as long as the generators are only tested in the daytime."],
+    support:["A modern data center is quieter than the traffic we already have.", "I lived near one in another city. After a month you forget it is there."]},
+  water:{concern:["We get drought warnings most summers. Where does the cooling water come from?", "Water for servers while we are asked to cut back on our lawns?", "Nobody has told us how many gallons a day.", "The aquifer is not a free resource for a company from out of town."],
+    cond:["Use reclaimed water or dry cooling and I am listening.", "Publish the water use every month. Then we can talk.", "OK with it if the city caps the water in the contract."],
+    support:["Closed-loop cooling uses far less water than people think.", "Industry has always used water here. This is nothing new."]},
+  power:{concern:["600 MW is a huge load. What happens to our bills?", "After the 2021 winter storm I do not trust the grid with one more giant customer.", "Who pays for the new substation and the lines?", "Rows of backup diesel generators next to homes. Really?"],
+    cond:["If they bring their own power and our rates do not go up, maybe.", "Make them pay for every grid upgrade they need.", "Only if it runs on new solar or wind, not on what we already have."],
+    support:["A big, steady customer can help pay for a stronger grid.", "An energy company is behind this. They should know how to power it."]},
+  money:{concern:["$30 million once, and then what? A building full of servers hires very few people.", "The business park was meant to bring hundreds of jobs. This brings a handful.", "I expect tax breaks for them and higher bills for us.", "Sell the land once and it is gone for good."],
+    cond:["Tie the sale to local hiring and training, in writing.", "Put part of the money into a fund the neighborhood controls.", "I would support it with a yearly payment to the schools."],
+    support:["$30 million for land that is sitting empty is a good deal.", "It grows the tax base without adding traffic or crowding the schools."]},
+  process:{concern:["We heard about it just before the vote. That is not how you treat neighbors.", "Too fast. The council should slow down and ask us.", "Why was the contract not discussed in public first?", "I left the meeting with more questions than answers."],
+    cond:["Hold real workshops first, then decide.", "Give us the studies and three months to read them.", "I am not against it. I am against being told after the fact."],
+    support:["The council followed its rules. Some people just do not like the answer.", "Staff studied it and recommended it. I trust that."]},
+  land:{concern:["We bought here because of the Midtown plan: shops, trails, offices. Not this.", "A windowless box on the best land in the park.", "It would sit between our homes and everything else.", "Once one industrial site goes in, the rest follows."],
+    cond:["Put it at the far end of the tract with a wide green buffer.", "Keep the trails and the frontage for shops and I am fine with it.", "Smaller, lower and further from the homes: then yes."],
+    support:["It is a business park. A data center is a business.", "Better this than another strip mall and its traffic."]},
+  care:{concern:["There is a retirement community right there. Did anyone ask them?", "People in a care home cannot just move away from the noise.", "Two schools a short drive away. Diesel exhaust on test days worries me.", "The people who live closest have the least say."],
+    cond:["Protect the closest homes first: windows, insulation, a number to call.", "If the care homes get a buffer and a say, OK.", "Give the schools a seat at the table."],
+    support:["It is cleaner than a factory and safer than a truck depot.", "No trucks, no smells, no night shifts driving through."]},
+  future:{concern:["All this for AI chatbots? Not worth our water and power.", "The heat it throws off has to go somewhere.", "What happens to the building when the AI boom ends?", "Lights on all night, every night."],
+    cond:["Reuse the waste heat for something the community can use.", "Require a plan for the site if they leave.", "Dark-sky lighting and a real line of trees, then fine."],
+    support:["This is the infrastructure of the next decade. Better here than somewhere else.", "The university could use the computing next door."]}
+};
+var SYNC = {};
+function synthetic(){   // the same sample every time: the places and the networks are drawn from a fixed seed
+  var site = ST.site; if (site !== "tx") return []; if (SYNC[site]) return SYNC[site];
+  var seed = 20261123, s = S(), out = [], tot = NETS.reduce(function(a, n){ return a + n[2]; }, 0);
+  function rnd(){ seed = (seed + 0x6D2B79F5) | 0; var t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }
+  var anchors = s.places.map(function(q){ return [q[0].split(" · ")[0], q[1], q[2]]; }).concat([["the proposed site", s.center[0], s.center[1]], ["the proposed site", s.center[0] + .0021, s.center[1] - .0016]]);
+  TOPICS.forEach(function(tp){ Object.keys(STANCE).forEach(function(st){ (SYN[tp[0]][st] || []).forEach(function(text){
+    var r = rnd() * tot, net = NETS[0]; for (var i = 0; i < NETS.length; i++){ if (r < NETS[i][2]){ net = NETS[i]; break; } r -= NETS[i][2]; }
+    var a = anchors[Math.floor(rnd() * anchors.length)], d = 50 + rnd() * 210, ang = rnd() * Math.PI * 2;
+    out.push({s:st, t:text, syn:true, net:net[0], tp:[tp[0]], near:a[0], ll:[+(a[1] + d * Math.cos(ang) / 111320).toFixed(6), +(a[2] + d * Math.sin(ang) / (111320 * Math.cos(a[1] * Math.PI / 180))).toFixed(6)]}); }); }); });
+  for (var k = out.length - 1; k > 0; k--){ var j = Math.floor(rnd() * (k + 1)), x = out[k]; out[k] = out[j]; out[j] = x; }
+  return SYNC[site] = out;
+}
+var VF = {kind:"all", net:null, topic:"", heat:true};   // what the map and the list show
+function kindOf(v){ return v.syn ? "social" : v.src ? "press" : "session"; }
+function netName(k){ var n = NETS.filter(function(x){ return x[0] === k; })[0]; return n ? n[1] : ""; }
+function topicName(k){ var n = TOPICS.filter(function(x){ return x[0] === k; })[0]; return n ? n[1] : ""; }
+function voicesAll(){ return visitors().slice().reverse().concat(VOICES[ST.site] || [], synthetic()); }   // newest session voices first, then the reported ones, then the sample
+function inTopic(v){ return !VF.topic || (v.tp || []).indexOf(VF.topic) >= 0; }
+function shown(v){ var k = kindOf(v); return inTopic(v) && (VF.kind === "all" || VF.kind === k) && (!VF.net || (k === "social" && v.net === VF.net)); }
 var VO = {map:null, el:null, live:null, layer:null, pts:[], dline:null, site:null, img:null, armed:0, about:null};   // pts: the marks the visitor has put on the map for the voice being written
 var MARKS = ["Tap the map to mark the place you mean, or several places to link them. No mark: your voice goes to the list only.", "One place marked. Tap another to link them, or tap a mark to remove it.", "Places linked. Tap a mark to remove it."];
 function visitors(){ try { var o = JSON.parse(localStorage.getItem("dcscope-voices") || "{}"); return o && Array.isArray(o[ST.site]) ? o[ST.site].filter(function(v){ return v && STANCE[v.s] && typeof v.t === "string"; }) : []; } catch(e){ return []; } }
@@ -1339,17 +1409,32 @@ function ptsOf(v){ return (Array.isArray(v.pts) ? v.pts : [v.ll, v.ll2]).filter(
 function whereOf(v){ var q = ptsOf(v), n = v.names || []; if (!q.length) return "The whole project"; if (q.length === 1) return n[0] ? "At " + n[0] : "On the map";
   return q.map(function(_, i){ return n[i] || (i ? "another place" : "One place"); }).join(" ↔ "); }
 function vcard(v){
-  return '<div class="vcard" style="--c:' + STANCE[v.s][1] + '">' + (okPic(v.img) ? '<img src="' + v.img + '" alt="">' : '') + '<p>' + esc(v.t) + '</p><small>' + STANCE[v.s][0] + ' · ' + esc(v.src || "Visitor · " + whereOf(v) + (v.about ? " · on a closed scenario" : "")) + '</small></div>'; }
+  var k = kindOf(v), tp = (v.tp || []).map(topicName).filter(function(x){ return x; }).join(", "),
+    tag = k === "social" ? '<span class="vtag net">' + netName(v.net) + '</span><span class="vtag syn">Synthetic</span>' : k === "press" ? '<span class="vtag">Reported</span>' : '<span class="vtag ses">Session</span>',
+    from = k === "social" ? "invented for this sample · near " + v.near : k === "press" ? v.src : (v.sess ? v.sess + " · " : "") + whereOf(v) + (v.about ? " · on a closed scenario" : "");
+  return '<div class="vcard" style="--c:' + STANCE[v.s][1] + '">' + (okPic(v.img) ? '<img src="' + v.img + '" alt="">' : '') + '<div class="vtags">' + tag + (tp ? '<span class="vtag tp">' + esc(tp) + '</span>' : '') + '</div><p>' + esc(v.t) + '</p><small>' + STANCE[v.s][0] + ' · ' + esc(from) + '</small></div>'; }
+function sessName(){ try { return (localStorage.getItem("dcscope-session") || "").slice(0, 40); } catch(e){ return ""; } }
 function voicesHTML(){
-  return '<div class="card stage" data-view="voices"><form class="vadd" id="vadd" autocomplete="off"><h3>Add your voice</h3>' +
+  return '<div class="card stage" data-view="voices"><div class="vleft"><form class="vadd" id="vadd" autocomplete="off"><h3>Add your voice</h3>' +
     '<p class="vhint" id="vwhere">' + MARKS[Math.min(2, VO.pts.length)] + '</p>' +
     '<div class="stances" role="radiogroup" aria-label="Your position">' + Object.keys(STANCE).map(function(k){ return '<label style="--c:' + STANCE[k][1] + '"><input type="radio" name="vs" value="' + k + '"><span>' + STANCE[k][0] + '</span></label>'; }).join("") + '</div>' +
     '<textarea name="vt" maxlength="160" placeholder="One sentence: your opinion" aria-label="Your sentence"></textarea>' +
+    '<div class="vmeta"><input name="vsess" type="text" maxlength="40" value="' + esc(sessName()) + '" placeholder="Session, e.g. Workshop 1" aria-label="The session this voice is added in"><select name="vtopic" aria-label="Topic"><option value="">Topic (optional)</option>' + TOPICS.map(function(t){ return '<option value="' + t[0] + '">' + t[1] + '</option>'; }).join("") + '</select></div>' +
     '<div class="vprev" id="vprev" hidden><img alt="The picture drawn from your sentence"></div>' +
     '<div class="vrow">' + micBtn("voice") + '<button class="vgen" type="button" data-vg disabled>Generate image</button><button class="vgo" type="submit" disabled>Add</button></div>' +
-    '<p class="vhint" id="vhint">The image is optional. To draw it, your sentence is sent to an image service; the rest stays on this device.</p></form>' +
+    '<p class="vhint" id="vhint">Filed under Sessions. The image is optional: to draw it, your sentence is sent to an image service. The rest stays on this device.</p></form>' +
+    '<div class="vfilt" id="vfilt"></div></div>' +
     '<div class="vpanel"><div class="hd">Voices · ' + (ST.site === "tx" ? "College Station" : S().name) + '</div><div class="vbody" id="vbody"></div>' +
-    '<div class="vfoot"><button type="button" data-vx="export">Export</button><button type="button" data-vx="clear">Clear visitors</button></div></div></div>';
+    '<div class="vfoot"><button type="button" data-vx="export">Export sessions</button><button type="button" data-vx="clear">Clear sessions</button></div></div></div>';
+}
+function vfiltHTML(all){   // what is on the map, by kind, by network and by topic; counts are for the topic chosen
+  var inT = all.filter(inTopic), n = {all:inT.length, press:0, social:0, session:0}, nets = {}; inT.forEach(function(v){ var k = kindOf(v); n[k]++; if (k === "social") nets[v.net] = (nets[v.net] || 0) + 1; });
+  function chip(k, label, c, on, attr){ return '<button type="button" class="vchip" ' + attr + '="' + k + '" aria-pressed="' + on + '">' + label + '<b>' + c + '</b></button>'; }
+  return '<div class="vfh"><b>On the map</b>' + (n.social ? '<span class="vtag syn">Synthetic sample · not a survey</span>' : '') + '</div>' +
+    '<div class="vchips" role="group" aria-label="Kind of voice">' + chip("all", "All", n.all, VF.kind === "all" && !VF.net, "data-vk") + chip("press", "Reported", n.press, VF.kind === "press", "data-vk") + chip("social", "Social media", n.social, VF.kind === "social" && !VF.net, "data-vk") + chip("session", "Sessions", n.session, VF.kind === "session", "data-vk") + '</div>' +
+    '<small class="vlab">Social media and web · synthetic</small><div class="vchips" role="group" aria-label="Network">' + NETS.map(function(x){ return chip(x[0], x[1], nets[x[0]] || 0, VF.net === x[0], "data-vn"); }).join("") + '</div>' +
+    '<div class="vmeta"><select data-vtopic aria-label="Topic"><option value="">All topics</option>' + TOPICS.map(function(t){ return '<option value="' + t[0] + '"' + (VF.topic === t[0] ? " selected" : "") + '>' + t[1] + '</option>'; }).join("") + '</select><button type="button" class="vchip" data-vheat aria-pressed="' + VF.heat + '">Heat</button></div>' +
+    '<p class="vhint"><i class="vdot f"></i>Filled pins: reported in the press, or added in a session. <i class="vdot r"></i>Ringed pins: the synthetic sample, invented to show the map with many voices. Not real posts; set at random around landmarks, not where anyone lives.</p>';
 }
 function arc(a, b){   // a gentle curve between two places
   var mx = (a[0] + b[0]) / 2 + (b[1] - a[1]) * .16, my = (a[1] + b[1]) / 2 - (b[0] - a[0]) * .16, pts = [];
@@ -1378,6 +1463,7 @@ function voDraw(stage){
     VO.raster = greyTiles().addTo(map); VO.tint = tintOn(map);
     lightStyle().then(function(st){ lightLayer(st).addTo(map); map.removeLayer(VO.raster); map.removeLayer(VO.tint); }).catch(function(){});
     var cp = map.createPane("context"); cp.style.zIndex = 350; cp.style.pointerEvents = "none";
+    var hp = map.createPane("vheat"); hp.style.zIndex = 380; hp.style.pointerEvents = "none"; VO.hrend = L.svg({pane:"vheat", padding:.6}); VO.heat = L.layerGroup().addTo(map);   // the heat lies under the pins, blurred
     L.control.scale({metric:false, position:"bottomleft"}).addTo(map); VO.live = L.layerGroup().addTo(map);
     map.on("click", function(e){ voMark(e.latlng); });
   } else if (VO.el.parentNode !== stage) stage.insertBefore(VO.el, stage.firstChild);
@@ -1394,11 +1480,15 @@ function voDraw(stage){
   panSync(VO.map);
 }
 function voRefresh(){
-  if (!VO.map) return; var g = VO.live, mine = visitors().slice().reverse(), all = mine.concat(VOICES[ST.site] || []), n = {support:0, cond:0, concern:0}; g.clearLayers();
-  all.forEach(function(v){ n[v.s]++; var q = ptsOf(v); if (!q.length) return; var c = STANCE[v.s][1], pop = [vcard(v), {maxWidth:260, className:"vpop"}], line = [];
+  if (!VO.map) return; var g = VO.live, all = voicesAll(), list = all.filter(shown), n = {support:0, cond:0, concern:0}, kn = {press:0, social:0, session:0}; g.clearLayers(); VO.heat.clearLayers();
+  list.slice().reverse().forEach(function(v){ var k = kindOf(v); n[v.s]++; kn[k]++; var q = ptsOf(v); if (!q.length) return; var c = STANCE[v.s][1], pop = [vcard(v), {maxWidth:260, className:"vpop"}], line = [];   // drawn last to first, so that session voices lie on top
+    if (VF.heat) q.forEach(function(a){ L.circleMarker(a, {pane:"vheat", renderer:VO.hrend, radius:k === "social" ? 34 : 42, stroke:false, fillColor:c, fillOpacity:.2, interactive:false}).addTo(VO.heat); });
     if (q.length > 1){ q.forEach(function(b, i){ if (i) line = line.concat(arc(q[i - 1], b)); }); L.polyline(line, {color:c, weight:4, opacity:.85}).bindPopup(pop[0], pop[1]).addTo(g); }
-    q.forEach(function(a){ L.circleMarker(a, {radius:q.length > 1 ? 7 : v.src ? 8 : 10, color:"#fbfdfc", weight:2.5, fillColor:c, fillOpacity:.95}).bindPopup(pop[0], pop[1]).addTo(g); }); });
-  var body = $("vbody"); if (body) body.innerHTML = '<div class="vcount">' + Object.keys(STANCE).map(function(k){ return '<div style="--c:' + STANCE[k][1] + '"><b>' + n[k] + '</b><span>' + STANCE[k][0] + '</span></div>'; }).join("") + '</div><div class="vlist">' + closedAll().slice().reverse().map(ccardHTML).join("") + all.map(vcard).join("") + '</div>';
+    q.forEach(function(a){ L.circleMarker(a, k === "social" ? {radius:5.5, color:c, weight:3, fillColor:"#fbfdfc", fillOpacity:1} : {radius:q.length > 1 ? 7 : k === "press" ? 8 : 10, color:"#fbfdfc", weight:2.5, fillColor:c, fillOpacity:.95}).bindPopup(pop[0], pop[1]).addTo(g); }); });
+  var f = $("vfilt"); if (f) f.innerHTML = vfiltHTML(all);
+  var parts = [kn.press ? kn.press + " reported in the press" : "", kn.social ? kn.social + " synthetic" : "", kn.session ? kn.session + " added in sessions" : ""].filter(function(x){ return x; });
+  var body = $("vbody"); if (body) body.innerHTML = '<div class="vcount">' + Object.keys(STANCE).map(function(k){ return '<div style="--c:' + STANCE[k][1] + '"><b>' + n[k] + '</b><span>' + STANCE[k][0] + '</span></div>'; }).join("") + '</div>' +
+    '<p class="vsum">' + (list.length ? list.length + (list.length === 1 ? " voice: " : " voices: ") + parts.join(", ") + "." : "No voice matches what is chosen on the left.") + '</p><div class="vlist">' + closedAll().slice().reverse().map(ccardHTML).join("") + list.map(vcard).join("") + '</div>';
   var w = $("vwhere"), ab = VO.about && closedAll().filter(function(c){ return c.id === VO.about; })[0]; if (w && ab) w.textContent = "About the closed scenario " + scenKey(ab) + ". Mark a place on the map if you mean one.";
 }
 // The picture is drawn from the visitor's sentence by an open image service (Pollinations). Only the sentence is sent.
@@ -1419,23 +1509,28 @@ function generate(f, btn){
 function vready(f){ var t = f.vt.value.trim(); f.querySelector(".vgo").disabled = !(f.vs.value && t); var g = f.querySelector(".vgen"); if (g.textContent !== "Drawing…") g.disabled = !t; }
 document.addEventListener("input", function(ev){ var f = ev.target.closest ? ev.target.closest("#vadd") : null; if (f) vready(f); });
 document.addEventListener("change", function(ev){
+  if (ev.target.hasAttribute && ev.target.hasAttribute("data-vtopic")){ VF.topic = ev.target.value; voRefresh(); return; }
   var f = ev.target.closest ? ev.target.closest("#vadd") : null; if (!f) return; vready(f);
 });
 document.addEventListener("submit", function(ev){
   var f = ev.target; if (!f || f.id !== "vadd") return; ev.preventDefault(); var t = f.vt.value.trim().slice(0, 160); if (!f.vs.value || !t) return;
   var list = visitors();
-  list.push({id:Date.now() + "-" + Math.floor(Math.random() * 1e6), s:f.vs.value, t:t, img:VO.img || null, pts:VO.pts.map(function(o){ var q = o.m.getLatLng(); return [+q.lat.toFixed(6), +q.lng.toFixed(6)]; }), names:VO.pts.map(function(o){ return o.name; }), about:VO.about || null, at:new Date().toISOString()});
+  list.push({id:Date.now() + "-" + Math.floor(Math.random() * 1e6), s:f.vs.value, t:t, img:VO.img || null, pts:VO.pts.map(function(o){ var q = o.m.getLatLng(); return [+q.lat.toFixed(6), +q.lng.toFixed(6)]; }), names:VO.pts.map(function(o){ return o.name; }), about:VO.about || null, sess:(f.vsess.value || "").trim().slice(0, 40) || null, tp:f.vtopic.value ? [f.vtopic.value] : [], at:new Date().toISOString()});
+  try { localStorage.setItem("dcscope-session", (f.vsess.value || "").trim().slice(0, 40)); } catch(e){}
   try { saveVisitors(list); } catch(e){ $("vhint").textContent = "This device is full. Export, then clear, and try again."; return; }
   f.vt.value = ""; [].forEach.call(f.querySelectorAll("input[name=vs]"), function(r){ r.checked = false; }); VO.img = null; var pv = $("vprev"); pv.hidden = true; pv.querySelector("img").removeAttribute("src"); f.querySelector(".vgen").textContent = "Generate image"; vready(f);
-  $("vhint").textContent = "Added. Thank you."; VO.about = null; voUnmark(); voRefresh(); wordsFill();
+  f.vtopic.value = ""; $("vhint").textContent = "Added, under Sessions. Thank you."; VO.about = null; voUnmark(); voRefresh(); wordsFill();
 });
 document.addEventListener("click", function(ev){
+  var T = ev.target, c = T.closest ? T.closest("[data-vk]") : null; if (c){ VF.kind = c.getAttribute("data-vk"); VF.net = null; voRefresh(); return; }
+  if ((c = T.closest ? T.closest("[data-vn]") : null)){ var nk = c.getAttribute("data-vn"); if (VF.net === nk){ VF.net = null; VF.kind = "all"; } else { VF.net = nk; VF.kind = "social"; } voRefresh(); return; }
+  if ((c = T.closest ? T.closest("[data-vheat]") : null)){ VF.heat = !VF.heat; voRefresh(); return; }
   var gb = ev.target.closest ? ev.target.closest("[data-vg]") : null; if (gb){ generate(gb.closest("form"), gb); return; }
   var b = ev.target.closest ? ev.target.closest("[data-vx]") : null; if (!b) return; var list = visitors();
   if (b.getAttribute("data-vx") === "export"){ var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify({site:ST.site, exported:new Date().toISOString(), voices:list}, null, 1)], {type:"application/json"})); a.download = "voices-" + ST.site + ".json"; document.body.appendChild(a); a.click(); a.remove(); return; }
-  if (!list.length){ b.textContent = "No visitors yet"; return; }
-  if (Date.now() - VO.armed > 4000){ VO.armed = Date.now(); b.textContent = "Clear " + list.length + "? Press again"; setTimeout(function(){ if (b.isConnected) b.textContent = "Clear visitors"; }, 4000); return; }
-  VO.armed = 0; saveVisitors([]); b.textContent = "Clear visitors"; voRefresh();
+  if (!list.length){ b.textContent = "Nothing added yet"; return; }
+  if (Date.now() - VO.armed > 4000){ VO.armed = Date.now(); b.textContent = "Clear " + list.length + "? Press again"; setTimeout(function(){ if (b.isConnected) b.textContent = "Clear sessions"; }, 4000); return; }
+  VO.armed = 0; saveVisitors([]); b.textContent = "Clear sessions"; voRefresh();
 });
 window.addEventListener("storage", function(ev){ if (ev.key === "dcscope-voices" || ev.key === "dcscope-closed"){ voRefresh(); wordsFill(); } });
 function sentimentHTML(bare){ if (ST.site !== "mi") return voicesHTML(); return embedHTML("live/sentiment.jpg", "The original Sentiment map: pins and heat for supportive, conditional and concerned remarks, with its filters and discussion list", "The original DataScope. Choose Sentiment map in its bar"); }
@@ -2420,7 +2515,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-172510";
+var BUILD = "20261123-192417";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
