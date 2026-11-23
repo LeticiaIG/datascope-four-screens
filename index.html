@@ -703,7 +703,7 @@ html.checking .app{visibility:hidden}
    the color of its chapter, named, with what it took. The bubble turns amber and says MAX when nothing is left, red when the choices ask for more */
 .measure.simple.film .ph.q.bud{--bc:var(--gain);width:auto;height:auto;border:0;border-radius:0;background:none;gap:.3rem;text-shadow:none}
 .measure.simple.film .ph.q.bud.max{--bc:#ffc928} .measure.simple.film .ph.q.bud.over{--bc:var(--loss)}
-.film .bud svg{display:block;width:min(36rem,56vh);height:auto;overflow:visible;filter:drop-shadow(0 2px 10px #0d0e0f99)}
+.film .bud svg{display:block;width:min(26rem,42vh);height:auto;overflow:visible;filter:drop-shadow(0 2px 10px #0d0e0f99)}
 .film .bud .rg{fill:none;stroke:var(--fg);stroke-width:1.6;stroke-dasharray:5 4} .film .bud .rT{stroke:#4aa3ff} .film .bud .rB{stroke:var(--gain)} .film .bud .rE{stroke:#ffc928}
 .film .bud .ax,.film .bud .tk{stroke:var(--fg);stroke-width:1.2}
 .film .bud .rl{font-family:"Jost","Futura",var(--font);font-size:11.5px;font-weight:500;fill:var(--fg);paint-order:stroke;stroke:#0d0e0f;stroke-width:2.6px;stroke-linejoin:round}
@@ -1945,7 +1945,7 @@ function budBubHTML(i){   // what is left of the budget in the middle; around it
   var rb = rad(q.left0), big = q.over || q.full ? "MAX" : money(q.left0), small = q.over ? "over by " + (q.left0 < 0 ? money(-q.left0) : money(-q.left1) + " a year") : q.full && q.left0 <= 0 ? "of " + money(tot) + " spent" : "left of " + money(tot);
   var note = (outs.length ? '<em>Does not fit: ' + outs.join(", ") + '.</em> ' : '') + (q.left1 < 0 ? '<em>' + money(-q.left1) + ' a year over.</em>' : money(q.left1) + ' of ' + money(q.b[1]) + ' a year left.') + ' Example prices.';
   return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.freeze === "bud" ? " sel" : "") + '" style="--i:' + i + '" data-bud aria-label="The budget, ' + money(tot) + ' upfront. ' + (parts.length ? parts.map(function(p){ return p[1] + " takes " + money(r2(p[2])); }).join(", ") + ". " : "Nothing is spent yet. ") + (q.over ? "The choices ask for more than there is." : q.full ? "Nothing is left." : money(q.left0) + " is left.") + '">' +
-    '<svg viewBox="-150 -110 300 216" aria-hidden="true">' + (n ? '<line class="ax" x1="0" x2="0" y1="-' + R + '" y2="' + (-rb).toFixed(1) + '"/>' : '') + o + '<circle class="bb" r="' + rb.toFixed(1) + '"/><circle class="hl" cx="' + (-rb * .3).toFixed(1) + '" cy="' + (-rb * .34).toFixed(1) + '" r="' + (rb * .42).toFixed(1) + '"/>' +
+    '<svg viewBox="-112 -110 224 216" aria-hidden="true">' + (n ? '<line class="ax" x1="0" x2="0" y1="-' + R + '" y2="' + (-rb).toFixed(1) + '"/>' : '') + o + '<circle class="bb" r="' + rb.toFixed(1) + '"/><circle class="hl" cx="' + (-rb * .3).toFixed(1) + '" cy="' + (-rb * .34).toFixed(1) + '" r="' + (rb * .42).toFixed(1) + '"/>' +
     '<text class="bn" y="2" text-anchor="middle">' + big + '</text><text class="bs" y="14" text-anchor="middle">' + small + '</text></svg><span class="bl">' + note + '</span></button></div>';
 }
 function sayYou(x){   // one bubble, said to the person looking at it
@@ -2969,7 +2969,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-222509";
+var BUILD = "20261123-222628";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
