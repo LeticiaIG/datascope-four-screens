@@ -17,6 +17,8 @@ For a case study that has no original DataScope (Texas), the left wall is a sent
 
 On the Texas table, under Design, the heights of the D2 berm and the D3 walls can be set, and trees, walls and berms that are in none of the four designs can be added with two taps. They enter the sound where you stand and the residents' dots.
 
+**Linked maps (Texas).** The table, the sentiment map and the center wall show the same place. Moving any of the maps by hand (a drag, a zoom) moves the others, and the listener travels the same step, so the wall seen from the ground follows while the map is still being dragged and keeps looking at what the table is centred on. Moving only the listener (dragging the figure, tapping the ground, walking on the wall) changes where the wall stands and leaves the maps where they are, unless the listener ends more than about 2 km from what they show. Each map keeps its own zoom. "Reset the view" on the table or on the wall brings everything back to the site.
+
 **Closing a scenario.** On the right wall, "Close this scenario as agreed" keeps the scenario with what it gains, gives up and leaves unknown. It then appears on the sentiment map (Texas), where people can say what they think of it; their answers are counted on the closed scenario on both walls. A closed scenario can be shown again or reopened.
 
 **Examples** (`#examples`): a photomontage of the room in use (a generated image) and the annotated captures of the four screens.

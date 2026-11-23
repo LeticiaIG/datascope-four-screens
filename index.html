@@ -600,7 +600,7 @@ var TECH = { T1:{gwh:182.2, mw:26.0, water:52.9, db:47.4}, T2:{gwh:191.9, mw:29.
 var ENERGY = { E2:{cost:275, land:"1.5 sq mi", what:"solar"}, E3:{cost:150, land:"5–11 sq mi", what:"wind"}, E4:{cost:1000, land:"On-site", what:"microreactors"} };
 var UPFRONT = 10, YEARLY = .5;
 var CH = ["design", "technology", "energy", "benefits"];
-var ST = {d:"D1", t:"T1", e:"E1", b:{B1:true, B2:false, B3:false, B4:false}, ch:"design", topic:"all", px:0, pz:0, rot:0, rw:"analysis", site:"mi", ag:true, big:false, hw:6, hb:4, x:[], ear:null};   // hw, hb: wall and berm heights set on the table; x: what was added there; ear: where the listener stands   // site: mi = Allen Park, Michigan; tx = College Station, Texas   // rw: what the right wall shows in the room view
+var ST = {d:"D1", t:"T1", e:"E1", b:{B1:true, B2:false, B3:false, B4:false}, ch:"design", topic:"all", px:0, pz:0, rot:0, rw:"analysis", site:"mi", ag:true, big:false, hw:6, hb:4, x:[], ear:null, pan:[0, 0]};   // hw, hb: wall and berm heights set on the table; x: what was added there; ear: where the listener stands   // site: mi = Allen Park, Michigan; tx = College Station, Texas   // rw: what the right wall shows in the room view
 // The site, in metres: x runs east, z runs south. One list feeds the 3D model, the plan's labels and the measurements.
 var PARCEL = {x0:-156, x1:156, z0:-54, z1:50};
 var RIVER = [[-560, -96], [-340, -130], [-190, -104], [-60, -142], [70, -108], [200, -144], [340, -112], [560, -152]];
@@ -962,7 +962,7 @@ function glab(latlng, text, cls, dir){ return L.tooltip({permanent:true, directi
 function geoInit(stage){
   if (GEO.map) return;
   var el = GEO.el = document.createElement("div"); el.className = "geomap"; stage.insertBefore(el, stage.firstChild);   // in the page first, so the map can measure it
-  var map = GEO.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(S().center, S().zoom); el.style.position = "";
+  var map = GEO.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(focusLL(), S().zoom); el.style.position = "";
   function far(){ el.classList.toggle("far", map.getZoom() < 16.75); if (GEO.live && GEO.fp) geoDraw(); } map.on("zoomend", far); far();
   map.attributionControl.setPrefix(false);
   GEO.tiles = {
@@ -980,6 +980,7 @@ function geoInit(stage){
   lightBase();
   GEO.live = L.layerGroup().addTo(map);
   map.on("click", function(e){ if (PTT.that || PTT.wait) putThere(e.latlng); else if (OWN.tool && S().open && ST.ch === "design") ownTap(e.latlng); });   // put that there: the building was tapped, this is the place
+  linkMap(map);
 }
 function acresCircle(s){ return L.circle(s.center, {radius:Math.sqrt(s.acres * 4046.86 / Math.PI), color:"#1c2a28", weight:2, dashArray:"9 7", fill:false, interactive:false}); }
 // What belongs to the site: its outlines, its landmarks and its wetlands, parks and flood areas. Redrawn when the case study changes.
@@ -991,17 +992,17 @@ function geoSite(){
   if (s.boundary){ L.polygon(s.boundary, {color:"#1c2a28", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(g); glab(s.boundary[1], s.boundaryLabel, "", "left").addTo(g); }
   if (s.acres){ var c = acresCircle(s).addTo(g), r = c.getRadius(); glab([s.center[0] + r / MY, s.center[1]], s.areaLabel, "", "top").addTo(g); }
   s.places.forEach(function(q){ L.circleMarker([q[1], q[2]], {radius:5, color:"#fbfdfc", weight:2, fillColor:"#3b7a66", fillOpacity:1, interactive:false}).addTo(g); glab([q[1], q[2]], q[0], "", "right").addTo(g); });
-  loadEnv(g, s.bbox, function(){ return GEO.layer === g; }); map.setView(s.center, s.zoom, {animate:false});
+  loadEnv(g, s.bbox, function(){ return GEO.layer === g; }); homeView(map, s.zoom);
 }
 // The center wall of a site that has no original tool to show: the aerial photo of the place, with the building on it.
 function satDraw(stage){
   var s = S();
   if (!SAT.map){ var el = SAT.el = document.createElement("div"); el.className = "geomap"; stage.insertBefore(el, stage.firstChild);
-    SAT.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(s.center, 16); el.style.position = ""; SAT.map.attributionControl.setPrefix(false);
+    SAT.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(focusLL(), 16); el.style.position = ""; SAT.map.attributionControl.setPrefix(false); linkMap(SAT.map);
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {maxNativeZoom:19, maxZoom:20, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"}).addTo(SAT.map);
     L.control.scale({metric:false, position:"bottomleft"}).addTo(SAT.map); SAT.live = L.layerGroup().addTo(SAT.map); }
   else stage.insertBefore(SAT.el, stage.firstChild);
-  SAT.map.invalidateSize(false); if (SAT.site !== ST.site){ SAT.site = ST.site; SAT.map.setView(s.center, 16, {animate:false}); }
+  SAT.map.invalidateSize(false); if (SAT.site !== ST.site){ SAT.site = ST.site; homeView(SAT.map, 16); } panSync(SAT.map);
   var g = SAT.live, cs = bldg(ST.px, ST.pz, ST.rot); g.clearLayers();
   if (s.acres) acresCircle(s).setStyle({color:"#fbfdfc"}).addTo(g);
   if (s.boundary) L.polygon(s.boundary, {color:"#fbfdfc", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(g);
@@ -1254,7 +1255,7 @@ function voUnmark(){ VO.pts.forEach(function(o){ VO.map.removeLayer(o.m); }); VO
 function voDraw(stage){
   var s = S();
   if (!VO.map){ var el = VO.el = document.createElement("div"); el.className = "geomap"; stage.insertBefore(el, stage.firstChild);
-    var map = VO.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(s.center, s.zoom); el.style.position = ""; map.attributionControl.setPrefix(false);
+    var map = VO.map = L.map(el, {zoomControl:false, zoomSnap:.5, zoomDelta:.5, wheelPxPerZoomLevel:90}).setView(focusLL(), s.zoom); el.style.position = ""; map.attributionControl.setPrefix(false); linkMap(map);
     VO.raster = greyTiles().addTo(map); VO.tint = tintOn(map);
     lightStyle().then(function(st){ lightLayer(st).addTo(map); map.removeLayer(VO.raster); map.removeLayer(VO.tint); }).catch(function(){});
     var cp = map.createPane("context"); cp.style.zIndex = 350; cp.style.pointerEvents = "none";
@@ -1262,7 +1263,7 @@ function voDraw(stage){
     map.on("click", function(e){ voMark(e.latlng); });
   } else if (VO.el.parentNode !== stage) stage.insertBefore(VO.el, stage.firstChild);
   VO.map.invalidateSize(false);
-  if (VO.site !== ST.site){ VO.site = ST.site; VO.map.setView(s.center, s.zoom, {animate:false});
+  if (VO.site !== ST.site){ VO.site = ST.site; homeView(VO.map, s.zoom);
     if (VO.layer) VO.map.removeLayer(VO.layer); var g = VO.layer = L.layerGroup().addTo(VO.map);   // the same ground as the table map: flood, wetlands, parks, the site and its landmarks
     if (s.acres) acresCircle(s).addTo(g);
     if (s.boundary) L.polygon(s.boundary, {color:"#1c2a28", weight:2.2, dashArray:"9 7", fill:false, interactive:false}).addTo(g);
@@ -1271,6 +1272,7 @@ function voDraw(stage){
       if (el){ L.DomEvent.disableClickPropagation(el); el.addEventListener("click", function(){ voMark([q[1], q[2]], q[0].split(" · ")[0]); }); } });
     loadEnv(g, s.bbox, function(){ return VO.layer === g; }); voUnmark(); }
   voRefresh();
+  panSync(VO.map);
 }
 function voRefresh(){
   if (!VO.map) return; var g = VO.live, mine = visitors().slice().reverse(), all = mine.concat(VOICES[ST.site] || []), n = {support:0, cond:0, concern:0}; g.clearLayers();
@@ -1551,6 +1553,34 @@ function contour(L, sc){   // the line where the sound falls to L, looked for al
 }
 function nearSrc(q, sc){ return Math.min.apply(null, sc.src.map(function(so){ return Math.hypot(q[0] - so.p[0], q[1] - so.p[1]); })); }   // metres to the nearest of the plant's sources
 function hears(L){ return L >= 55 ? 2 : L >= 45 ? 1 : 0; }   // the same two contours as on the table
+// ---------- one place for every map ----------
+// The table, the sentiment map and the wall seen from above are centred on the same spot (ST.pan, in metres from the centre of the site), and the wall
+// seen from the ground looks at it. Whoever moves one map moves them all, and the listener travels the same step, so the wall keeps its distance from
+// what the table shows. Moving the listener alone (dragging the figure, tapping the ground, walking) changes only where the wall stands.
+function focusM(){ return S().open && Array.isArray(ST.pan) ? ST.pan : [0, 0]; }
+function focusLL(){ var p = focusM(); return ll(p[0], p[1]); }
+function panDelta(c){ var c0 = S().center, p = focusM(); return [(c[1] - c0[1]) * MXs() - p[0], (c0[0] - c[0]) * MY - p[1]]; }   // how far a map's centre [lat, lng] is from the shared place
+function panBy(c){   // a map was moved by hand: the shared place and the listener move the same step
+  if (!S().open) return; var d = panDelta(c), q = ear(), p = focusM(); if (Math.hypot(d[0], d[1]) < 2) return;
+  ST.pan = [Math.round(p[0] + d[0]), Math.round(p[1] + d[1])]; ST.ear = [Math.round(q[0] + d[0]), Math.round(q[1] + d[1])]; render(); tell();
+}
+function panLive(c){   // while it is being dragged: the wall from the ground follows at once, on this screen and on the others
+  if (!S().open) return; var d = panDelta(c), q = ear(), q2 = [q[0] + d[0], q[1] + d[1]], now = Date.now();
+  if (AXO.map && AXO.el && AXO.el.isConnected && gvOn() && GV.pos){ GV.to = null; GV.pos = q2; gvCam(); if (now - (GV.liveT2 || 0) > 100){ GV.liveT2 = now; AXO.live = q2; axoEar(); } }
+  if (chan && now - (panLive.t || 0) > 250){ panLive.t = now; try { var o = JSON.parse(JSON.stringify(ST)), p = focusM(); o.pan = [Math.round(p[0] + d[0]), Math.round(p[1] + d[1])]; o.ear = [Math.round(q2[0]), Math.round(q2[1])]; chan.postMessage(JSON.stringify(o)); } catch(e){} }
+}
+function linkMap(map){   // a Leaflet map joins. A move begun by a hand on it (a drag, a zoom, a key) moves the shared place; the moves it makes to follow the others do not
+  function by(){ if (!map._dcSkip) map._dcUser = true; }
+  map.on("dragstart", by); map.on("zoomstart", by); map.getContainer().addEventListener("keydown", by);
+  map.on("drag", function(){ var c = map.getCenter(); panLive([c.lat, c.lng]); });
+  map.on("moveend", function(){ if (!map._dcUser) return; map._dcUser = false; if (!S().open || map.latLngToContainerPoint(focusLL()).distanceTo(map.getSize().divideBy(2)) < 3) return; var c = map.getCenter(); panBy([c.lat, c.lng]); });
+}
+function panSync(map){   // bring a Leaflet map to the shared place, unless it is there already or someone has a hand on it
+  if (!map || !S().open || map._dcUser) return; var f = focusLL(), px = map.latLngToContainerPoint(f).distanceTo(map.getSize().divideBy(2)); if (!(px >= 3)) return;
+  var quick = Date.now() - (map._dcAt || 0) < 700; map._dcAt = Date.now();
+  if (quick || px > 3000){ map._dcSkip = true; map.setView(f, map.getZoom(), {animate:false}); map._dcSkip = false; } else map.panTo(f, {animate:true, duration:.45});
+}
+function homeView(map, zoom){ map._dcSkip = true; map.setView(focusLL(), zoom, {animate:false}); map._dcSkip = false; }   // a new site: every map starts on it
 function ear(){ if (Array.isArray(ST.ear) && isFinite(ST.ear[0]) && isFinite(ST.ear[1])) return ST.ear; var p = S().places[0], c = S().center; return [(p[2] - c[1]) * MXs(), (c[0] - p[1]) * MY]; }   // until someone moves: the first landmark of the site
 function earName(){ var q = ear(), best = null, bd = 45; S().places.forEach(function(p){ var c = S().center, d = Math.hypot((p[2] - c[1]) * MXs() - q[0], (c[0] - p[1]) * MY - q[1]); if (d < bd){ bd = d; best = p[0].split(" · ")[0]; } }); return best; }
 function heard2(st){   // what is heard where the listener stands: now, with the conventional campus, and what each part of the scenario changes
@@ -1588,7 +1618,7 @@ try { var gv0 = JSON.parse(localStorage.getItem("dcscope-gv") || "null"); if (gv
 GV.tilt = GVTILT[GV.h];
 function gvOn(){ return GV.on; }
 function gvSave(){ try { localStorage.setItem("dcscope-gv", JSON.stringify({on:GV.on, h:GV.h})); } catch(e){} }
-function gvFace(q){ var c = AXO.sc ? AXO.sc.src[0].p : [0, 0]; return Math.atan2(c[0] - q[0], q[1] - c[1]) * 180 / Math.PI; }   // the bearing from a place to the plant
+function gvFace(q){ var c = focusM(), dx = c[0] - q[0], dz = c[1] - q[1]; return Math.hypot(dx, dz) < 60 ? GV.b : Math.atan2(dx, -dz) * 180 / Math.PI; }   // the bearing from a place to what the table is centred on: the plant, until someone moves the map
 function gvCam(){   // put the eye where the listener is
   var map = AXO.map, q = GV.pos; if (!map || !q) return;
   var th = GV.tilt * Math.PI / 180, br = GV.b * Math.PI / 180, run = GV.h * Math.tan(th), c = ll(q[0] + Math.sin(br) * run, q[1] - Math.cos(br) * run), foc = (AXO.el.clientHeight || 600) / 2 / Math.tan(GVFOV * Math.PI / 360);
@@ -1605,7 +1635,7 @@ function gvMode(){   // the lens, the hands and the colors of the view in use
   GVPAINT.forEach(function(p){ if (map.getLayer(p[0])) map.setPaintProperty(p[0], p[1], p[on ? 3 : 2]); });
   ["ring-line", "ring-glow", "ring-solid", "photo"].forEach(function(id, n){ if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", (n === 0) === on ? "none" : "visible"); });
   try { if (on){ map.setMaxPitch(89); map.setVerticalFieldOfView(GVFOV); }
-    else { map.setVerticalFieldOfView(9); map.jumpTo({center:[s.center[1], s.center[0]], zoom:15.7, pitch:57, bearing:-28}); map.setMaxPitch(70); map.touchZoomRotate.enableRotation(); } } catch(e){}
+    else { var f0 = focusLL(); map.setVerticalFieldOfView(9); map.jumpTo({center:[f0[1], f0[0]], zoom:15.7, pitch:57, bearing:-28}); map.setMaxPitch(70); map.touchZoomRotate.enableRotation(); } } catch(e){}
 }
 function gvShow(){   // after the eye moves: hide the labels behind it or too far to read, and set the sky down on the horizon
   var on = gvOn() && GV.pos, q = GV.pos, br = GV.b * Math.PI / 180, fx = Math.sin(br), fz = -Math.cos(br), c0 = S().center, mx = MXs();
@@ -1633,7 +1663,7 @@ function beltTrees(out, a, b, w, base, seed){   // a planted belt as trees: abou
 function gvSettle(){   // the eye has stopped: name the rings and bring the residents of the ground now in sight
   if (!AXO.map || !gvOn() || !GV.pos) return; gvLabels(); gvShow(); moreBlocks();
 }
-function gvGo(q, d){ if (!GV.pos) return; GV.from = GV.pos.slice(); GV.to = q; GV.t0 = performance.now(); GV.dur = Math.max(500, Math.min(2200, d * 3.5)); clearTimeout(GV.ct); GV.ct = 0; AXO.hold = GV.t0 + 6000; }   // walk there
+function gvGo(q, d){ if (!GV.pos) return; GV.silent = GV.nf = false; GV.from = GV.pos.slice(); GV.to = q; GV.t0 = performance.now(); GV.dur = Math.max(500, Math.min(2200, d * 3.5)); clearTimeout(GV.ct); GV.ct = 0; AXO.hold = GV.t0 + 6000; }   // walk there
 function gvAhead(m){ var p = GV.to || GV.pos, br = GV.b * Math.PI / 180; if (p) gvGo([p[0] + Math.sin(br) * m, p[1] - Math.cos(br) * m], Math.abs(m)); }
 function gvTurn(d){ GV.bTo = (GV.bTo == null ? GV.b : GV.bTo) + d; GV.auto = false; AXO.hold = performance.now() + 6000; }
 function gvStep(m){   // the wheel: walk while it turns, and settle where it stops
@@ -1716,7 +1746,10 @@ function axoInit(stage, light){
     map.addLayer({id:"dc", type:"fill-extrusion", source:"dc", paint:{"fill-extrusion-color":["get", "c"], "fill-extrusion-height":["get", "h"], "fill-extrusion-base":["get", "b"], "fill-extrusion-opacity":1}});
     AXO.ready = true; axoSync();
   });
-  map.on("moveend", function(){ if (!gvOn()) moreBlocks(); });
+  map.on("movestart", function(e){ if (e && e.originalEvent) AXO.userMove = true; });
+  map.on("moveend", function(e){ var user = AXO.userMove || !!(e && e.originalEvent); AXO.userMove = false; if (gvOn()) return;   // from above: moving the wall by hand moves the shared place too
+    if (user && S().open){ var fl = focusLL(), fp = map.project([fl[1], fl[0]]); if (Math.hypot(fp.x - el.clientWidth / 2, fp.y - el.clientHeight / 2) > 3){ var c = map.getCenter(); panBy([c.lat, c.lng]); return; } }
+    moreBlocks(); });
   map.on("resize", function(){ if (gvOn()) gvCam(); });
   map.on("click", function(e){ var c0 = S().center, q = [(e.lngLat.lng - c0[1]) * MXs(), (c0[0] - e.lngLat.lat) * MY];   // tap the ground: stand there and listen
     if (!gvOn()) return standAt(q); if (!GV.pos || e.point.y < GV.hz + 8) return;   // from the ground: walk there, a kilometre and a half at most
@@ -1726,7 +1759,7 @@ function axoInit(stage, light){
 function amark(ll2, html, cls, anchor){ var d = document.createElement("div"); d.className = "amk " + (cls || ""); d.innerHTML = html; return new maplibregl.Marker({element:d, anchor:anchor || "left", offset:anchor ? [0, 0] : [8, 0]}).setLngLat([ll2[1], ll2[0]]).addTo(AXO.map); }
 function axoSync(){   // everything that follows the table: the blocks, the rings, the labels, what each resident hears, the key, the sound
   var map = AXO.map, s = S(), gon = gvOn(); if (!map || !AXO.ready) return;
-  if (AXO.site !== ST.site){ AXO.site = ST.site; GV.mode = null; GV.auto = true; GV.earKey = null; GV.tilt = GVTILT[GV.h]; if (!gon) map.jumpTo({center:[s.center[1], s.center[0]], zoom:15.7, pitch:57, bearing:-28});
+  if (AXO.site !== ST.site){ AXO.site = ST.site; GV.mode = null; GV.auto = true; GV.earKey = null; GV.tilt = GVTILT[GV.h]; GV.rel = null; if (!gon){ var f0 = focusLL(); map.jumpTo({center:[f0[1], f0[0]], zoom:15.7, pitch:57, bearing:-28}); }
     (AXO.places || []).forEach(function(m){ m.remove(); }); AXO.places = s.places.map(function(q){ return amark([q[1], q[2]], '<i></i>' + esc(q[0].split(" · ")[0]), "pl"); }); }
   var sc = AXO.sc = acScene(ST), c55 = contour(55, sc), c45 = contour(45, sc), cs = bldg(ST.px, ST.pz, ST.rot), q = ear(); AXO.scBase = acScene(ST, true);
   map.getSource("site").setData(gj(s.acres ? [poly(circleLL(s.center, Math.sqrt(s.acres * 4046.86 / Math.PI)))] : s.boundary ? [poly(s.boundary)] : []));
@@ -1741,8 +1774,14 @@ function axoSync(){   // everything that follows the table: the blocks, the ring
     AXO.you.on("dragend", function(){ if (AXO.live) standAt(AXO.live); AXO.live = null; }); }
   var ql = ll(q[0], q[1]); AXO.you.setLngLat([ql[1], ql[0]]); AXO.live = null;
   if (GV.mode !== gon){ GV.mode = gon; gvMode(); }
-  if (gon){ var ek = ST.site + "|" + q[0] + "," + q[1]; if (GV.earKey !== ek || !GV.pos){ GV.earKey = ek; GV.pos = [q[0], q[1]]; GV.to = null; }   // the eye follows the listener, also when another screen moves it
-    if (GV.auto && nearSrc(GV.pos, sc) > 60) GV.b = gvFace(GV.pos); gvCam(); gvLabels(); } else { (GV.lab || []).forEach(function(m){ m.remove(); }); GV.lab = []; }
+  var fm = focusM(), rel = [q[0] - fm[0], q[1] - fm[1]], pure = !!GV.rel && Math.hypot(rel[0] - GV.rel[0], rel[1] - GV.rel[1]) < 3; GV.rel = rel;   // pure: the maps moved and the listener with them, so the wall keeps looking the same way
+  if (gon){ var ek = ST.site + "|" + q[0] + "," + q[1];
+    if (GV.earKey !== ek || !GV.pos){ var far = GV.pos && GV.earKey && GV.earKey.split("|")[0] === ST.site ? Math.hypot(q[0] - GV.pos[0], q[1] - GV.pos[1]) : -1; GV.earKey = ek;   // the eye follows the listener, also when another screen moves it: it glides there if it is near
+      if (far > 3 && far < 3000 && !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)){ GV.from = GV.pos.slice(); GV.to = [q[0], q[1]]; GV.silent = true; GV.nf = pure; GV.t0 = performance.now(); GV.dur = Math.max(350, Math.min(1500, far * 3)); }
+      else { GV.pos = [q[0], q[1]]; GV.to = null; } }
+    if (GV.auto && !GV.to && !pure) GV.b = gvFace(GV.pos); gvCam(); gvLabels(); }
+  else { (GV.lab || []).forEach(function(m){ m.remove(); }); GV.lab = [];
+    if (!AXO.userMove){ var fl = focusLL(), fp = map.project([fl[1], fl[0]]); if (Math.hypot(fp.x - AXO.el.clientWidth / 2, fp.y - AXO.el.clientHeight / 2) > 3) map.easeTo({center:[fl[1], fl[0]], duration:450}); } }   // from above the wall is centred where the table is
   gvShow();
   loadBlocks(); axoHear(); axoEar(); axoKey();
   if (!AXO.raf) AXO.raf = requestAnimationFrame(axoFrame);
@@ -1779,7 +1818,8 @@ function fetchBlocks(bb, site){
     axoHear(); axoKey();
   }).catch(function(){ AXO.busy = false; if (AXO.agSite === site && !AXO.agents.length){ AXO.err = "The census blocks could not be loaded, so no residents are shown."; axoKey(); } });
 }
-function standAt(q){ ST.ear = [Math.round(q[0]), Math.round(q[1])]; render(); tell(); }
+function standAt(q){ var f = focusM(), o = ear(); if (S().open && Math.hypot(q[0] - f[0], q[1] - f[1]) > 2200) ST.pan = [Math.round(f[0] + q[0] - o[0]), Math.round(f[1] + q[1] - o[1])];   // far from what the maps show: they come along
+  ST.ear = [Math.round(q[0]), Math.round(q[1])]; render(); tell(); }
 function axoHear(){   // what each resident would hear, now and with the conventional campus
   var sc = AXO.sc, b0 = AXO.scBase, now = performance.now(); if (!sc) return;
   AXO.agents.forEach(function(a){ var k = hears(acLevel(a.e, a.s, sc)); a.base = hears(acLevel(a.e, a.s, b0)); if (a.cls >= 0 && a.cls !== k) a.t0 = now; a.cls = k; });   // a ring opens around a resident whose answer has just changed
@@ -1803,7 +1843,7 @@ function axoKey(){
     '<p class="anote">' + (more > 0 ? "About " + about(more * AXO.per) + " more residents hear it than with the conventional campus." : more < 0 ? "About " + about(-more * AXO.per) + " fewer residents hear it than with the conventional campus." : "The same residents hear it as with the conventional campus.") + '</p>' +
     '<p class="asrc">1 dot = ' + AXO.per + (AXO.per === 1 ? " resident" : " residents") + ' · 2020 Census blocks, for the ground seen so far.</p>';
   if (S().open) o += '<div class="arow"><span>Size</span>' + sw("data-big", [["ref", "Reference", !ST.big], ["big", "600 MW", ST.big]]) + '</div>' + (ST.big ? '<p class="asrc">What if: 600 MW heard as 23 reference plants in one place, 14 dB louder.</p>' : '');
-  o += '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the aerial photograph, lying flat, so trees and roofs are seen as they are from the air; buildings stand up where OpenStreetMap has them. The sky is scenery.</p>' : '') + '<p class="asrc imh">Press H to hide or show the panels.</p>';
+  o += '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the aerial photograph, lying flat, so trees and roofs are seen as they are from the air; buildings stand up where OpenStreetMap has them. The sky is scenery. The maps are linked: move the table or the sentiment map and this wall goes with them.</p>' : '') + '<p class="asrc imh">Press H to hide or show the panels.</p>';
   el.innerHTML = o;
 }
 function axoFrame(ts){
@@ -1813,9 +1853,9 @@ function axoFrame(ts){
   if (!gon && AXO.orbit && ts > AXO.hold && AXO.last && !still) map.setBearing(map.getBearing() + dt * 1.6);   // the slow turn of the immersive view
   if (gon){ var mv = false;
     if (GV.to){ var k = Math.min(1, (ts - GV.t0) / GV.dur), e2 = k < .5 ? 2 * k * k : 1 - Math.pow(2 - 2 * k, 2) / 2; if (!(k >= 0)) k = e2 = 1;   // walking
-      GV.pos = [GV.from[0] + (GV.to[0] - GV.from[0]) * e2, GV.from[1] + (GV.to[1] - GV.from[1]) * e2]; if (GV.auto && AXO.sc && nearSrc(GV.pos, AXO.sc) > 60) GV.b = gvFace(GV.pos); mv = true;
+      GV.pos = [GV.from[0] + (GV.to[0] - GV.from[0]) * e2, GV.from[1] + (GV.to[1] - GV.from[1]) * e2]; if (GV.auto && !GV.nf) GV.b = gvFace(GV.pos); mv = true;
       if (ts - GV.liveT > 120){ GV.liveT = ts; AXO.live = GV.pos; axoEar(); }   // the sound follows on the way
-      if (k >= 1){ var tq = GV.to; GV.to = null; setTimeout(function(){ standAt(tq); }, 0); } }
+      if (k >= 1){ var tq = GV.to; GV.to = null; if (GV.silent){ GV.silent = GV.nf = false; AXO.live = null; axoEar(); } else setTimeout(function(){ standAt(tq); }, 0); } }   // a walk made here is told to the other screens; one made to follow them is not
     if (GV.bTo != null){ var db = GV.bTo - GV.b; if (Math.abs(db) < .08 || still){ GV.b = GV.bTo; GV.bTo = null; } else GV.b += db * Math.min(1, dt * 7); mv = true; }
     else if (AXO.orbit && ts > AXO.hold && !still && !GV.to){ GV.b += Math.cos(ts / 1000 * .16) * 2.6 * dt; mv = true; }   // the immersive view looks slowly from side to side
     if (mv) gvCam();
@@ -1910,8 +1950,8 @@ function command(text){
   if (/zoom out|farther|further|away/.test(t) && GEO.map){ GEO.map.zoomOut(1); return note("“" + text + "” · farther."); }
   if (/aerial|satellite|photo/.test(t) && GEO.map){ useBase("satellite"); render(); return note("“" + text + "” · aerial photo."); }
   if (/\b(street )?map\b/.test(t) && GEO.map){ useBase("map"); render(); return note("“" + text + "” · map."); }
-  if (/texas|college station/.test(t)){ ST.site = "tx"; MAPV = null; render(); tell(); return note("“" + text + "” · Texas."); }
-  if (/michigan|allen park/.test(t)){ ST.site = "mi"; MAPV = null; render(); tell(); return note("“" + text + "” · Michigan."); }
+  if (/texas|college station/.test(t)){ ST.site = "tx"; ST.ear = null; ST.pan = [0, 0]; MAPV = null; render(); tell(); return note("“" + text + "” · Texas."); }
+  if (/michigan|allen park/.test(t)){ ST.site = "mi"; ST.ear = null; ST.pan = [0, 0]; MAPV = null; render(); tell(); return note("“" + text + "” · Michigan."); }
   m = /\b(trees?|wall|berm)\b/.exec(t);
   if (m && S().open && !/sound wall/.test(t) && /\b(add|put|plant|build|more|some)\b/.test(t)){ OWN.tool = m[1].replace(/s$/, "") === "tree" ? "trees" : m[1]; OWN.a = null; ST.ch = "design"; render(); return note("“" + text + "” · tap the map where it starts, then where it ends.", true); }
   SAY.forEach(function(x){ if (!hit && x[1].test(t)) hit = x[0]; });
@@ -1976,7 +2016,7 @@ function render(){
   var own = (VIEW === "sentiment" || VIEW === "view") && ST.site === "mi", shown = main.getAttribute("data-shown"), key = VIEW + "|" + ST.site;
   $("sites").innerHTML = ["mi", "tx"].map(function(k){ return '<button type="button" data-site="' + k + '" aria-pressed="' + (ST.site === k) + '">' + SITES[k].name + '</button>'; }).join("");
   document.body.classList.toggle("grey", VIEW === "analysis" || VIEW === "metrics"); document.body.classList.toggle("room", VIEW === "all"); document.body.classList.toggle("embed", own && LIVE);
-  if (shown === key && (own || VIEW === "sentiment")) return;   // the embedded original keeps running; nothing on it follows the choices made here
+  if (shown === key && (own || VIEW === "sentiment")){ if (!own && VO.map) panSync(VO.map); return; }   // the embedded original keeps running; nothing on it follows the choices made here
   function right(){ return '<a class="lab" href="#' + ST.rw + '">Right wall · Live analysis</a>' +
     '<span class="rw" role="group" aria-label="Right wall"><button type="button" data-rw="analysis" aria-pressed="' + (ST.rw === "analysis") + '">With images</button><button type="button" data-rw="metrics" aria-pressed="' + (ST.rw === "metrics") + '">Metrics only</button></span>' + mini(ST.rw); }
   function table(){ return '<a class="lab" href="#editor">Table · Scenario Editor</a>' + mini("editor"); }
@@ -1993,7 +2033,7 @@ function render(){
   var xs = main.querySelector('.stage[data-view="axo"]'); if (xs){ try { axoDraw(xs); } catch(e){ if (window.console) console.warn("Axonometric view failed", e); AXO.failed = true; return render(); } } else { audioSet(); if (document.body.classList.contains("imm")) immersive(false); }
   var vs = main.querySelector('.stage[data-view="voices"]'); if (vs && window.L){ try { voDraw(vs); } catch(e){ if (window.console) console.warn("Voices map failed", e); } }
   var ss = main.querySelector('.stage[data-view="sat"]'); if (ss && window.L){ try { satDraw(ss); } catch(e){ if (window.console) console.warn("Aerial view failed", e); } }
-  var gs = main.querySelector('.stage[data-view="geo"]'); if (gs){ try { geoInit(gs); gs.insertBefore(GEO.el, gs.firstChild); GEO.map.invalidateSize(false); geoSite(); geoDraw(); } catch(e){ if (window.console) console.warn("Map failed", e); GEO.failed = true; return render(); } }
+  var gs = main.querySelector('.stage[data-view="geo"]'); if (gs){ try { geoInit(gs); gs.insertBefore(GEO.el, gs.firstChild); GEO.map.invalidateSize(false); geoSite(); panSync(GEO.map); geoDraw(); } catch(e){ if (window.console) console.warn("Map failed", e); GEO.failed = true; return render(); } }
   var tok = ++TOK, th = [].slice.call(main.querySelectorAll(".thumb[data-alt]")); if (th.length) setTimeout(function(){ drawThumbs(th, tok); }, 0);
   fit(); wordsFill(); cancelAnimationFrame(agRaf); agRaf = requestAnimationFrame(drawAgents); if (keep && $(keep)) $(keep).focus();
 }
@@ -2014,7 +2054,7 @@ function adopt(raw){
     if (typeof o.ag === "boolean") ST.ag = o.ag; if (typeof o.big === "boolean") ST.big = o.big;
     if ([3, 6, 9].indexOf(o.hw) >= 0) ST.hw = o.hw; if ([2, 4, 6].indexOf(o.hb) >= 0) ST.hb = o.hb;
     function pt(q){ return Array.isArray(q) && isFinite(q[0]) && isFinite(q[1]) && Math.abs(q[0]) < 30000 && Math.abs(q[1]) < 30000; }
-    ST.ear = pt(o.ear) ? [+o.ear[0], +o.ear[1]] : null;
+    ST.ear = pt(o.ear) ? [+o.ear[0], +o.ear[1]] : null; ST.pan = pt(o.pan) ? [+o.pan[0], +o.pan[1]] : [0, 0];
     ST.x = Array.isArray(o.x) ? o.x.filter(function(e){ return e && OWNS[e.k] && pt(e.a) && pt(e.b) && OWNS[e.k][1].indexOf(e.v) >= 0; }).slice(-12).map(function(e){ return {k:e.k, a:[+e.a[0], +e.a[1]], b:[+e.b[0], +e.b[1]], v:e.v}; }) : [];
     if (isFinite(o.px) && isFinite(o.pz) && isFinite(o.rot)) setPose(+o.px, +o.pz, +o.rot);
   } catch(e){ return; }
@@ -2095,8 +2135,8 @@ document.addEventListener("click", function(ev){
   if ((b = T.closest("[data-snd]"))){ AXO.on = b.getAttribute("data-snd") === "on" && audioStart(); axoEar(); axoKey(); return; }
   if ((b = T.closest("[data-az]")) && AXO.map){ var how = b.getAttribute("data-az"), m = AXO.map, c0 = S().center;
     if (how === "imm"){ immersive(!document.body.classList.contains("imm")); return; }
-    if (gvOn()){ if (how === "in" || how === "out") gvAhead(how === "in" ? 60 : -60); else if (how === "reset"){ GV.auto = true; GV.bTo = null; GV.tilt = GVTILT[GV.h]; GV.earKey = null; ST.ear = null; render(); tell(); } else gvTurn(how === "left" ? -30 : 30); return; }
-    if (how === "in") m.zoomIn(); else if (how === "out") m.zoomOut(); else if (how === "reset") m.easeTo({center:[c0[1], c0[0]], zoom:15.7, pitch:57, bearing:-28}); else m.easeTo({bearing:m.getBearing() + (how === "left" ? -30 : 30)}); return; }
+    if (gvOn()){ if (how === "in" || how === "out") gvAhead(how === "in" ? 60 : -60); else if (how === "reset"){ GV.auto = true; GV.bTo = null; GV.tilt = GVTILT[GV.h]; GV.earKey = null; GV.rel = null; ST.ear = null; ST.pan = [0, 0]; render(); tell(); } else gvTurn(how === "left" ? -30 : 30); return; }
+    if (how === "in") m.zoomIn(); else if (how === "out") m.zoomOut(); else if (how === "reset"){ ST.ear = null; ST.pan = [0, 0]; render(); tell(); m.easeTo({center:[c0[1], c0[0]], zoom:15.7, pitch:57, bearing:-28}); } else m.easeTo({bearing:m.getBearing() + (how === "left" ? -30 : 30)}); return; }
 });
 // The immersive view: the whole screen, no bar, a slow turn. H hides the panels for projection; Esc or the button leaves.
 function immersive(on){
@@ -2112,7 +2152,7 @@ document.addEventListener("keydown", function(ev){ if ((ev.key === "Enter" || ev
 window.addEventListener("storage", function(ev){ if (ev.key === "dcscope-asked") wordsFill(); });
 document.addEventListener("click", function(ev){   // the case study switch sits in the header
   var si = ev.target.closest ? ev.target.closest("[data-site]") : null; if (!si) return;
-  ST.site = si.getAttribute("data-site"); MAPV = null; render(); tell();
+  var site2 = si.getAttribute("data-site"); if (site2 !== ST.site){ ST.ear = null; ST.pan = [0, 0]; } ST.site = site2; MAPV = null; render(); tell();
 });
 $("main").addEventListener("click", function(ev){
   var z = ev.target.closest ? ev.target.closest("[data-zoom]") : null;
@@ -2120,7 +2160,7 @@ $("main").addEventListener("click", function(ev){
   if (rw){ ST.rw = rw.getAttribute("data-rw"); render(); tell(); return; }
   var bb = ev.target.closest ? ev.target.closest("[data-base]") : null;
   if (bb && GEO.map){ useBase(bb.getAttribute("data-base")); [].forEach.call(bb.parentNode.children, function(x){ x.setAttribute("aria-pressed", String(x === bb)); }); return; }
-  if (z && GEO.map && z.closest('.stage[data-view="geo"]')){ var hz = z.getAttribute("data-zoom"); if (hz === "reset") GEO.map.setView(S().center, S().zoom); else GEO.map.setZoom(GEO.map.getZoom() + (hz === "in" ? 1 : -1)); return; }
+  if (z && GEO.map && z.closest('.stage[data-view="geo"]')){ var hz = z.getAttribute("data-zoom"); if (hz === "reset"){ var fp = focusM(), fq = ear(); GEO.map._dcSkip = true; GEO.map.setView(S().center, S().zoom); GEO.map._dcSkip = false; if (S().open && (fp[0] || fp[1])){ ST.ear = [Math.round(fq[0] - fp[0]), Math.round(fq[1] - fp[1])]; ST.pan = [0, 0]; render(); tell(); } } else GEO.map.setZoom(GEO.map.getZoom() + (hz === "in" ? 1 : -1)); return; }
   if (z){ var how = z.getAttribute("data-zoom"); if (how === "reset"){ MAPV = null; redrawMap(); } else zoomMap(how === "in" ? .72 : 1 / .72, WM / 2, HM / 2); return; }
   var t = ev.target.closest ? ev.target.closest("[data-ch]") : null; if (!t) return; ST.ch = t.getAttribute("data-ch"); render(); tell(); });
 function route(){ var h = (location.hash || "").replace("#", ""); VIEW = "all"; VIEWS.forEach(function(v){ if (v[0] === h) VIEW = h; }); render(); }
@@ -2131,7 +2171,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-005220";
+var BUILD = "20261123-142943";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
