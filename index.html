@@ -309,23 +309,29 @@ label.sm:has(input:focus-visible){outline:2px solid var(--accent);outline-offset
 .note ul{margin:.2rem 0 0;padding-left:1rem}
 .stage > .note{position:absolute;top:.9rem;left:.9rem;width:21rem;max-width:calc(100% - 26rem)}
 .notes3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;width:94%}
-.under{display:flex;align-items:flex-start;justify-content:center;gap:1.2rem;width:100%}
+.under{display:flex;align-items:flex-start;justify-content:center;gap:1.2rem;width:4836px}
 .under .note{width:17rem;margin-top:1.5rem}
 .under .swap{flex-direction:column;margin-top:1.5rem}
 .tabs button{font:inherit;font-weight:600;font-size:.9rem;color:var(--muted);border:0;background:none;border-radius:9px;padding:.4rem .8rem;cursor:pointer;white-space:nowrap}
 .tabs button[aria-pressed="true"]{color:var(--warn)}
 
 /* "All": the four screens as they stand in the room, which is dark */
-body.room{background:#0a0c0b}
-body.room .scr{border-color:#2b3432;box-shadow:0 0 60px rgba(190,220,205,.13),0 18px 40px rgba(0,0,0,.6)}
-.room{flex:1 1 auto;min-height:0;padding:3.6rem 22px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7rem;perspective:2400px}
-.walls{display:flex;align-items:center;justify-content:center;width:100%;perspective:2000px}
-.scr{position:relative;display:block;flex:0 0 auto;width:32.5%;aspect-ratio:16/9;background:var(--bg);border:6px solid #1c2a28;border-radius:10px;overflow:hidden;box-shadow:0 14px 34px rgba(20,40,34,.28);text-decoration:none;color:inherit}
+/* The room is laid out at one size (three walls of 1572 px, a table of 2128 px, in a frame 6046 px wide) and then scaled as a whole to the window,
+   so it looks the same in any window. The page's body takes the class "inroom", not "room": with "room" the rule below also caught the body, the
+   page grew as wide as the three walls and it only fitted with the browser zoomed out. */
+body.inroom{background:#0a0c0b;overflow:hidden}
+body.inroom .main{position:relative;overflow:hidden}
+body.inroom .scr{border-color:#2b3432;box-shadow:0 0 60px rgba(190,220,205,.13),0 18px 40px rgba(0,0,0,.6)}
+.room{position:absolute;left:50%;top:var(--ry,60px);width:6046px;margin-left:-3023px;padding:258px 0 0;display:flex;flex-direction:column;align-items:center;gap:11px;transform-origin:50% 0;transform:scale(var(--rk,.25))}
+.walls{display:flex;align-items:center;justify-content:center;width:4836px;perspective:2000px}
+.scr{position:relative;display:block;flex:0 0 auto;width:1572px;aspect-ratio:16/9;background:var(--bg);border:6px solid #1c2a28;border-radius:10px;overflow:hidden;box-shadow:0 14px 34px rgba(20,40,34,.28);text-decoration:none;color:inherit}
 .scr img{width:100%;height:100%;object-fit:cover;display:block}
-.scr .lab{position:absolute;left:.5rem;top:.5rem;background:#1c2a28;color:#fff;font-size:.78rem;font-weight:700;border-radius:999px;padding:.2rem .7rem;z-index:2}
+.scr .lab{position:absolute;left:1.3rem;top:1.3rem;background:#1c2a28;color:#fff;font-size:2rem;font-weight:700;border-radius:999px;padding:.4rem 1.4rem;z-index:2}
+.wl .lab{left:auto;right:1.3rem}   /* the side walls are cut by the window at their outer edge, so their labels sit at the inner one */
+.scr .rw{right:auto;left:1.3rem;top:5.4rem;padding:5px} .scr .rw button{font-size:1.7rem;padding:.35rem 1.2rem}
 .wl{transform:rotateY(34deg);transform-origin:right center}
 .wr{transform:rotateY(-34deg);transform-origin:left center}
-.tb{width:44%;transform:rotateX(46deg);transform-origin:top center}
+.tb{width:2128px;transform:rotateX(46deg);transform-origin:top center}
 .mini{width:1600px;height:900px;transform-origin:0 0;transform:scale(var(--k,.3));display:flex;background:var(--bg)}
 .scr:has(.mini.dark){background:#050606}
 .mini > .main{flex:1 1 auto}
@@ -520,10 +526,13 @@ html.checking .app{visibility:hidden}
   .alts,.say{position:static;width:auto;max-width:none;border:0;box-shadow:none}
   .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem 0}
   .tile:nth-child(odd){border-left:0;padding-left:0}
-  .walls{flex-direction:column;gap:1rem}
+  body.inroom,body.inroom .main{overflow:visible}
+  .room{position:static;width:auto;margin:0;padding:3.6rem 22px 0;transform:none;gap:.7rem}
+  .walls{flex-direction:column;gap:1rem;width:100%}
   .scr,.tb{width:100%;transform:none;margin:0}
+  .scr .lab,.wl .lab{left:.5rem;right:auto;top:.5rem;font-size:.78rem;padding:.2rem .7rem} .scr .rw{left:auto;right:.5rem;top:.5rem;padding:2px} .scr .rw button{font-size:.72rem;padding:.2rem .6rem}
   .notes3{grid-template-columns:minmax(0,1fr);width:100%}
-  .under{flex-direction:column;align-items:stretch}
+  .under{flex-direction:column;align-items:stretch;width:100%}
   .under .note{width:auto}
   .stage > .note{position:static;width:auto;max-width:none}
 }
@@ -1418,7 +1427,7 @@ function ccardHTML(c){
 }
 function examplesHTML(bare){
   function fig(src, cap, cls){ return '<figure' + (cls ? ' class="' + cls + '"' : '') + '><a href="' + src + '" target="_blank" rel="noopener"><img src="' + src + '" alt="' + cap + '" loading="lazy"></a><figcaption>' + cap + '</figcaption></figure>'; }
-  return '<div class="card exs"><div class="hd">Examples</div>' + fig("examples/room-people.jpg", "People deliberating around the four screens. One of them points at the right wall, where each choice is written as what it gains and what it gives up. The center wall is imagined as a place you could walk into, with the sound drawn as rings. Generated image: the room, the people and the landscape are imagined, and the screens are redrawn from the real ones, so small text is approximate.", "hero") +
+  return '<div class="card exs"><div class="hd">Examples</div>' + fig("examples/room-people.jpg", "People deliberating around the four screens. One of them points at the right wall, where each choice is written as what it gains and what it gives up. The center wall is imagined as a place you could walk into, with the sound drawn as rings. AI-generated image: the room, the people and the landscape are imagined, and the screens are redrawn from the real ones, so small text is approximate.", "hero") +
     '<div class="exgrid">' + fig("guide/0-layout.jpg", "The room as the page lays it out") + fig("guide/1-left-wall.jpg", "Left wall · Sentiment map") +
     fig("guide/2-center-wall.jpg", "Center wall · Site layout") + fig("guide/3-table.jpg", "Table · Scenario Editor") + fig("guide/4-right-wall.jpg", "Right wall · Live analysis") + '</div></div>';
 }
@@ -2015,7 +2024,7 @@ function render(){
   function mini(k){ return '<div class="mini' + (k === "analysis" || k === "metrics" ? " grey" : "") + '"><div class="main">' + H[k](true) + '</div></div>'; }
   var own = (VIEW === "sentiment" || VIEW === "view") && ST.site === "mi", shown = main.getAttribute("data-shown"), key = VIEW + "|" + ST.site;
   $("sites").innerHTML = ["mi", "tx"].map(function(k){ return '<button type="button" data-site="' + k + '" aria-pressed="' + (ST.site === k) + '">' + SITES[k].name + '</button>'; }).join("");
-  document.body.classList.toggle("grey", VIEW === "analysis" || VIEW === "metrics"); document.body.classList.toggle("room", VIEW === "all"); document.body.classList.toggle("embed", own && LIVE);
+  document.body.classList.toggle("grey", VIEW === "analysis" || VIEW === "metrics"); document.body.classList.toggle("inroom", VIEW === "all"); document.body.classList.toggle("embed", own && LIVE);
   if (shown === key && (own || VIEW === "sentiment")){ if (!own && VO.map) panSync(VO.map); return; }   // the embedded original keeps running; nothing on it follows the choices made here
   function right(){ return '<a class="lab" href="#' + ST.rw + '">Right wall · Live analysis</a>' +
     '<span class="rw" role="group" aria-label="Right wall"><button type="button" data-rw="analysis" aria-pressed="' + (ST.rw === "analysis") + '">With images</button><button type="button" data-rw="metrics" aria-pressed="' + (ST.rw === "metrics") + '">Metrics only</button></span>' + mini(ST.rw); }
@@ -2037,7 +2046,11 @@ function render(){
   var tok = ++TOK, th = [].slice.call(main.querySelectorAll(".thumb[data-alt]")); if (th.length) setTimeout(function(){ drawThumbs(th, tok); }, 0);
   fit(); wordsFill(); cancelAnimationFrame(agRaf); agRaf = requestAnimationFrame(drawAgents); if (keep && $(keep)) $(keep).focus();
 }
-function fit(){ document.querySelectorAll(".mini").forEach(function(el){ el.style.setProperty("--k", el.parentNode.clientWidth / 1600); }); }
+function fit(){
+  var room = document.querySelector("#main > .room");   // the room, 6046 px wide and 1990 px tall as drawn, takes the largest size that fits under the bar
+  if (room){ var top = 58, H = Math.max(120, window.innerHeight - top - 10), k = Math.min(window.innerWidth / 6046, H / 1990); room.style.setProperty("--rk", k); room.style.setProperty("--ry", Math.round(Math.max(top, (window.innerHeight - 1990 * k) * .38)) + "px"); }
+  document.querySelectorAll(".mini").forEach(function(el){ el.style.setProperty("--k", el.parentNode.clientWidth / 1600); });
+}
 window.addEventListener("resize", fit);
 
 // ---------- one state for every screen ----------
@@ -2171,7 +2184,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-142943";
+var BUILD = "20261123-145147";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
