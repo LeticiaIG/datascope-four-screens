@@ -1403,7 +1403,7 @@ function ccardHTML(c){
 }
 function examplesHTML(bare){
   function fig(src, cap, cls){ return '<figure' + (cls ? ' class="' + cls + '"' : '') + '><a href="' + src + '" target="_blank" rel="noopener"><img src="' + src + '" alt="' + cap + '" loading="lazy"></a><figcaption>' + cap + '</figcaption></figure>'; }
-  return '<div class="card exs"><div class="hd">Examples</div>' + fig("examples/room-people.jpg", "People deliberating around the four screens, with the center wall imagined as a place you could walk into and the sound drawn as rings. Generated image: the room, the people and the landscape are imagined, and the screens are redrawn from the real ones, so small text is approximate.", "hero") +
+  return '<div class="card exs"><div class="hd">Examples</div>' + fig("examples/room-people.jpg", "People deliberating around the four screens. One of them points at the right wall, where each choice is written as what it gains and what it gives up. The center wall is imagined as a place you could walk into, with the sound drawn as rings. Generated image: the room, the people and the landscape are imagined, and the screens are redrawn from the real ones, so small text is approximate.", "hero") +
     '<div class="exgrid">' + fig("guide/0-layout.jpg", "The room as the page lays it out") + fig("guide/1-left-wall.jpg", "Left wall · Sentiment map") +
     fig("guide/2-center-wall.jpg", "Center wall · Site layout") + fig("guide/3-table.jpg", "Table · Scenario Editor") + fig("guide/4-right-wall.jpg", "Right wall · Live analysis") + '</div></div>';
 }
@@ -2006,7 +2006,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-001004";
+var BUILD = "20261123-001740";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
