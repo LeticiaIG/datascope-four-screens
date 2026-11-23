@@ -78,6 +78,41 @@ h2{margin:0;font-size:1.05rem;font-weight:700}
 .chap{position:absolute;top:.9rem;right:.9rem;background:var(--surface);border-radius:999px;padding:.35rem 1rem;font-weight:700}
 .measure{flex:1 1 auto;min-height:0;border:0;border-radius:0;padding:4.8rem 1.6rem 1.4rem;display:flex;flex-direction:column;gap:1.2rem;position:relative}
 .measure .hd{font-size:1.4rem}
+.measure .hd .mdb{margin-left:auto;font-size:.85rem}
+.faces{flex:none;display:grid;grid-template-columns:auto repeat(5,minmax(0,1fr));gap:.6rem;align-items:stretch}
+.fcap{align-self:center;font-size:.95rem;font-weight:700;max-width:6.5rem;line-height:1.15}
+.face{display:flex;align-items:center;gap:.55rem;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:.45rem .65rem;min-width:0}
+.face svg{width:2.5rem;height:2.5rem;flex:none} .face div{min-width:0;display:flex;flex-direction:column;gap:.05rem}
+.face b{font-size:.92rem;line-height:1.15} .face span{font-size:.72rem;font-weight:600;color:var(--muted);line-height:1.2}
+.face.m2{border-color:#9cc7b6} .face.m0{border-color:#e0aaa3}
+.measure.simple{gap:.8rem}
+.bubs{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,1fr);gap:1.2rem}
+.bcol{min-width:0;min-height:0;display:flex;flex-direction:column;gap:.5rem;border-radius:var(--r);padding:.8rem 1rem;background:#fff;border:1px solid var(--line)}
+.bcol h4{margin:0;font-size:1.35rem;display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap} .bcol h4 small{font-size:.8rem;font-weight:600;color:var(--muted)}
+.bcol.g h4{color:#2f6957} .bcol.l h4{color:#9a3f36} .bcol.q h4{color:#5d6d69}
+.bfield{flex:1 1 auto;min-height:0;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;align-items:center;gap:.5rem .7rem;overflow:hidden}
+.bfield .nil{margin:0;font-size:.95rem;font-weight:600;color:var(--muted);text-align:center;max-width:16rem}
+.bub{--s:9rem;font:inherit;width:calc(var(--s) * var(--k, 1));height:calc(var(--s) * var(--k, 1));flex:none;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1rem;padding:.7rem;text-align:center;cursor:pointer;color:var(--ink);border:2px solid transparent;position:relative;transition:transform .15s}
+.bub:nth-child(even){margin-top:.6rem} .bub:hover{transform:scale(1.04)}
+.bub.d0{--s:7.5rem} .bub.d1{--s:7.5rem} .bub.d2{--s:8.5rem} .bub.d3{--s:9.6rem}
+.bub b{font-size:1.8rem;line-height:1;font-weight:800;letter-spacing:-.01em} .bub.d3 b{font-size:2.3rem} .bub.d2 b{font-size:2rem} .bub.w b{font-size:1.15rem;line-height:1.1}
+.bub span{font-size:.72rem;font-weight:600;line-height:1.15;max-width:100%} .bub i{font-style:normal;font-size:.68rem;font-weight:800;letter-spacing:.03em;border-radius:999px;padding:.05rem .45rem;background:#ffffffb8}
+.bub.g{background:#d5ebe1;border-color:#3b7a66} .bub.g b{color:#24594a} .bub.l{background:#f6d9d5;border-color:#b5534a} .bub.l b{color:#8f372f}
+.bub.g.d0,.bub.l.d0{border-style:dashed}
+.bub.q{--s:7rem;background:#f1f4f2;border:2px dashed #9aa8a3;margin-top:0} .bub.q b{font-size:1.4rem;color:#5d6d69} .bub.q span{font-size:.7rem}
+.bcol.q .bfield{gap:.5rem} .bmore{flex-basis:100%;text-align:center}
+.bub.sel{box-shadow:0 0 0 4px var(--ink)} .bub:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.bfield.many .bub{--k:.94;padding:.5rem} .bfield.many .bub b{font-size:1.6rem} .bfield.many .bub.d3 b{font-size:1.9rem} .bfield.many .bub.w b{font-size:1.05rem} .bfield.many .bub span{font-size:.68rem}
+.bwhy p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden} .bwhy p.bsrc{-webkit-line-clamp:1}
+.bmore{font-size:.8rem;font-weight:700;color:var(--muted);align-self:center}
+.bwhy{flex:none;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:.7rem 1rem;min-height:3.4rem;display:flex;flex-direction:column;gap:.2rem;justify-content:center}
+.bwhy p{margin:0;font-size:1rem;font-weight:600;line-height:1.35} .bwhy p > b{font-size:1.3rem;font-weight:800;margin-right:.2rem} .bwhy b.g{color:#24594a} .bwhy b.l{color:#8f372f}
+.bwhy .bfrom{font-weight:700} .bwhy .bsrc,.bwhy p.bsrc{font-size:.76rem;font-weight:600;color:var(--muted)} .bwhy .bw0{color:var(--muted)}
+.moneybar{flex:none;padding:.7rem 1.1rem;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:.4rem 1rem}
+.mcell{display:flex;flex-direction:column;gap:.1rem;min-width:0} .mcell small{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.mcell b{font-size:1.5rem;line-height:1.1} .mcell span{font-size:.76rem;font-weight:600;color:var(--muted);line-height:1.25} .mcell.ok b{color:#24594a} .mcell.bad b{color:#8f372f}
+.mop{font-style:normal;font-size:1.8rem;font-weight:700;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){ .bub{transition:none} }
 .chosen{display:flex;flex-wrap:wrap;gap:.5rem}
 .chosen span{font-size:.95rem;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:.3rem .9rem;color:var(--muted)}
 .chosen span.now{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
@@ -490,6 +525,24 @@ body.nopanels .akey,body.nopanels .stage[data-view="axo"] .zoomc{display:none}
   radial-gradient(ellipse 6% 7.5% at 76% 58%,#fffffff0 0,#ffffff00 100%),radial-gradient(ellipse 4.5% 10% at 80% 51%,#ffffffeb 0,#ffffff00 100%),radial-gradient(ellipse 5.5% 6.5% at 84.5% 59%,#ffffffe0 0,#ffffff00 100%),
   radial-gradient(ellipse 9% 5% at 25% 16%,#ffffffb8 0,#ffffff00 100%),radial-gradient(ellipse 11% 4.5% at 66% 22%,#ffffffb0 0,#ffffff00 100%),radial-gradient(ellipse 3.5% 3.5% at 95% 84%,#ffffffd0 0,#ffffff00 100%)}
 .axo.gv .amk.sn{background:#fbfdfce0}
+/* night: the map is dimmed and turned blue, the clouds give way to stars, the lamps of the campus come on */
+.axo canvas.maplibregl-canvas{transition:filter .9s}
+.axo.night canvas.maplibregl-canvas{filter:brightness(.5) saturate(.7) contrast(1.08)}
+.axo .gnight{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .9s;background:linear-gradient(#081229e6 0%,#0b1b3a8c 42%,#0b1b3a59 100%);mix-blend-mode:multiply}
+.axo.night .gnight{opacity:1}
+.axo.night .gsky i{opacity:.16} .axo.night .ghaze{background:linear-gradient(#0a142c99,#0a142c33 40%,#0a142c00)}
+.axo.night .gsky::before{content:"";position:absolute;inset:0;background-image:radial-gradient(1.2px 1.2px at 6% 22%,#fff 50%,#fff0),radial-gradient(1px 1px at 14% 58%,#fff 50%,#fff0),radial-gradient(1.4px 1.4px at 23% 14%,#fff 50%,#fff0),radial-gradient(1px 1px at 31% 44%,#fff 50%,#fff0),radial-gradient(1.2px 1.2px at 39% 9%,#fff 50%,#fff0),radial-gradient(1px 1px at 47% 63%,#fff 50%,#fff0),radial-gradient(1.5px 1.5px at 55% 27%,#fff 50%,#fff0),radial-gradient(1px 1px at 63% 50%,#fff 50%,#fff0),radial-gradient(1.2px 1.2px at 71% 16%,#fff 50%,#fff0),radial-gradient(1px 1px at 79% 39%,#fff 50%,#fff0),radial-gradient(1.4px 1.4px at 88% 12%,#fff 50%,#fff0),radial-gradient(1px 1px at 94% 55%,#fff 50%,#fff0),radial-gradient(1px 1px at 18% 34%,#fff 50%,#fff0),radial-gradient(1px 1px at 67% 72%,#fff 50%,#fff0),radial-gradient(1px 1px at 84% 68%,#fff 50%,#fff0);opacity:.9}
+.axo.night .gsky::after{content:"";position:absolute;right:16%;top:16%;width:34px;height:34px;border-radius:50%;background:#f4f1dc;box-shadow:0 0 28px 8px #f4f1dc55}
+.lamp{width:9px;height:9px;border-radius:50%;background:#ffe9b0;box-shadow:0 0 10px 5px #ffd98a99,0 0 26px 14px #ffcf7a40;pointer-events:none}
+.axo.night .amk.sn{background:#fbfdfcd0}
+/* the immersive view from the ground: soft mist drifts across, as on a height */
+.axo .gmist{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;display:none}
+body.imm .axo.gv .gmist{display:block}
+.gmist i{position:absolute;top:0;bottom:0;left:-60%;width:220%;background-repeat:no-repeat;background-image:radial-gradient(ellipse 22% 16% at 18% 62%,#ffffffb3 0,#ffffff00 100%),radial-gradient(ellipse 16% 12% at 30% 70%,#ffffff99 0,#ffffff00 100%),radial-gradient(ellipse 26% 14% at 62% 82%,#ffffffa6 0,#ffffff00 100%),radial-gradient(ellipse 18% 10% at 84% 58%,#ffffff8c 0,#ffffff00 100%);animation:mist 95s linear infinite;opacity:.6}
+.gmist i + i{background-image:radial-gradient(ellipse 30% 12% at 40% 50%,#ffffff80 0,#ffffff00 100%),radial-gradient(ellipse 20% 16% at 74% 74%,#ffffff8c 0,#ffffff00 100%),radial-gradient(ellipse 14% 9% at 8% 80%,#ffffff73 0,#ffffff00 100%);animation-duration:150s;animation-direction:reverse;opacity:.45}
+.axo.night .gmist i{opacity:.22}
+@keyframes mist{from{transform:translateX(-18%)}to{transform:translateX(18%)}}
+@media (prefers-reduced-motion: reduce){ .gmist i{animation:none} .axo canvas.maplibregl-canvas,.axo .gnight{transition:none} }
 .amk{font-family:var(--font);font-size:12px;font-weight:700;color:#1c2a28;background:#fbfdfcf0;border:1px solid #b9cec4;border-radius:5px;padding:2px 7px;white-space:nowrap;pointer-events:none}
 .amk.pl{display:flex;align-items:center;gap:5px;font-weight:600}
 .amk.pl i{width:8px;height:8px;border-radius:50%;background:#3b7a66;border:1.5px solid #fff}
@@ -1641,6 +1694,68 @@ function examplesHTML(bare){
     '<div class="exgrid">' + fig("guide/0-layout.jpg", "The room as the page lays it out") + fig("guide/1-left-wall.jpg", "Left wall · Sentiment map") +
     fig("guide/2-center-wall.jpg", "Center wall · Site layout") + fig("guide/3-table.jpg", "Table · Scenario Editor") + fig("guide/4-right-wall.jpg", "Right wall · Live analysis") + '</div></div>';
 }
+// A result as a bubble: one large figure, a few plain words, the code of the choice it comes from. The figure is the one the statement already
+// carries (the same numbers and sources as the lists and the wheel); where the size is not known the bubble says so in words and is dashed.
+var BLAB = {B1:"grants for local projects", B2:"the city's share of the plant", B3:"for the most affected homes", B4:"training and internships"};
+function signedPct(a, b){ var x = (a - b) / b; return (x < 0 ? "−" : "+") + (Math.abs(x) >= .995 && Math.abs(x) < 1 ? "99" : Math.round(Math.abs(x) * 100)) + "%"; }
+function bigOf(s){
+  var c = s.code, g = c.charAt(0), r = TECH.T1, t = TECH[c], en = ENERGY[c], m;
+  if (s.ax === "water" && t) return [signedPct(t.water, r.water), "cooling water"];
+  if (s.ax === "power" && t) return [signedPct(t.gwh, r.gwh), "electricity"];
+  if (s.ax === "quiet"){
+    if ((m = /about (\d+) dB (quieter|louder)/.exec(s.how || ""))) return [(m[2] === "quieter" ? "−" : "+") + m[1] + " dB", m[2] + " where you stand"];
+    if (/almost no change/.test(s.how || "")) return ["0 dB", "no change where you stand"];
+    if (t && t.db !== r.db){ var d = t.db - r.db; return [(d > 0 ? "+" : "−") + Math.round(Math.abs(d)) + " dB", d > 0 ? "louder fans on hot days" : "quieter equipment"]; }
+    return [s.dir > 0 ? "Quieter" : "Louder", "for the nearest neighbors"]; }
+  if (s.ax === "clean") return [pct(funds().share), c === "E4" ? "of six microreactors paid for" : "of the power from new " + en.what];
+  if (s.ax === "money" && g === "B"){ var pr = price(c); return [pr[0] ? money(pr[0]) : money(pr[1]) + "/yr", BLAB[c] + (pr[0] && pr[1] ? "<br>+ " + money(pr[1]) + " a year" : "")]; }
+  if (s.ax === "money" && en) return [money(funds().e), "goes to " + en.what + ", not to benefits"];
+  if (s.ax === "money") return ["Heat", "from the servers, for nearby customers"];
+  if (s.ax === "places") return ["Places", "a pool, a spa, community rooms and cafes"];
+  if (s.ax === "views") return ["Less in view", "behind berms and planting"];
+  return [s.t, ""];
+}
+// Who it is good for. A face for each group, read from the bubbles and from nothing else: more gained than given up among the results that touch
+// the group, a smile; more given up, a frown; neither or as much of each, a straight face. It is a way to look at the same results from
+// several sides, not a survey of what those people think.
+var GROUPS = [["Nearest neighbors", function(x){ return x.ax === "quiet" || x.ax === "views" || x.code === "B3"; }],
+  ["The wider community", function(x){ return x.ax === "places" || (x.ax === "money" && x.code !== "B3"); }],
+  ["Water", function(x){ return x.ax === "water"; }],
+  ["The grid and the climate", function(x){ return x.ax === "power" || x.ax === "clean"; }]];
+function faceSVG(m){ var c = ["#b5534a", "#7b8a85", "#3b7a66"][m], d = ["M11 24 Q18 18 25 24", "M11 22 L25 22", "M11 20 Q18 27 25 20"][m];
+  return '<svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" fill="' + ["#f6d9d5", "#eef1ef", "#d5ebe1"][m] + '" stroke="' + c + '" stroke-width="2"/><circle cx="12.5" cy="14" r="1.9" fill="' + c + '"/><circle cx="23.5" cy="14" r="1.9" fill="' + c + '"/><path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="2.2" stroke-linecap="round"/></svg>'; }
+function facesHTML(st){
+  function few(list){ return list.slice(0, 3).map(function(x){ var b = bigOf(x); return b[0] + (/\d/.test(b[0]) ? " " + b[1].split("<br>")[0].split(",")[0] : ""); }).join(" · ") + (list.length > 3 ? " · …" : ""); }
+  var cells = GROUPS.map(function(g){ var list = st.filter(g[1]), sc = 0; list.forEach(function(x){ sc += x.dir * (x.deg || 1); }); var m = sc > 0 ? 2 : sc < 0 ? 0 : 1;
+    return '<div class="face m' + m + '">' + faceSVG(m) + '<div><b>' + g[0] + '</b><span>' + (list.length ? ["More given up than gained", "As much gained as given up", "More gained than given up"][m] + ": " + few(list) : "No change for them") + '</span></div></div>'; });
+  var sp = spentOf(ST), over = overBudget(), any = sp[0] || sp[1], dm = over ? 0 : any ? 2 : 1;
+  cells.push('<div class="face m' + dm + '">' + faceSVG(dm) + '<div><b>The developer</b><span>' + (over ? "Asked for more than it offered" : any ? "Pays " + money(sp[0]) + " + " + money(sp[1]) + " a year, within its offer" : "Nothing asked of it yet") + '</span></div></div>');
+  return '<span class="fcap">Who is it good for?</span>' + cells.join("");
+}
+function bubblesHTML(st, un){
+  var g = st.filter(function(x){ return x.dir > 0; }), l = st.filter(function(x){ return x.dir < 0; }), sel = SEL.ax ? null : SEL.id;
+  function bub(x){ var b = bigOf(x), wordy = !/\d/.test(b[0]); return '<button type="button" class="bub ' + (x.dir > 0 ? "g" : "l") + " d" + (x.deg || 0) + (wordy ? " w" : "") + (x.id === sel ? " sel" : "") + '" data-stm="' + x.id + '"><i>' + x.code + '</i><b>' + b[0] + '</b><span>' + b[1] + '</span></button>'; }
+  function ask(u){ return '<button type="button" class="bub q' + (u.id === sel ? " sel" : "") + '" data-stm="' + u.id + '"><i>' + u.code + '</i><b>?</b><span>' + esc(u.t) + '</span></button>'; }
+  function col(cls, title, sub, items, empty){ return '<div class="bcol ' + cls + '"><h4>' + title + '<small>' + sub + '</small></h4><div class="bfield' + (items.length > 4 ? " many" : "") + '">' + (items.length ? items.join("") : '<p class="nil">' + empty + '</p>') + '</div></div>'; }
+  return col("g", "You gain", g.length + (g.length === 1 ? " thing" : " things") + ", against a conventional data center", g.map(bub), "Nothing yet. This is the conventional data center: choose an alternative on the table.") +
+    col("l", "You give up", l.length ? l.length + (l.length === 1 ? " thing" : " things") : "nothing so far", l.map(bub), "Nothing given up so far.") +
+    col("q", "Not known yet", un.length ? un.length + (un.length === 1 ? " question" : " questions") + " for the developer" : "no open question", un.slice(0, 4).map(ask).concat(un.length > 4 ? ['<span class="bmore">+ ' + (un.length - 4) + ' more, under “The wheel, the sources and questions”</span>'] : []), "No open question for these choices.");
+}
+function bwhyHTML(st, un){   // the bubble in question, in one breath: what, because of which choice, why, the number, the source
+  var all = st.concat(un), x = SEL.ax ? null : all.filter(function(y){ return y.id === SEL.id; })[0];
+  if (!x) return '<p class="bw0">Tap a bubble to see why it is there and where its figure comes from.</p>';
+  var op = x.code === "ADD" ? ["", "What was added on the table"] : optOf(x.code), head = '<span class="cd">' + x.code + '</span> ' + op[1];
+  if (x.un) return '<p><b>?</b> ' + esc(x.t) + '. <span class="bsrc">The brief asks the developer for this, for ' + head + '. No answer yet.</span></p>';
+  var b = bigOf(x);
+  return '<p><b class="' + (x.dir > 0 ? "g" : "l") + '">' + b[0] + '</b> ' + b[1] + ' <span class="bfrom">because of ' + head + '.</span> ' + x.why + (x.num ? ' ' + x.num : x.how ? ' How much: ' + x.how + '.' : '') + '</p><p class="bsrc">Source: ' + srcOf(x.src) + '</p>';
+}
+function moneyHTML(){   // the budget in three figures: what there is, what the choices take, what is left and where it goes
+  var en = ENERGY[ST.e], b = bud(), sp = spentOf(ST), l = leftOf(ST), f = funds(), over = overBudget(), lines = chosen(ST).filter(function(c){ return c.charAt(0) !== "E" && (price(c)[0] || price(c)[1]); }).map(function(c){ return c + " " + priceWords(price(c)); });
+  function cell(k, v, sub, cls){ return '<div class="mcell ' + (cls || "") + '"><small>' + k + '</small><b>' + v + '</b><span>' + sub + '</span></div>'; }
+  return '<div class="card moneybar">' + cell("The budget to share out", money(b[0]) + " + " + money(b[1]) + " a year", "The developer’s offer, for the community to allocate. Taxes come on top.") + '<i class="mop">−</i>' +
+    cell("What the choices cost", money(sp[0]) + " + " + money(sp[1]) + " a year", lines.length ? lines.join(" · ") + " · example prices" : "Nothing chosen costs extra yet.") + '<i class="mop">=</i>' +
+    cell(over ? "Over the budget by" : "What is left", over ? [l[0] < 0 ? money(-l[0]) + " upfront" : "", l[1] < 0 ? money(-l[1]) + " a year" : ""].filter(function(x){ return x; }).join(" + ") : money(l[0]) + " + " + money(l[1]) + " a year", over ? "Something has to go, or the budget has to grow on the table." : en ? (f.e > 0 ? "The " + money(f.e) + " upfront goes to " + en.what + ": " + shareWords(f.share) + " of the power." : "Nothing is left for " + en.what + ".") : "Not allocated yet.", over ? "bad" : "ok") + '</div>';
+}
 function ledgerHTML(st, un){
   function col(cls, title, rows, empty, foot){ return '<div class="col ' + cls + '"><h3>' + title + '</h3><div class="rows">' + (rows.length ? rows.join("") : '<p class="nil">' + empty + '</p>') + '</div>' + (foot || "") + '</div>'; }
   var open = asked().filter(function(a){ return !a.ok; }), n = asked().length;
@@ -1724,6 +1839,9 @@ function wordsFill(){
   [].forEach.call(document.querySelectorAll('[data-w="ledger"]'), function(el){ el.innerHTML = ledgerHTML(st, un); });
   [].forEach.call(document.querySelectorAll('[data-w="wheel"]'), function(el){ var big = el.getAttribute("data-size") === "big"; el.innerHTML = (big ? WTAP : "") + wheelSVG(st, SEL.ax ? null : SEL.id, el.getAttribute("data-size")) + (big ? WHOW : WKEY); });
   [].forEach.call(document.querySelectorAll('[data-w="trace"]'), function(el){ el.innerHTML = traceHTML(st, un); });
+  [].forEach.call(document.querySelectorAll('[data-w="bubbles"]'), function(el){ el.innerHTML = bubblesHTML(st, un); });
+  [].forEach.call(document.querySelectorAll('[data-w="faces"]'), function(el){ el.innerHTML = facesHTML(st); });
+  [].forEach.call(document.querySelectorAll('[data-w="bwhy"]'), function(el){ el.innerHTML = bwhyHTML(st, un); });
   if (had && $("askq")){ var i = $("askq"); i.focus(); try { i.setSelectionRange(i.value.length, i.value.length); } catch(e){} }
 }
 // A question typed or spoken: find the result it is about and the kind of answer wanted. What cannot be traced is kept for the developer.
@@ -1787,6 +1905,8 @@ function contour(L, sc){   // the line where the sound falls to L, looked for al
 }
 function nearSrc(q, sc){ return Math.min.apply(null, sc.src.map(function(so){ return Math.hypot(q[0] - so.p[0], q[1] - so.p[1]); })); }   // metres to the nearest of the plant's sources
 function hears(L){ return L >= 55 ? 2 : L >= 45 ? 1 : 0; }   // the same two contours as on the table
+var NIGHTDB = 10;   // the day-night level (DNL) counts sound between 10 pm and 7 am as 10 dB more
+function hearsNow(L){ return hears(L + (AXO.night ? NIGHTDB : 0)); }   // what is heard on the center wall, by day or by night
 // ---------- one place for every map ----------
 // The table, the sentiment map and the wall seen from above are centred on the same spot (ST.pan, in metres from the centre of the site), and the wall
 // seen from the ground looks at it. Whoever moves one map moves them all, and the listener travels the same step, so the wall keeps its distance from
@@ -1873,7 +1993,7 @@ function gvMode(){   // the lens, the hands and the colors of the view in use
 }
 function gvShow(){   // after the eye moves: hide the labels behind it or too far to read, and set the sky down on the horizon
   var on = gvOn() && GV.pos, q = GV.pos, br = GV.b * Math.PI / 180, fx = Math.sin(br), fz = -Math.cos(br), c0 = S().center, mx = MXs();
-  [].concat(AXO.places || [], AXO.marks || [], GV.lab || [], HOT.marks || []).forEach(function(m){ var v = true; if (on){ var p = m.getLngLat(), dx = (p.lng - c0[1]) * mx - q[0], dz = (c0[0] - p.lat) * MY - q[1]; v = dx * fx + dz * fz > 8 && Math.hypot(dx, dz) < 3000; } m.getElement().style.visibility = v ? "" : "hidden"; });
+  [].concat(AXO.places || [], AXO.marks || [], GV.lab || [], HOT.marks || [], AXO.lamps || []).forEach(function(m){ var v = true; if (on){ var p = m.getLngLat(), dx = (p.lng - c0[1]) * mx - q[0], dz = (c0[0] - p.lat) * MY - q[1]; v = dx * fx + dz * fz > 8 && Math.hypot(dx, dz) < 3000; } m.getElement().style.visibility = v ? "" : "hidden"; });
   var sky = AXO.sky; if (!sky || !on) return; var H = AXO.el.clientHeight, foc = GV.foc = H / 2 / Math.tan(GVFOV * Math.PI / 360), up = (90 - GV.tilt) * Math.PI / 180;
   GV.hz = H / 2 - foc * Math.min(.85 * Math.tan(up), Math.tan(up - .75 * Math.PI / 180));   // where MapLibre ends the ground
   sky.style.height = Math.max(0, Math.round(GV.hz) + 1) + "px"; if (AXO.haze){ AXO.haze.style.top = Math.max(0, Math.round(GV.hz)) + "px"; AXO.haze.style.height = Math.round(foc * .04) + "px"; } var st = sky.firstChild.style; st.height = Math.round(foc * .66) + "px"; st.backgroundSize = Math.round(foc * Math.PI / 180 * 120) + "px 100%"; st.backgroundPositionX = Math.round(-GV.b * foc * Math.PI / 180 - GV.drift) + "px";
@@ -2021,6 +2141,12 @@ function hotSpots(){
   if (ST.t === "T4"){ var sh = st("T4"); out.push({k:"heat", n:"Heat recovery", at:campusAt(-30, 27.7), from:campusAt(-55, 140), say:["T4 Heat recovery and reuse. " + (sh ? sh.t + "." : ""), sh ? sh.why : "", sh && sh.how ? sh.how.charAt(0).toUpperCase() + sh.how.slice(1) + "." : ""]}); }
   return out;
 }
+function nightSync(){   // the dark over the map, and the lamps of the campus: marks on the ground, lit only at night
+  if (!AXO.map) return; AXO.el.classList.toggle("night", !!AXO.night); (AXO.lamps || []).forEach(function(m){ m.remove(); }); AXO.lamps = []; if (!AXO.night) return;
+  var at = [[59, 11.5], [80, 5], [70, 18], [70, -13.5], [-63.5, -21], [-63.5, 21], [-47, 0], [0, -25], [30, -25], [-30, -25], [46, 23], [-46, 23], [0, 24]];
+  if (ST.d === "D4") at = at.concat([[null, 22, 46], [null, 6, 58]]);
+  at.forEach(function(q){ var w = q[0] === null ? [q[1], q[2]] : campusAt(q[0], q[1]), g = ll(w[0], w[1]), d = document.createElement("div"); d.className = "lamp"; AXO.lamps.push(new maplibregl.Marker({element:d, anchor:"center"}).setLngLat([g[1], g[0]]).addTo(AXO.map)); });
+}
 function hotSync(){   // the dots follow the campus and the choices
   HOT.marks.forEach(function(m){ m.remove(); }); HOT.marks = []; if (!AXO.map) return; HOT.list = hotSpots();
   var i = HOT.k ? HOT.list.map(function(x){ return x.k; }).indexOf(HOT.k) : -1; HOT.i = i; if (i < 0) HOT.k = null;
@@ -2067,7 +2193,9 @@ function axoInit(stage, light){
   try { map.setVerticalFieldOfView(9); } catch(e){}   // a narrow lens: nearly parallel lines, as in an axonometric drawing
   map.dragRotate.enable(); map.touchZoomRotate.enableRotation(); map.keyboard.enable();
   var ac = AXO.ag = document.createElement("canvas"); ac.className = "aagents"; ac.setAttribute("aria-hidden", "true"); map.getCanvasContainer().appendChild(ac);
-  var sk = AXO.sky = document.createElement("div"); sk.className = "gsky"; sk.setAttribute("aria-hidden", "true"); sk.innerHTML = "<i></i>"; el.appendChild(sk); var hzd = AXO.haze = document.createElement("div"); hzd.className = "ghaze"; hzd.setAttribute("aria-hidden", "true"); el.appendChild(hzd); gvHands(map);
+  var sk = AXO.sky = document.createElement("div"); sk.className = "gsky"; sk.setAttribute("aria-hidden", "true"); sk.innerHTML = "<i></i>"; el.appendChild(sk); var hzd = AXO.haze = document.createElement("div"); hzd.className = "ghaze"; hzd.setAttribute("aria-hidden", "true"); el.appendChild(hzd);
+  ["gnight", "gmist"].forEach(function(c){ var d = document.createElement("div"); d.className = c; d.setAttribute("aria-hidden", "true"); d.innerHTML = c === "gmist" ? "<i></i><i></i>" : ""; el.appendChild(d); });
+  try { AXO.night = !!localStorage.getItem("dcscope-night"); } catch(e){} gvHands(map);
   map.on("load", function(){
     map.addSource("site", {type:"geojson", data:gj([])}); map.addSource("ring", {type:"geojson", data:gj([])}); map.addSource("dc", {type:"geojson", data:gj([])});
     map.addSource("photo", {type:"raster", tiles:["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize:256, maxzoom:19, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"});
@@ -2104,7 +2232,7 @@ function axoSync(){   // everything that follows the table: the blocks, the ring
   AXO.marks.forEach(function(m){ m.remove(); }); AXO.marks = [amark([Math.max(cs[0][0], cs[1][0]), (cs[0][1] + cs[1][1]) / 2], "Data center", "dk", "bottom")];
   if (!gon) AXO.marks.push(amark(ll(c55[45][0], c55[45][1]), "55 dBA contour", "sn", "center"), amark(ll(c45[27][0], c45[27][1]), "45 dBA", "sn", "center"));
   var ep = energyPlot(); if (ep){ var eq = campusAt((ep[0] + ep[2]) / 2, ep[1]); AXO.marks.push(amark(ll(eq[0], eq[1]), (ST.e === "E2" ? "Solar" : "Wind") + " · " + shareWords(share()) + " of the power · built elsewhere, drawn here", "en", "bottom")); }
-  hotSync();
+  nightSync(); hotSync();
   if (!AXO.you){ var d = document.createElement("div"); d.className = "you"; d.innerHTML = "<i></i><b>You</b>"; d.title = "Drag to stand somewhere else";
     AXO.you = new maplibregl.Marker({element:d, draggable:true, anchor:"bottom"}).setLngLat([0, 0]).addTo(map);
     AXO.you.on("drag", function(){ var p = AXO.you.getLngLat(), c0 = S().center; AXO.live = [(p.lng - c0[1]) * MXs(), (c0[0] - p.lat) * MY]; axoEar(); });
@@ -2159,15 +2287,15 @@ function standAt(q){ var f = focusM(), o = ear(); if (S().open && Math.hypot(q[0
   ST.ear = [Math.round(q[0]), Math.round(q[1])]; render(); tell(); }
 function axoHear(){   // what each resident would hear, now and with the conventional campus
   var sc = AXO.sc, b0 = AXO.scBase, now = performance.now(); if (!sc) return;
-  AXO.agents.forEach(function(a){ var k = hears(acLevel(a.e, a.s, sc)); a.base = hears(acLevel(a.e, a.s, b0)); if (a.cls >= 0 && a.cls !== k) a.t0 = now; a.cls = k; });   // a ring opens around a resident whose answer has just changed
+  AXO.agents.forEach(function(a){ var k = hearsNow(acLevel(a.e, a.s, sc)); a.base = hearsNow(acLevel(a.e, a.s, b0)); if (a.cls >= 0 && a.cls !== k) a.t0 = now; a.cls = k; });   // a ring opens around a resident whose answer has just changed
 }
 function axoEar(){   // the level where the listener stands (or is being dragged), for the readout and for the loudspeakers
   if (!AXO.sc) return; var q = AXO.live || ear(); AXO.earL = acLevel(q[0], q[1], AXO.sc); AXO.earB = acLevel(q[0], q[1], AXO.scBase); AXO.earD = nearSrc(q, AXO.sc);
   var el = $("aear"); if (el) el.innerHTML = earHTML(); audioSet();
 }
-function earHTML(){ var k = hears(AXO.earL), nm = AXO.live ? null : earName(), d = AXO.earL - (AXO.earB || AXO.earL);
+function earHTML(){ var k = hearsNow(AXO.earL), nm = AXO.live ? null : earName(), d = AXO.earL - (AXO.earB || AXO.earL);
   return '<b style="color:' + ["#2f6957", "#8a5c08", "#9a3f36"][k] + '">' + ["Where you stand you do not hear it", "Where you stand you hear it", "Where you stand you hear it clearly"][k] + '</b>' +
-    '<small>' + (nm ? "At " + esc(nm) + " · " : "") + 'about ' + about(Math.round(AXO.earD)) + ' m from the plant · ' + Math.round(Math.max(0, AXO.earL)) + ' dBA, ' + dbWords(d) + ' with the conventional campus.</small><small>' + (gvOn() ? "Tap the ground to walk there, drag to look around." : "Drag the figure, or tap the ground, to stand somewhere else.") + '</small>'; }
+    '<small>' + (nm ? "At " + esc(nm) + " · " : "") + 'about ' + about(Math.round(AXO.earD)) + ' m from the plant · ' + Math.round(Math.max(0, AXO.earL)) + ' dBA, ' + dbWords(d) + ' with the conventional campus.' + (AXO.night ? ' At night it counts as ' + Math.round(Math.max(0, AXO.earL) + NIGHTDB) + '.' : '') + '</small><small>' + (gvOn() ? "Tap the ground to walk there, drag to look around." : "Drag the figure, or tap the ground, to stand somewhere else.") + '</small>'; }
 function axoKey(){
   var el = $("akey"); if (!el) return; var n = [0, 0, 0], more = 0; AXO.agents.forEach(function(a){ n[a.cls < 0 ? 0 : a.cls]++; if (a.cls > 0 && !a.base) more++; if (!a.cls && a.base > 0) more--; });
   var tot = AXO.agents.length, wait = !tot && !AXO.err, sw = function(attr, list){ return '<span class="sw" role="group">' + list.map(function(x){ return '<button type="button" ' + attr + '="' + x[0] + '" aria-pressed="' + !!x[2] + '">' + x[1] + '</button>'; }).join("") + '</span>'; };
@@ -2180,7 +2308,8 @@ function axoKey(){
     '<p class="anote">' + (more > 0 ? "About " + about(more * AXO.per) + " more residents hear it than with the conventional campus." : more < 0 ? "About " + about(-more * AXO.per) + " fewer residents hear it than with the conventional campus." : "The same residents hear it as with the conventional campus.") + '</p>' +
     '<p class="asrc">1 dot = ' + AXO.per + (AXO.per === 1 ? " resident" : " residents") + ' · 2020 Census blocks, for the ground seen so far.</p>';
   if (S().open) o += '<div class="arow"><span>Size</span>' + sw("data-big", [["ref", "Reference", !ST.big], ["big", "600 MW", ST.big]]) + '</div>' + (ST.big ? '<p class="asrc">What if: 600 MW heard as 23 reference plants in one place, 14 dB louder.</p>' : '');
-  o += '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the aerial photograph, lying flat, so trees and roofs are seen as they are from the air; buildings stand up where OpenStreetMap has them. The sky is scenery. The maps are linked: move the table or the sentiment map and this wall goes with them.</p>' : '') + '<p class="asrc imh">Press H to hide or show the panels.</p>';
+  o += '<div class="arow"><span>Time</span>' + sw("data-tod", [["day", "Day", !AXO.night], ["night", "Night", AXO.night]]) + '</div>' + (AXO.night ? '<p class="asrc">At night the same sound counts as 10 dB more, as in the day-night level (DNL) of US noise rules, which adds 10 dB between 10 pm and 7 am: more residents hear it, and the background you listen against is 10 dB lower. The dark, the stars and the lamps are scenery.</p>' : '') +
+    '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table. With Listen on, a soft background plays behind the plant (as 45 dBA by day, 10 dB less at night): it is for the ear, not measured.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the aerial photograph, lying flat, so trees and roofs are seen as they are from the air; buildings stand up where OpenStreetMap has them. The sky is scenery. The maps are linked: move the table or the sentiment map and this wall goes with them.</p>' : '') + '<p class="asrc imh">Press H to hide or show the panels.</p>';
   el.innerHTML = o;
 }
 function axoFrame(ts){
@@ -2232,12 +2361,15 @@ function audioStart(){
     var src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.loopEnd = (len - F) / ctx.sampleRate;
     var lp = ctx.createBiquadFilter(); lp.type = "lowpass"; var hum = ctx.createOscillator(); hum.type = "sawtooth"; var hl = ctx.createBiquadFilter(); hl.type = "lowpass"; hl.frequency.value = 420; var hg = ctx.createGain(); hg.gain.value = 0;
     var out = ctx.createGain(); out.gain.value = 0; src.connect(lp); lp.connect(out); hum.connect(hl); hl.connect(hg); hg.connect(out); out.connect(ctx.destination); src.start(); hum.start();
-    AXO.audio = {ctx:ctx, lp:lp, hum:hum, hg:hg, out:out}; }
+    var bsrc = ctx.createBufferSource(); bsrc.buffer = buf; bsrc.loop = true; bsrc.loopEnd = (len - F) / ctx.sampleRate; bsrc.playbackRate.value = .62; var bl = ctx.createBiquadFilter(); bl.type = "lowpass"; bl.frequency.value = 380; var amb = ctx.createGain(); amb.gain.value = 0;
+    bsrc.connect(bl); bl.connect(amb); amb.connect(ctx.destination); bsrc.start(.7);   // the background the plant is heard against: a soft, low rush
+    AXO.audio = {ctx:ctx, lp:lp, hum:hum, hg:hg, out:out, amb:amb}; }
   try { AXO.audio.ctx.resume(); } catch(e){} return true;
 }
 function audioSet(){
   var a = AXO.audio; if (!a) return; var live = AXO.on && AXO.el && AXO.el.isConnected, now = a.ctx.currentTime, L = AXO.earL, T = {T1:[900, 110, .05], T2:[1700, 146, .17], T3:[620, 92, .03], T4:[900, 110, .05]}[ST.t];
   a.out.gain.setTargetAtTime(live && L > 18 ? Math.min(1.5, Math.pow(10, (L - 62) / 20)) : 0, now, .2);   // 62 dBA plays at full level; every 20 dB less is a tenth of it
+  if (a.amb) a.amb.gain.setTargetAtTime(live ? Math.pow(10, ((AXO.night ? 45 - NIGHTDB : 45) - 62) / 20) : 0, now, .6);   // the background, for the ear only: played as 45 dBA by day (the lower contour) and 10 dB less at night
   a.lp.frequency.setTargetAtTime(T[0] * Math.max(.4, Math.min(1, 220 / Math.max(40, AXO.earD || 1e4))), now, .3); a.hum.frequency.setTargetAtTime(T[1], now, .3); a.hg.gain.setTargetAtTime(T[2], now, .3);
 }
 // ---------- put that there: point at a thing, point at a place, say what to do ----------
@@ -2327,13 +2459,15 @@ function altCards(cls){   // one card per alternative of the chapter: its pictur
 // The right wall: the picture and its alternatives on the left; on the right what the scenario gives, takes and leaves unknown, and the trace of one result back to its choice.
 // The right wall: the reading in words and in the wheel, with no picture. The wheel, large, with how to read it; one small wheel per alternative of the chapter
 // (tap one to choose it); the three lists; the trace, which says why each wedge is there; the offer. (#metrics, its older address, opens the same screen.)
+var MD = {detail:false};   // the right wall opens on the bubbles; the wheel, the lists and the trace are one tap away
 function metricsHTML(bare){
-  var b = modules();
-  return '<div class="card measure"><div class="hd">Live analysis · what this scenario gives and takes</div>' +
-    '<div class="chosen">' + ["d","t","e"].map(function(k){ var o = chosenName(k), c = {d:"design", t:"technology", e:"energy"}[k]; return '<button type="button" data-ch="' + c + '"' + (ST.ch === c ? ' class="now"' : '') + '><b>' + o[0] + '</b>' + o[1] + '</button>'; }).join("") +
-    '<button type="button" data-ch="benefits"' + (ST.ch === "benefits" ? ' class="now"' : '') + '><b>' + (b.length ? b.join(" ") : "B") + '</b>' + (b.length ? "Benefits" : "No benefit yet") + '</button></div>' +
+  var b = modules(), chips = '<div class="chosen">' + ["d","t","e"].map(function(k){ var o = chosenName(k), c = {d:"design", t:"technology", e:"energy"}[k]; return '<button type="button" data-ch="' + c + '"' + (ST.ch === c ? ' class="now"' : '') + '><b>' + o[0] + '</b>' + o[1] + '</button>'; }).join("") +
+    '<button type="button" data-ch="benefits"' + (ST.ch === "benefits" ? ' class="now"' : '') + '><b>' + (b.length ? b.join(" ") : "B") + '</b>' + (b.length ? "Benefits" : "No benefit yet") + '</button></div>';
+  if (MD.detail) return '<div class="card measure"><div class="hd">Live analysis · what this scenario gives and takes<button type="button" class="pbtn mdb" data-md="0">‹ Back to the simple view</button></div>' + chips +
     '<div class="mbody"><div class="mleft"><div class="whl" data-w="wheel" data-size="big"></div><div class="smalls">' + altCards("sm") + '</div></div>' +
     '<div class="mright"><div class="led" data-w="ledger"></div><div class="trace" data-w="trace"></div></div></div>' + offerHTML() + '</div>';
+  return '<div class="card measure simple"><div class="hd">What this plan means for the neighborhood<button type="button" class="pbtn mdb" data-md="1">The wheel, the sources and questions ›</button></div>' + chips +
+    '<div class="faces" data-w="faces"></div><div class="bubs" data-w="bubbles"></div><div class="bwhy" data-w="bwhy"></div>' + moneyHTML() + '</div>';
 }
 function render(){
   var main = $("main"), keep = document.activeElement && document.activeElement.id, H = {editor:editorHTML, sentiment:sentimentHTML, view:viewHTML, analysis:metricsHTML, examples:examplesHTML};
@@ -2447,6 +2581,7 @@ document.addEventListener("click", function(ev){
   if ((b = T.closest("[data-mic]"))){ listen(b.getAttribute("data-mic"), b); return; }
   if ((b = T.closest("[data-stm]"))){ SEL.id = b.getAttribute("data-stm"); SEL.ax = null; SEL.msg = ""; wordsFill(); return; }
   if ((b = T.closest("[data-wax]"))){ pickSpoke(b.getAttribute("data-wax")); return; }
+  if ((b = T.closest("[data-md]"))){ MD.detail = b.getAttribute("data-md") === "1"; render(); return; }
   if ((b = T.closest("[data-q]"))){ SEL.q = b.getAttribute("data-q"); SEL.msg = ""; wordsFill(); return; }
   if ((b = T.closest("[data-set]"))){ SEL.ax = null; SEL.msg = ""; choose(b.getAttribute("data-set")); return; }
   if ((b = T.closest("[data-keep]"))){ keepAsked(b.getAttribute("data-keep"), false); SEL.msg = "Kept for the developer."; wordsFill(); return; }
@@ -2475,6 +2610,7 @@ document.addEventListener("click", function(ev){
   if ((b = T.closest("[data-gv]"))){ GV.on = b.getAttribute("data-gv") === "on"; GV.auto = true; GV.bTo = null; GV.to = null; gvSave(); render(); return; }
   if ((b = T.closest("[data-gh]"))){ GV.h = +b.getAttribute("data-gh"); GV.tilt = GVTILT[GV.h]; gvSave(); gvCam(); axoKey(); return; }
   if ((b = T.closest("[data-snd]"))){ AXO.on = b.getAttribute("data-snd") === "on" && audioStart(); axoEar(); axoKey(); return; }
+  if ((b = T.closest("[data-tod]"))){ AXO.night = b.getAttribute("data-tod") === "night"; try { localStorage.setItem("dcscope-night", AXO.night ? "1" : ""); } catch(e){} nightSync(); axoHear(); axoEar(); axoKey(); return; }
   if ((b = T.closest("[data-hot]"))){ var hk = b.getAttribute("data-hot"); hotPick(HOT.list.map(function(x){ return x.k; }).indexOf(hk), false); AXO.hold = performance.now() + 15000; return; }
   if ((b = T.closest("[data-tour]"))){ var tw = b.getAttribute("data-tour");
     if (tw === "x"){ HOT.i = -1; HOT.k = null; tourFill(); } else if (tw === "go"){ if (HOT.list[HOT.i]) hotGo(HOT.list[HOT.i]); } else hotPick(HOT.i < 0 ? 0 : HOT.i + (tw === "next" ? 1 : -1), true); return; }
@@ -2515,7 +2651,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-192417";
+var BUILD = "20261123-194108";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
