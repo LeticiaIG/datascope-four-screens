@@ -2689,7 +2689,7 @@ function metricsHTML(bare){
   var key = chosen(ST).join(" ") + "|" + ST.site, was = MD.key, cut = !bare && was != null && was !== key, hit = ""; MD.key = bare && was != null ? was : key;
   if (cut){ var a0 = was.split("|")[0].split(" "), a1 = chosen(ST); hit = ["D", "T", "E", "B"].filter(function(g){ return a0.filter(function(c){ return c.charAt(0) === g; }).join() !== a1.filter(function(c){ return c.charAt(0) === g; }).join(); })[0] || ""; }
   var acts = '<div class="chosen acts">' + [["design", "D", "Design", chosenName("d")], ["technology", "T", "Technology", chosenName("t")], ["energy", "E", "Energy", chosenName("e")], ["benefits", "B", "Benefits", [b.length ? b.join(" ") : "B", b.length ? b.map(function(c){ return optOf(c)[1]; }).join(" · ") : "No benefit yet"]]].map(function(c, i){
-    return '<button type="button" data-ch="' + c[0] + '" class="k' + c[1] + (ST.ch === c[0] ? " now" : "") + (hit === c[1] ? " hit" : "") + '"><small>' + (i + 1) + ' · ' + c[2] + '</small><em>' + c[3][1] + '</em></button>'; }).join("") + '<button type="button" class="mdb" data-md="1">Wheel · sources · questions ›</button></div>';
+    return '<button type="button" data-ch="' + c[0] + '" class="k' + c[1] + (ST.ch === c[0] ? " now" : "") + (hit === c[1] ? " hit" : "") + '"><small>' + (i + 1) + ' · ' + c[2] + '</small><em>' + c[3][1] + '</em></button>'; }).join("") + '<button type="button" class="mdb" data-md="1" title="The wheel, the sources and the questions">Details ›</button></div>';
   return '<div class="card measure simple film' + (cut ? " cut" : "") + '" aria-label="What this plan means for the neighborhood"><div class="rwbg" aria-hidden="true"></div>' + (cut ? '<i class="whip" aria-hidden="true"></i>' : '') + '' + acts +
     '<div class="bubs" data-w="bubbles"></div><div class="faces" data-w="faces"></div><div class="bwhy" data-w="bwhy"></div>' + moneyHTML() + '<i class="crop" aria-hidden="true"></i>' +
     '<p class="rwattr">Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community. Buildings © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="https://openmaptiles.org/">OpenMapTiles</a>, <a href="https://openfreemap.org/">OpenFreeMap</a></p></div>';
@@ -2948,7 +2948,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-221021";
+var BUILD = "20261123-221137";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
