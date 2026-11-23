@@ -627,6 +627,7 @@ body.imm .tour{display:flex} body.nopanels .tour{display:none}
 .exs figcaption{font-size:.85rem;font-weight:600;color:var(--muted)}
 .exs .hero{max-width:70rem;align-self:center;width:100%}
 .exgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.exs .hd.exsub{font-size:1.1rem;margin-top:.6rem}
 /* a light lock: the page asks for a code when one is set */
 html.checking .app{visibility:hidden}
 .gate{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:1.5rem}
@@ -688,7 +689,8 @@ html.checking .app{visibility:hidden}
    Two typefaces: Jost (light) for figures and sentences, Space Mono for labels. Three colors carry meaning: mint for what is gained, orange for
    what is given up, grey for what is not known. */
 .measure.simple.film{--bg:#0d0e0f;--fg:#f1eee3;--dim:#8e8c84;--gain:#8df0bd;--loss:#ff6a3d;--line:#f1eee333;font-family:"Jost","Futura","Century Gothic",var(--font);color:var(--fg);gap:1rem;padding:4.9rem 2.4rem 1.2rem}
-.measure.simple.film > .rwbg::after{content:"";position:absolute;inset:0;background:#0d0e0feb}
+.measure.simple.film > .rwbg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 46%,#0d0e0f52 0,#0d0e0f8c 62%,#0d0e0fc7 100%),linear-gradient(#0d0e0fb8 0,#0d0e0f00 20%,#0d0e0f00 62%,#0d0e0fd1 100%)}   /* a grade and a vignette: the landscape stays in view, the words stay readable */
+.measure.simple.film.night > .rwbg::after{background:linear-gradient(#0d0e0f99 0,#0d0e0f00 20%,#0d0e0f00 62%,#0d0e0fb3 100%)}
 .film button{font-family:inherit;color:inherit}
 .film .slate,.film .acts small,.film .bcol h4,.film .fcap,.film .face b,.film .bub span,.film .mcell small,.film .strips,.film .frz,.film .go,.film .bmore,.film .mdb{font-family:"Space Mono",ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.14em;font-weight:400}
 .film .slate{display:flex;align-items:center;gap:1.6rem;font-size:.68rem;color:var(--dim);border-bottom:1px solid var(--line);padding-bottom:.5rem}
@@ -703,8 +705,25 @@ html.checking .app{visibility:hidden}
 .film .acts button::after{content:"";position:absolute;right:.7rem;top:.6rem;width:.55rem;height:.55rem;border-radius:50%;background:var(--fg)}
 .film .acts .kT::after{background:#4aa3ff} .film .acts .kE::after{background:#ffc928} .film .acts .kB::after{background:var(--gain)}
 .measure.simple.film .acts button.now{border-color:var(--fg);background:none}
-.film .bubs{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:2rem;align-items:stretch}
-.measure.simple.film .bcol{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:.6rem 0 0;align-items:flex-start;gap:.5rem;--c:var(--gain)} .measure.simple.film .bcol.l{--c:var(--loss);align-items:flex-end}
+.film .bubs{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:2rem;align-items:stretch;perspective:1500px}
+.measure.simple.film .bcol.g{transform:rotateY(13deg);transform-origin:0 50%} .measure.simple.film .bcol.l{transform:rotateY(-13deg);transform-origin:100% 50%}
+.film .phs{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:1.1cqw;align-self:stretch} .film .bcol.l .phs{align-items:flex-end}
+.film .ph{font:inherit;display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:1.2cqw;align-items:center;justify-content:start;background:none;border:0;padding:0;cursor:pointer;color:var(--fg);text-align:left;text-shadow:0 2px 18px #0d0e0f99;transition:opacity .2s,transform .2s}
+.film .bcol.l .ph{grid-template-columns:auto auto;text-align:right;justify-content:end} .film .bcol.l .ph .ar{order:2;grid-column:2;grid-row:1 / span 2} .film .bcol.l .ph b,.film .bcol.l .ph span{grid-column:1}
+.film .ph .ar{grid-row:1 / span 2;width:min(5.2rem,11cqw);height:min(5.2rem,11cqw);display:block;filter:drop-shadow(0 4px 14px #0d0e0f80)} .film .ph .ar svg{width:100%;height:100%;display:block;fill:var(--c)}
+.film .ph b{font-size:min(4.6rem,10cqw);font-weight:400;line-height:.9;letter-spacing:-.02em;color:var(--c);font-variant-numeric:tabular-nums;align-self:end}
+.film .ph span{font-size:min(1.7rem,3.9cqw);font-weight:400;line-height:1.1;align-self:start}
+.film .ph.d1 b,.film .ph.d0 b{font-size:min(3.6rem,8cqw)} .film .ph.d1 .ar,.film .ph.d0 .ar{width:min(4.2rem,9cqw);height:min(4.2rem,9cqw)}
+.film .ph.d0 .ar svg{fill:none;stroke:var(--c);stroke-width:1.3;stroke-dasharray:2.5 2}
+.film .phs.many{gap:.5cqw} .film .phs.many .ph b{font-size:min(2.4rem,5.4cqw)} .film .phs.many .ph span{font-size:min(1.05rem,2.5cqw)} .film .phs.many .ph .ar{width:min(2.8rem,6cqw);height:min(2.8rem,6cqw)}
+.measure.simple.film .ph.q{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3rem;--c:var(--fg);border:1.5px dashed var(--fg);border-radius:50%;width:11rem;height:11rem;justify-content:center;text-shadow:none;background:#0d0e0f73}
+.film .ph.q b{font-size:3.6rem;font-weight:300;color:var(--fg);align-self:auto} .film .ph.q span{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;line-height:1.5;align-self:auto}
+.film .bubs.frozen .ph:not(.sel){opacity:.22} .film .bubs.frozen .ph.sel{transform:scale(1.06)} .measure.simple.film .bubs.frozen .ph.q.sel{background:var(--fg);color:var(--bg)} .film .bubs.frozen .ph.q.sel b{color:var(--bg)}
+.film.cut .ph{animation:snap .3s cubic-bezier(.2,1.7,.4,1) both;animation-delay:calc(140ms + var(--i, 0) * 70ms)}
+@media (prefers-reduced-motion: reduce){ .film.cut .ph{animation:none} }
+.measure.simple.film .phs .nil{background:none;border:0;border-radius:0;padding:0;margin:0;font-size:2rem;font-weight:300;color:var(--fg);opacity:.7;text-shadow:0 2px 18px #0d0e0f99}
+.film .hd,.film .sayl,.film .mcell b{text-shadow:0 2px 18px #0d0e0f99}
+.measure.simple.film .bcol{background:none;border:0;border-top:1px solid #f1eee366;border-radius:0;padding:.6rem 0 0;align-items:flex-start;gap:.5rem;--c:var(--gain)} .measure.simple.film .bcol.l{--c:var(--loss);align-items:flex-end}
 .measure.simple.film .bcol.q{border:0;padding:0;justify-content:center;align-items:center}
 .measure.simple.film .bcol h4{align-self:auto;background:none;color:var(--c);padding:0;border-radius:0;font-size:.74rem;gap:.7rem;align-items:center}
 .film .bcol h4 i{min-width:0;height:auto;padding:0;background:none;color:var(--c);font-size:.74rem;border-radius:0} .film .bcol h4 i::before{content:"× "}
@@ -1816,7 +1835,8 @@ function examplesHTML(bare){
   function fig(src, cap, cls){ return '<figure' + (cls ? ' class="' + cls + '"' : '') + '><a href="' + src + '" target="_blank" rel="noopener"><img src="' + src + '" alt="' + cap + '" loading="lazy"></a><figcaption>' + cap + '</figcaption></figure>'; }
   return '<div class="card exs"><div class="hd">Examples</div>' + fig("examples/room-people.jpg", "People deliberating around the four screens. One of them points at the right wall, where each choice is written as what it gains and what it gives up. The center wall is imagined as a place you could walk into, with the sound drawn as rings. AI-generated image: the room, the people and the landscape are imagined, and the screens are redrawn from the real ones, so small text is approximate.", "hero") +
     '<div class="exgrid">' + fig("guide/0-layout.jpg", "The room as the page lays it out") + fig("guide/1-left-wall.jpg", "Left wall · Sentiment map") +
-    fig("guide/2-center-wall.jpg", "Center wall · Site layout") + fig("guide/3-table.jpg", "Table · Scenario Editor") + fig("guide/4-right-wall.jpg", "Right wall · Live analysis") + '</div></div>';
+    fig("guide/2-center-wall.jpg", "Center wall · Site layout") + fig("guide/3-table.jpg", "Table · Scenario Editor") + fig("guide/4-right-wall.jpg", "Right wall · Live analysis") + '</div>' +
+    '<div class="hd exsub">Showing the data · the process</div><div class="exgrid">' + fig("examples/process-rings.jpg", "A step on the way to the right wall: each result as a ring with one large figure, on a dark ground, here frozen on one of them. The wall now tells the same trade-off in words with arrows, over the landscape.") + '</div></div>';
 }
 // A result as a bubble: one large figure, a few plain words, the code of the choice it comes from. The figure is the one the statement already
 // carries (the same numbers and sources as the lists and the wheel); where the size is not known the bubble says so in words and is dashed.
@@ -1860,16 +1880,30 @@ function facesHTML(st){   // a face and a name; the reason comes when the face i
   return '<span class="fcap">Who is it good for?</span>' + facesData(st).map(function(f, i){ return '<button type="button" class="face m' + f.m + (MD.freeze === "face:" + i ? " sel" : "") + '" data-face="' + i + '">' + faceSVG(f.m) + '<b>' + f.n + '</b></button>'; }).join("");
 }
 function counted(st){ return st.filter(function(x){ var b = bigOf(x)[0]; return !/^(0 dB|0%|\$0M?)$/.test(b); }); }   // on the staged wall
+var ARROW = {d:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2h8v10h6L12 22 2 12h6z"/></svg>', u:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 22h8V12h6L12 2 2 12h6z"/></svg>', r:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8v8h10v6l10-10L12 2v6z"/></svg>'};
+function phraseOf(x){   // [arrow, figure, words]
+  var b = bigOf(x), n = b[0].replace(/^[−+]/, ""), up = b[0].charAt(0) === "+", t = TECH[x.code], en = ENERGY[x.code];
+  if (x.ax === "water" && t) return [up ? "u" : "d", n, (up ? "more" : "less") + " cooling water"];
+  if (x.ax === "power" && t) return [up ? "u" : "d", n, (up ? "more" : "less") + " electricity"];
+  if (x.ax === "quiet") return /\d/.test(n) ? [up ? "u" : "d", n, /pin/.test(b[1]) ? (up ? "louder" : "quieter") + " where you stand" : up ? "louder on hot days" : "quieter equipment"] : [x.dir > 0 ? "d" : "u", x.dir > 0 ? "Quieter" : "Louder", "for the nearest neighbors"];
+  if (x.ax === "clean") return ["u", n, x.code === "E4" ? "of six microreactors paid for" : "of the power from new " + en.what];
+  if (x.ax === "money" && x.code.charAt(0) === "B") return ["r", n, {B1:"in grants for local projects", B2:"for the city's share of the plant", B3:"for the most affected homes", B4:"for training and internships"}[x.code]];
+  if (x.ax === "money" && en) return ["r", n, "to " + en.what + ", not to benefits"];
+  if (x.ax === "money") return ["r", "Heat", "from the servers, for nearby customers"];
+  if (x.ax === "places") return ["u", "Places", "a pool, a spa, rooms and cafes"];
+  if (x.ax === "views") return ["d", "Less", "of the building in view"];
+  return ["r", b[0], b[1]];
+}
 function bubblesHTML(st, un){
   var sel = SEL.ax ? null : SEL.id, bi = 0, TOP = 3; st = counted(st);
   function rank(list){ return list.map(function(x, i){ return [x, i]; }).sort(function(a, b){ return (b[0].deg || 0) - (a[0].deg || 0) || (/\d/.test(bigOf(b[0])[0]) ? 1 : 0) - (/\d/.test(bigOf(a[0])[0]) ? 1 : 0) || a[1] - b[1]; }).map(function(a){ return a[0]; }); }
   var g = rank(st.filter(function(x){ return x.dir > 0; })), l = rank(st.filter(function(x){ return x.dir < 0; }));
-  function bub(x){ var b = bigOf(x), wordy = !/\d/.test(b[0]); return '<button type="button" class="bub ' + (x.dir > 0 ? "g" : "l") + " d" + (x.deg || 0) + (wordy ? " w" : "") + (x.id === sel ? " sel" : "") + '" style="--i:' + (bi++) + '" data-stm="' + x.id + '"><b>' + b[0] + '</b><span>' + b[1].split("<br>")[0] + '</span></button>'; }
+  function line(x){ var f = phraseOf(x); return '<button type="button" class="ph ' + (x.dir > 0 ? "g" : "l") + " d" + (x.deg || 0) + (x.id === sel ? " sel" : "") + '" style="--i:' + (bi++) + '" data-stm="' + x.id + '"><i class="ar">' + ARROW[f[0]] + '</i><b>' + f[1] + '</b><span>' + f[2] + '</span></button>'; }
   function col(cls, n, title, list, empty){ var show = MD.all ? list : list.slice(0, TOP), more = list.length - show.length;
-    return '<div class="bcol ' + cls + '"><h4>' + title + '<i>' + n + '</i></h4><div class="bfield' + (show.length > 4 ? " many" : "") + '">' + (show.length ? show.map(bub).join("") : '<p class="nil">' + empty + '</p>') + '</div>' +
-      (more > 0 ? '<button type="button" class="bmore" data-ball="1">and ' + more + ' smaller</button>' : MD.all && list.length > TOP ? '<button type="button" class="bmore" data-ball="0">show the largest only</button>' : '') + '</div>'; }
+    return '<div class="bcol ' + cls + '"><h4>' + title + '<i>' + n + '</i></h4><div class="phs' + (show.length > 3 ? " many" : "") + '">' + (show.length ? show.map(line).join("") : '<p class="nil">' + empty + '</p>') + '</div>' +
+      (more > 0 ? '<button type="button" class="bmore" data-ball="1">and ' + more + ' smaller</button>' : MD.all && list.length > TOP ? '<button type="button" class="bmore" data-ball="0">the largest only</button>' : '') + '</div>'; }
   return col("g", g.length, "The neighborhood gains", g, "Nothing yet") +
-    '<div class="bcol q"><button type="button" class="bub q' + (MD.freeze === "q" ? " sel" : "") + '" style="--i:' + (bi++) + '" data-qs><b>' + un.length + '</b><span>' + (un.length === 1 ? "question" : "questions") + ' not answered yet</span></button></div>' +
+    '<div class="bcol q"><button type="button" class="ph q' + (MD.freeze === "q" ? " sel" : "") + '" style="--i:' + (bi++) + '" data-qs><b>' + un.length + '</b><span>' + (un.length === 1 ? "question" : "questions") + '<br>nobody has<br>answered</span></button></div>' +
     col("l", l.length, "The neighborhood gives up", l, "Nothing so far");   // gains and what is given up face each other across what is not known
 }
 function sayYou(x){   // one bubble, said to the person looking at it
@@ -2009,7 +2043,7 @@ function wordsFill(){
 // Figures that run up to their value: each large figure on the staged wall counts from nothing the first time it shows and whenever it changes.
 function runUp(){
   var film = document.querySelector(".measure.film"); if (!film || film.closest(".mini")) return; var seen = MD.seen || (MD.seen = {}), still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches, now = {};
-  [].forEach.call(film.querySelectorAll(".bub > b, .mcell > b"), function(el, n){ var k = el.parentNode.getAttribute("data-stm") || (el.parentNode.hasAttribute("data-qs") ? "q" : "m" + n), txt = el.textContent; now[k] = txt; if (seen[k] === txt || still || !/\d/.test(txt)) return;
+  [].forEach.call(film.querySelectorAll(".ph > b, .mcell > b"), function(el, n){ var k = el.parentNode.getAttribute("data-stm") || (el.parentNode.hasAttribute("data-qs") ? "q" : "m" + n), txt = el.textContent; now[k] = txt; if (seen[k] === txt || still || !/\d/.test(txt)) return;
     var t0 = performance.now(), D = 620; (function tick(ts){ var u = Math.min(1, (ts - t0) / D), e = 1 - Math.pow(1 - u, 3); if (!el.isConnected) return;
       el.textContent = u >= 1 ? txt : txt.replace(/\d+(\.\d+)?/g, function(m){ var dec = (m.split(".")[1] || "").length; return (parseFloat(m) * e).toFixed(dec); }); if (u < 1) requestAnimationFrame(tick); })(t0); });
   MD.seen = now;
@@ -2900,7 +2934,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-215643";
+var BUILD = "20261123-220103";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
