@@ -2370,7 +2370,7 @@ function axoKey(){
     '<p class="asrc">1 dot = ' + AXO.per + (AXO.per === 1 ? " resident" : " residents") + ' · 2020 Census blocks, for the ground seen so far.</p>';
   if (S().open) o += '<div class="arow"><span>Size</span>' + sw("data-big", [["ref", "Reference", !ST.big], ["big", "600 MW", ST.big]]) + '</div>' + (ST.big ? '<p class="asrc">What if: 600 MW heard as 23 reference plants in one place, 14 dB louder.</p>' : '');
   o += '<div class="arow"><span>Time</span>' + sw("data-tod", [["day", "Day", !AXO.night], ["night", "Night", AXO.night]]) + '</div>' + (AXO.night ? '<p class="asrc">At night the same sound counts as 10 dB more, as in the day-night level (DNL) of US noise rules, which adds 10 dB between 10 pm and 7 am: more residents hear it, and the background you listen against is 10 dB lower. The dark, the stars and the lamps are scenery.</p>' : '') +
-    '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table. With Listen on, a soft background plays behind the plant (as 45 dBA by day, 10 dB less at night): it is for the ear, not measured.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the table’s map with the aerial photograph mixed into it; buildings stand up where OpenStreetMap has them. The sky is scenery. The maps are linked: move the table or the sentiment map and this wall goes with them.</p>' : '') + '<p class="asrc imh">Press H to hide or show the panels.</p>';
+    '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table. With Listen on, a soft background plays behind the plant (as 45 dBA by day, 10 dB less at night): it is for the ear, not measured.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the table’s map with the aerial photograph mixed into it; buildings stand up where OpenStreetMap has them. The sky is scenery. The maps are linked: move the table or the sentiment map and this wall goes with them.</p>' : '') + '<p class="asrc imh">First person: the eye is 2 m above the ground, as if you stood there. Press H to hide or show the panels.</p>';
   el.innerHTML = o;
 }
 function axoFrame(ts){
@@ -2748,6 +2748,9 @@ document.addEventListener("click", function(ev){
 // The immersive view: the whole screen, no bar, a slow turn. H hides the panels for projection; Esc or the button leaves.
 function immersive(on){
   document.body.classList.toggle("imm", on); if (!on) document.body.classList.remove("nopanels"); AXO.orbit = on; AXO.hold = 0;
+  if (AXO.map && gvOn()){   // immersive is the first person: the eye comes down to a person's height, and goes back up on leaving
+    if (on && GV.h !== 2){ GV.hWas = GV.h; GV.h = 2; } else if (!on && GV.hWas){ GV.h = GV.hWas; GV.hWas = 0; }
+    GV.tilt = GVTILT[GV.h]; gvSave(); gvCam(); axoKey(); }
   try { if (on && !document.fullscreenElement) document.documentElement.requestFullscreen().catch(function(){}); else if (!on && document.fullscreenElement) document.exitFullscreen(); } catch(e){}
   var b = document.querySelector('[data-az="imm"]'); if (b) b.setAttribute("aria-pressed", String(on)); if (AXO.map) setTimeout(function(){ if (AXO.el.isConnected) AXO.map.resize(); }, 350);
 }
@@ -2777,7 +2780,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-212828";
+var BUILD = "20261123-213214";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
