@@ -889,30 +889,29 @@ html.checking .app{visibility:hidden}
    for given up; the words are black or white with the ground. Solid, flat color is kept for what stands on its own ground: the chapter tiles and the card
    that shows one choice. */
 .measure.simple.film .bubs{display:flex;perspective:none;gap:0} .measure.simple.film .faces{display:none}
-.film .fld{flex:1 1 auto;min-width:0;display:grid;grid-template-columns:1.2fr repeat(4,minmax(0,1fr));gap:1.3rem;align-items:stretch}
-.film .fcol{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;gap:.5rem;border-top:2px solid var(--fg);padding-top:.5rem}
-.film .fcol h4{margin:0;align-self:stretch;display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;font-size:.95rem;font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:1.05;color:var(--fg);text-shadow:0 0 3px var(--halo),0 0 14px var(--halo)}
+.film .fld{flex:1 1 auto;min-width:0;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);gap:2.4rem;align-items:stretch}
+.film .fmoney{min-width:0;min-height:0;display:flex;align-items:center;justify-content:center}
+.film .ftx{min-width:0;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:1.4rem 2.2rem;align-content:center}
+.film .fcol{min-width:0;min-height:0;display:flex;flex-direction:column;gap:.55rem;border-top:2px solid var(--fg);padding-top:.5rem}
+.film .fcol h4{margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;font-size:.95rem;font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:1.05;color:var(--fg);text-shadow:0 0 3px var(--halo),0 0 14px var(--halo)}
 .film .fcol h4 i{flex:none;font-style:normal;font-size:.8rem;font-weight:800;opacity:.65} .film .fcol h4 i.g{color:var(--gain);opacity:1} .film .fcol h4 i.l{color:var(--loss);opacity:1}
-.film .fbs{flex:1 1 auto;min-height:0;align-self:stretch;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;align-items:center;gap:.5rem}
-.film .fb{--s:9rem;font:inherit;width:var(--s);height:var(--s);flex:none;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;padding:.9rem;text-align:center;cursor:pointer;color:var(--fg);border:1px solid #ffffffb3;background:radial-gradient(circle at 32% 26%,#eafff6e0 0,#74ddb3b8 46%,#1f9d74a8 100%);box-shadow:0 10px 30px #0d0e0f1f;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);text-shadow:0 0 8px var(--halo);transition:transform .15s,opacity .2s}
-.film .fb.l{background:radial-gradient(circle at 32% 26%,#fff0ebe0 0,#f79a87b8 46%,#d94a35a8 100%)}
-.film .fb.d0{--s:8rem;background:#ffffff14;border:1.5px dashed var(--gain);box-shadow:none} .film .fb.l.d0{border-color:var(--loss)}
-.film .fb.d1{--s:8rem} .film .fb.d2{--s:9.6rem} .film .fb.d3{--s:11.2rem}
-.film .fbs.many .fb{--s:6.9rem;padding:.5rem} .film .fbs.many .fb.d2{--s:7.6rem} .film .fbs.many .fb.d3{--s:8.6rem}
-.film .fb:hover{transform:scale(1.04)}
-.film .fb b{font-size:1.9rem;font-weight:800;letter-spacing:-.04em;line-height:1} .film .fb.d3 b{font-size:2.5rem} .film .fbs.many .fb b{font-size:1.45rem} .film .fbs.many .fb.d3 b{font-size:1.8rem}
-.film .fb span{font-size:.7rem;font-weight:700;text-transform:uppercase;line-height:1.08;max-width:100%} .film .fbs.many .fb span{font-size:.58rem}
-.film .bubs.frozen .fb:not(.sel){opacity:.3} .film .fb.sel{box-shadow:0 0 0 3px var(--fg)}
-.film.cut .fb{animation:snap .5s cubic-bezier(.2,1.5,.4,1) both;animation-delay:calc(140ms + var(--i, 0) * 80ms)} .film.cut.rev .fb{animation-delay:calc(2.9s + var(--i, 0) * 80ms)}
-@media (prefers-reduced-motion: reduce){ .film.cut .fb{animation:none} }
+.film .fts{display:flex;flex-direction:column;gap:.55rem;min-height:0}
+.film .ft{font:inherit;display:grid;grid-template-columns:minmax(4.6rem,auto) minmax(0,1fr);align-items:baseline;gap:.2rem .8rem;background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--fg);text-shadow:0 0 3px var(--halo),0 0 14px var(--halo);transition:opacity .2s}
+.film .ft b{font-size:2.5rem;font-weight:800;letter-spacing:-.045em;line-height:.95;color:var(--gain);font-variant-numeric:tabular-nums} .film .ft.l b{color:var(--loss)}
+.film .ft.d0 b{font-size:1.7rem;opacity:.8}
+.film .ft span{font-size:1rem;font-weight:700;text-transform:uppercase;line-height:1.08}
+.film .fno{margin:0;font-size:1rem;font-weight:700;text-transform:uppercase;opacity:.45;color:var(--fg)}
+.film .bubs.frozen .ft:not(.sel){opacity:.25} .film .ft.sel b{text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:6px}
+.film.cut .ft{animation:snap .5s cubic-bezier(.2,1.5,.4,1) both;animation-delay:calc(140ms + var(--i, 0) * 80ms);transform-origin:0 50%} .film.cut.rev .ft{animation-delay:calc(2.9s + var(--i, 0) * 80ms)}
+@media (prefers-reduced-motion: reduce){ .film.cut .ft{animation:none} }
 /* the money bubble in the same hand: translucent discs one inside the other, each what that chapter took, and in the middle what stays with the community */
-.film .fmoney .bcol.q{flex:1 1 auto;min-height:0;align-self:stretch;justify-content:center}
-.measure.simple.film .fmoney .bud svg{width:100%;max-width:21rem;filter:none}
+.film .fmoney .bcol.q{flex:1 1 auto;min-width:0;min-height:0;justify-content:center;align-items:center}
+.measure.simple.film .fmoney .bud svg{width:min(100%,58vh);max-width:32rem;filter:none}
 .measure.simple.film .bud .rg{fill-opacity:.22;stroke:var(--kD);stroke-width:1} .measure.simple.film .bud .rT{stroke:var(--kT)} .measure.simple.film .bud .rE{stroke:var(--kE)}
 .measure.simple.film .bud .rl,.measure.simple.film .bud .rl.lD,.measure.simple.film .bud .rl.lT,.measure.simple.film .bud .rl.lE{fill:var(--fg);stroke:var(--halo);stroke-width:2.2px;paint-order:stroke}
 .measure.simple.film .bud .bb,.measure.simple.film .bud.max .bb{fill:#ffffff;fill-opacity:.45;stroke:#ffffff;stroke-width:1} .measure.simple.film .bud .bc{fill:url(#budfill);fill-opacity:.9}
 .measure.simple.film .bud .bn,.measure.simple.film .bud .bs{fill:var(--fg);stroke:var(--halo);stroke-width:2.6px;paint-order:stroke}
-.measure.simple.film .ph.q.bud .bl{font-size:.8rem;max-width:18rem}
+.measure.simple.film .ph.q.bud .bl{font-size:.9rem;max-width:24rem;margin-top:1.5rem}
 .measure.simple.film:not(.zz) .phs .nil{font-weight:800;text-transform:uppercase;letter-spacing:-.01em;font-size:1.4rem;opacity:.45}
 .film.cut .acts button.hit{animation:hit .7s ease-out both}
 @keyframes hit{0%{background:#f1eee3;color:#0d0e0f}100%{background:none}}
@@ -2068,12 +2067,12 @@ function budBubHTML(i){   // the budget is the community's to share out. The bub
 // The story in one picture. On the left the money, as one bubble that has shrunk with every choice. Then one bubble for every result, floating over the
 // group it lands on: green where something is gained, red where it is given up, larger for more, an outline where the size is not known. Who gains and
 // who loses is read from where the bubbles gather and what color they are.
-function fieldHTML(st){
+function fieldHTML(st){   // one bubble to look at, the money; everything else is said in words, group by group
   var i = 0, q = budState();
-  function bub(x){ var p = phraseOf(x); return '<button type="button" class="fb ' + (x.dir > 0 ? "g" : "l") + " d" + (x.deg || 0) + (MD.freeze === x.id ? " sel" : "") + '" style="--i:' + (i++) + '" data-stm="' + x.id + '"><b>' + p[1] + '</b><span>' + p[2] + '</span></button>'; }
+  function line(x){ var p = phraseOf(x); return '<button type="button" class="ft ' + (x.dir > 0 ? "g" : "l") + " d" + (x.deg || 0) + (MD.freeze === x.id ? " sel" : "") + '" style="--i:' + (i++) + '" data-stm="' + x.id + '"><b>' + p[1] + '</b><span>' + p[2] + '</span></button>'; }
   var cols = GROUPS.map(function(G){ var list = st.filter(function(x){ return G[1](x); }), sc = 0; list.forEach(function(x){ sc += x.dir * (x.deg || 1); });
-    return '<div class="fcol"><h4>' + G[0] + '<i class="' + (sc > 0 ? "g" : sc < 0 ? "l" : "") + '">' + (!list.length ? "no change" : sc > 0 ? "better" : sc < 0 ? "worse" : "even") + '</i></h4><div class="fbs' + (list.length > 2 ? " many" : "") + '">' + list.map(bub).join("") + '</div></div>'; }).join("");
-  return '<div class="fld"><div class="fcol fmoney"><h4>The budget<i class="' + (q.over ? "l" : "") + '">' + (q.over ? "over" : money(q.b[0])) + '</i></h4>' + budBubHTML(i++) + '</div>' + cols + '</div>';
+    return '<div class="fcol"><h4>' + G[0] + '<i class="' + (sc > 0 ? "g" : sc < 0 ? "l" : "") + '">' + (!list.length ? "no change" : sc > 0 ? "better" : sc < 0 ? "worse" : "even") + '</i></h4><div class="fts">' + (list.length ? list.map(line).join("") : '<p class="fno">Nothing changes for them.</p>') + '</div></div>'; }).join("");
+  return '<div class="fld"><div class="fmoney">' + budBubHTML(i++) + '</div><div class="ftx">' + cols + '</div></div>';
 }
 function sayYou(x){   // one bubble, said to the person looking at it
   var b = bigOf(x), n = b[0].replace(/^[−+]/, ""), up = b[0].charAt(0) === "+", t = TECH[x.code], en = ENERGY[x.code], pr;
@@ -3121,7 +3120,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-232617";
+var BUILD = "20261123-232836";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
