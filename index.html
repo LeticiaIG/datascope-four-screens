@@ -886,6 +886,28 @@ html.checking .app{visibility:hidden}
 .measure.simple.film .bud svg{filter:drop-shadow(0 0 22px #e85cb840)}
 .measure.simple.film > svg.thr{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}
 svg.thr path{fill:none;stroke-linecap:round;opacity:.5} svg.thr .g{stroke:var(--gain)} svg.thr .l{stroke:var(--loss)} svg.thr circle.g{fill:var(--gain);stroke:none} svg.thr circle.l{fill:var(--loss);stroke:none}
+/* ---------- flat ----------
+   The look of broadcast graphics: flat blocks of color, plain circles, nothing glowing. One color per chapter (blue, pink, mustard, mint), green and orange for
+   gained and given up, black and off-white for the words. The chapters are tiles; the budget is a target of flat bands, each band what that chapter took, the
+   middle what stays with the community; the three-second card takes the color of its chapter. */
+.measure.simple.film{--kD:#3a2bff;--kT:#e87bb3;--kE:#f2b63c;--kB:#a8f0cf;--gain:#a8f0cf;--loss:#ff6a2b}
+.measure.simple.film:not(.night){--kD:#3a2bff;--kT:#e87bb3;--kE:#f2b63c;--kB:#a8f0cf;--gain:#16663a;--loss:#f04e12}
+.measure.simple.film:not(.zz) .acts{gap:.5rem;align-items:stretch}
+.measure.simple.film:not(.zz) .acts button{background:var(--kD);color:#fff;border:0;border-image:none;border-radius:0;padding:.55rem .85rem .7rem;opacity:1;text-shadow:none;justify-content:flex-start}
+.measure.simple.film:not(.zz) .acts .kT{background:var(--kT);color:#0d0e0f} .measure.simple.film:not(.zz) .acts .kE{background:var(--kE);color:#0d0e0f} .measure.simple.film:not(.zz) .acts .kB{background:var(--kB);color:#0d0e0f}
+.measure.simple.film:not(.zz) .acts small{color:inherit;opacity:.8}
+.measure.simple.film:not(.zz) .acts button.now{border:0;padding-bottom:.7rem;box-shadow:inset 0 -8px 0 #0d0e0f} .measure.simple.film.night:not(.zz) .acts button.now{box-shadow:inset 0 -8px 0 #f4f2ea}
+.measure.simple.film:not(.zz) .acts button.mdb{background:#0d0e0f;color:#f4f2ea;border:0;padding:.55rem .9rem;align-self:stretch;justify-content:center} .measure.simple.film:not(.zz) .acts button.mdb:hover{background:#0d0e0f;color:#f4f2ea;padding:.55rem .9rem;border:0}
+.measure.simple.film .bud svg{filter:none}
+.measure.simple.film .bud .rg{fill:var(--kD);stroke:none;stroke-dasharray:none} .measure.simple.film .bud .rT{fill:var(--kT);stroke:none} .measure.simple.film .bud .rE{fill:var(--kE);stroke:none}
+.measure.simple.film .bud .rl{stroke:none;fill:#0d0e0f;font-weight:800;letter-spacing:.02em} .measure.simple.film .bud .rl.lD{fill:#fff} .measure.simple.film .bud .rl.lT,.measure.simple.film .bud .rl.lE{fill:#0d0e0f}
+.measure.simple.film .bud .bb{fill:#e9f7ef;fill-opacity:1;stroke:none} .measure.simple.film .bud .bc{fill:var(--kB);fill-opacity:1}
+.measure.simple.film .bud.max .bb{fill:#e9f7ef;fill-opacity:1} .measure.simple.film .bud.over .bb{fill:#ffd9c9;fill-opacity:1;stroke:none} .measure.simple.film .bud.over .bc{fill:var(--loss)}
+.measure.simple.film .bud .bn,.measure.simple.film .bud .bs{fill:#0d0e0f;stroke:none} .measure.simple.film .bud.over .bn{fill:#0d0e0f}
+.measure.simple.film > .reveal.kD,.measure.simple.film:not(.night) > .reveal.kD{background:#3a2bff;--fg:#fff;--dim:#ffffffb3;--c:#fff;color:#fff}
+.measure.simple.film > .reveal.kT,.measure.simple.film:not(.night) > .reveal.kT{background:#e87bb3;--fg:#0d0e0f;--dim:#0d0e0fb3;--c:#0d0e0f;color:#0d0e0f}
+.measure.simple.film > .reveal.kE,.measure.simple.film:not(.night) > .reveal.kE{background:#f2b63c;--fg:#0d0e0f;--dim:#0d0e0fb3;--c:#0d0e0f;color:#0d0e0f}
+.measure.simple.film > .reveal.kB,.measure.simple.film:not(.night) > .reveal.kB{background:#a8f0cf;--fg:#0d0e0f;--dim:#0d0e0fb3;--c:#0d0e0f;color:#0d0e0f}
 .measure.simple.film:not(.zz) .phs .nil{font-weight:800;text-transform:uppercase;letter-spacing:-.01em;font-size:1.4rem;opacity:.45}
 .film.cut .acts button.hit{animation:hit .7s ease-out both}
 @keyframes hit{0%{background:#f1eee3;color:#0d0e0f}100%{background:none}}
@@ -2031,13 +2053,13 @@ function budBubHTML(i){   // the budget is the community's to share out. The bub
   var q = budState(), bens = modules(), f = funds(), en = ENERGY[ST.e], tot = q.b[0] || 1, R = 100, R0 = 32, left = tot, o = "", n = 0, outs = [], ben = r2(bens.reduce(function(a, c){ return a + price(c)[0]; }, 0));
   function rad(v){ return R0 + (R - R0) * Math.max(0, Math.min(1, v / tot)); }
   var parts = [["D", "Design", price(ST.d)[0]], ["T", "Technology", price(ST.t)[0]], ["E", en ? en.what.charAt(0).toUpperCase() + en.what.slice(1) : "", f.e > 0 ? f.e : 0]].filter(function(p){ return p[2] > 0; });
-  parts.forEach(function(p){ if (left <= 0){ outs.push(p[1] + " " + money(r2(p[2]))); return; } var r = rad(left), sd = n++ % 2 ? 1 : -1; left = r2(left - p[2]);
-    o += '<circle class="rg r' + p[0] + '" r="' + r.toFixed(1) + '"/><line class="tk" x1="-4" x2="4" y1="' + (-r).toFixed(1) + '" y2="' + (-r).toFixed(1) + '"/><text class="rl l' + p[0] + '" x="' + (sd * 8) + '" y="' + (-r + 3).toFixed(1) + '" text-anchor="' + (sd < 0 ? "end" : "start") + '">' + p[1] + ' −' + money(r2(p[2])) + '</text>'; });
+  parts.forEach(function(p){ if (left <= 0){ outs.push(p[1] + " " + money(r2(p[2]))); return; } var r = rad(left); n++; left = r2(left - p[2]); var rn = rad(left), th = r - rn;   // a flat band from the size before this choice to the size after it
+    o += '<circle class="rg r' + p[0] + '" r="' + r.toFixed(1) + '"/>' + (th >= 7.5 ? '<text class="rl l' + p[0] + '" x="0" y="' + (-(r + rn) / 2 + 3).toFixed(1) + '" text-anchor="middle" style="font-size:' + Math.min(9.5, th - 1.5).toFixed(1) + 'px">' + p[1] + ' ' + money(r2(p[2])) + '</text>' : ''); });
   var comm = Math.max(0, left), rb = rad(comm), rc = comm > 0 ? Math.min(rb, rb * Math.sqrt(Math.min(1, ben / comm))) : 0, free = r2(comm - ben);
   var note = (q.over ? '<em>The choices ask for ' + (q.left0 < 0 ? money(-q.left0) : money(-q.left1) + " a year") + ' more than there is' + (outs.length ? ": " + outs.join(", ") + " does not fit" : "") + '.</em> ' : (ben ? money(ben) + " in benefits" : "No benefit chosen yet") + (free > 0 ? ", " + money(free) + " not allocated yet. " : ". Nothing is left to allocate. ")) +
     (q.left1 < 0 ? "" : money(q.left1) + ' of ' + money(q.b[1]) + ' a year left. ') + 'Example prices.';
   return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.freeze === "bud" ? " sel" : "") + '" style="--i:' + i + '" data-bud aria-label="The budget, ' + money(tot) + ' upfront, is the community’s to share out. ' + (parts.length ? "The choices about the plant take: " + parts.map(function(p){ return p[1] + " " + money(r2(p[2])); }).join(", ") + ". " : "") + money(comm) + ' stays with the community' + (ben ? ", " + money(ben) + " of it in benefits" : "") + '.">' +
-    '<svg viewBox="-112 -110 224 216" aria-hidden="true"><defs><radialGradient id="budfill" cx="34%" cy="28%" r="85%"><stop offset="0" stop-color="#ffd98a"/><stop offset=".5" stop-color="#f06aae"/><stop offset="1" stop-color="#6f6bff"/></radialGradient><linearGradient id="budedge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb057"/><stop offset=".5" stop-color="#e85cb8"/><stop offset="1" stop-color="#4f7dff"/></linearGradient></defs>' + (n ? '<line class="ax" x1="0" x2="0" y1="-' + R + '" y2="' + (-rb).toFixed(1) + '"/>' : '') + o + '<circle class="bb" r="' + rb.toFixed(1) + '"/>' + (rc > 0 ? '<circle class="bc" r="' + rc.toFixed(1) + '"/>' : '') +
+    '<svg viewBox="-112 -110 224 216" aria-hidden="true"><defs><radialGradient id="budfill" cx="34%" cy="28%" r="85%"><stop offset="0" stop-color="#ffd98a"/><stop offset=".5" stop-color="#f06aae"/><stop offset="1" stop-color="#6f6bff"/></radialGradient><linearGradient id="budedge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb057"/><stop offset=".5" stop-color="#e85cb8"/><stop offset="1" stop-color="#4f7dff"/></linearGradient></defs>' + o + '<circle class="bb" r="' + rb.toFixed(1) + '"/>' + (rc > 0 ? '<circle class="bc" r="' + rc.toFixed(1) + '"/>' : '') +
     '<text class="bn" y="2" text-anchor="middle">' + (q.over ? "−" + (q.left0 < 0 ? money(-q.left0) : money(-q.left1)) : money(comm)) + '</text><text class="bs" y="14" text-anchor="middle">' + (q.over ? (q.left0 < 0 ? "over the budget" : "a year over the budget") : "for the community") + '</text></svg><span class="bl">' + note + '</span></button></div>';
 }
 function sayYou(x){   // one bubble, said to the person looking at it
@@ -2818,7 +2840,7 @@ var MD = {detail:false};   // the right wall opens on the bubbles; the wheel, th
 function revealHTML(g, a0, a1){
   var code = a1.filter(function(c){ return c.charAt(0) === g && a0.indexOf(c) < 0; })[0], gone = code ? null : a0.filter(function(c){ return c.charAt(0) === g && a1.indexOf(c) < 0; })[0];
   var head = '<small>' + ("DTEB".indexOf(g) + 1) + ' · ' + {D:"Design", T:"Technology", E:"Energy", B:"Benefits"}[g] + '</small>';
-  function box(cls, name, body){ return '<div class="reveal ' + cls + '" data-reveal role="status">' + head + '<em>' + name + '</em>' + body + '<u>Tap to go on</u></div>'; }
+  function box(cls, name, body){ return '<div class="reveal k' + g + ' ' + cls + '" data-reveal role="status">' + head + '<em>' + name + '</em>' + body + '<u>Tap to go on</u></div>'; }
   if (!code) return gone ? box("", optOf(gone)[1], '<p class="rv0">left out</p><p class="rc">What it took goes back to the budget.</p>') : "";
   var list = statements(ST).filter(function(s){ return s.code === code; }).sort(function(x, y){ return (y.deg || 0) - (x.deg || 0) || (/^0 dB/.test(bigOf(x)[0]) ? 1 : 0) - (/^0 dB/.test(bigOf(y)[0]) ? 1 : 0); }), x = list[0], pr = price(code), f = funds(), en = ENERGY[code];
   var cost = en ? (f.e > 0 ? "It takes the " + money(f.e) + " left of the budget." : "Nothing is left of the budget for it.") : pr[0] || pr[1] ? "It takes " + priceWords(pr) + " of the budget (example price)." : "It costs nothing extra.";
@@ -3099,7 +3121,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-231731";
+var BUILD = "20261123-232024";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
