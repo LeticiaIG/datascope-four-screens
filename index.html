@@ -699,6 +699,13 @@ html.checking .app{visibility:hidden}
 .measure.simple.film .moneybar{gap:.4rem 1.3rem} .film .mcap{grid-column:1 / -1;font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);opacity:.8}
 .film .pot,.film .lft{font-size:.95rem;white-space:nowrap;text-shadow:0 1px 3px #0d0e0fcc} .film .pot b,.film .lft b{font-size:1.6rem;font-weight:300;font-variant-numeric:tabular-nums} .film .lft{text-align:right} .film .lft.bad,.film .lft.bad b{color:var(--loss)}
 .film .moneybar .strip{height:1.5rem} .film .moneybar .strip i{justify-content:flex-start;padding:0 .45rem;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap} .film .moneybar .strip i b{line-height:1.5rem;padding:0}
+/* the middle of the wall: the budget as one bubble. It grows as the choices spend it, turns amber and says MAX when nothing is left, red when they ask for more */
+.measure.simple.film .ph.q.bud{--bc:var(--gain);width:calc(8rem + 6rem * var(--u,0));height:calc(8rem + 6rem * var(--u,0));border:1.5px solid var(--bc);background:radial-gradient(circle at 38% 32%,color-mix(in srgb,var(--bc) 50%,transparent),color-mix(in srgb,var(--bc) 14%,transparent) 72%),#0d0e0f80;animation:budgrow .7s cubic-bezier(.2,1.5,.4,1) both}
+.measure.simple.film .ph.q.bud.max{--bc:#ffc928} .measure.simple.film .ph.q.bud.over{--bc:var(--loss);animation:budgrow .7s cubic-bezier(.2,1.5,.4,1) both,budover 1.4s ease-in-out .7s infinite}
+.measure.simple.film .ph.q.bud b{font-size:3rem;font-weight:400;letter-spacing:.01em;text-shadow:0 1px 3px #0d0e0fcc} .measure.simple.film .ph.q.bud span{max-width:82%;text-shadow:0 1px 3px #0d0e0fcc}
+@keyframes budgrow{from{width:calc(8rem + 6rem * var(--u0,0));height:calc(8rem + 6rem * var(--u0,0))}}
+@keyframes budover{50%{box-shadow:0 0 0 10px #ff6a3d40}}
+@media (prefers-reduced-motion:reduce){ .measure.simple.film .ph.q.bud,.measure.simple.film .ph.q.bud.over{animation:none} }
 .film .fqs{display:flex;gap:.5rem;justify-content:center;margin:.1rem 0} .film .fqs .go{margin:0;vertical-align:0} .film .fqs .go[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
 .film .alts2{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:.4rem} .film .alts2 .setb{display:inline-flex;align-items:center;gap:.45rem;background:#0d0e0f66;border:1px solid var(--fg);border-radius:999px;padding:.2rem .8rem .2rem .3rem;color:var(--fg);font-size:.9rem;cursor:pointer} .film .alts2 .setb b{font-size:.9rem;font-weight:400} .film .alts2 .setb small{display:none}
 .film .bubs.frozen:has(.ph.sel) ~ .faces{display:none}   /* a held figure takes the room of the faces for its questions */
@@ -1915,8 +1922,20 @@ function bubblesHTML(st, un){
     return '<div class="bcol ' + cls + '"><h4>' + title + '<i>' + n + '</i></h4><div class="phs' + (show.length > 3 ? " many" : "") + '">' + (show.length ? show.map(line).join("") : '<p class="nil">' + empty + '</p>') + '</div>' +
       (more > 0 ? '<button type="button" class="bmore" data-ball="1">and ' + more + ' smaller</button>' : MD.all && list.length > TOP ? '<button type="button" class="bmore" data-ball="0">the largest only</button>' : '') + '</div>'; }
   return col("g", g.length, "The neighborhood gains", g, "Nothing yet") +
-    '<div class="bcol q"><button type="button" class="ph q' + (MD.freeze === "q" ? " sel" : "") + '" style="--i:' + (bi++) + '" data-qs><b>' + un.length + '</b><span>' + (un.length === 1 ? "question" : "questions") + '<br>nobody has<br>answered</span></button></div>' +
+    budBubHTML(bi++) +
     col("l", l.length, "The neighborhood gives up", l, "Nothing so far");   // gains and what is given up face each other across what is not known
+}
+// The middle of the wall: the budget as one bubble, in the manner of the gas bubble of The Community Carbon Impact. It grows as the choices spend
+// the budget, says how much is left while there is room, turns amber and says MAX when nothing is left, and red when the choices ask for more.
+function budState(){
+  var b = bud(), l = leftOf(ST), f = funds(), left0 = r2(l[0] - (f.e > 0 ? f.e : 0)), left1 = l[1], over = left0 < 0 || left1 < 0;
+  return {b:b, left0:left0, left1:left1, over:over, full:!over && (left0 <= 0 || left1 <= 0), used:Math.max(b[0] > 0 ? (b[0] - left0) / b[0] : 0, b[1] > 0 ? (b[1] - left1) / b[1] : 0)};   // used: the fuller of the two parts, upfront or yearly
+}
+function budBubHTML(i){
+  var q = budState(), k = Math.max(0, Math.min(1.15, q.used)), k0 = MD.budU == null ? k : MD.budU; MD.budU = k;
+  var sub = q.over ? "over the budget by " + [q.left0 < 0 ? money(-q.left0) : "", q.left1 < 0 ? money(-q.left1) + " a year" : ""].filter(function(x){ return x; }).join(" + ") :
+    q.full ? (q.left0 <= 0 && q.left1 <= 0 ? "the whole budget is spent" : q.left0 <= 0 ? "the upfront budget is all spent" : "the yearly budget is all spent") : "of the budget left, and " + money(q.left1) + " a year";
+  return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.freeze === "bud" ? " sel" : "") + '" style="--i:' + i + ';--u:' + k.toFixed(3) + ';--u0:' + k0.toFixed(3) + '" data-bud><b>' + (q.over || q.full ? "MAX" : money(q.left0)) + '</b><span>' + sub + '</span></button></div>';
 }
 function sayYou(x){   // one bubble, said to the person looking at it
   var b = bigOf(x), n = b[0].replace(/^[−+]/, ""), up = b[0].charAt(0) === "+", t = TECH[x.code], en = ENERGY[x.code], pr;
@@ -1935,6 +1954,8 @@ function bwhyHTML(st, un){   // the bubble in question, in one breath: what, bec
   var all = st.concat(un), x = SEL.ax ? null : all.filter(function(y){ return y.id === SEL.id; })[0], fr = !!x && MD.freeze === x.id, cs = counted(st), g = cs.filter(function(y){ return y.dir > 0; }).length, l = cs.length - g;
   if (document.querySelector(".measure.film")){   // on the staged wall the picture runs until something is tapped; then it holds, and one line speaks to you
     var go = '<button type="button" class="go" data-unfreeze>▶ Go on</button>', fz = '<i class="frz">Freeze</i>';
+    if (MD.freeze === "bud"){ var q = budState(), en0 = ENERGY[ST.e], fe = funds().e, bens = modules(), tk = [["design", price(ST.d)], ["technology", price(ST.t)], ["benefits", [bens.reduce(function(a, c){ return a + price(c)[0]; }, 0), bens.reduce(function(a, c){ return a + price(c)[1]; }, 0)]]].filter(function(p){ return p[1][0] || p[1][1]; }).map(function(p){ return p[0] + " " + priceWords([r2(p[1][0]), r2(p[1][1])]); });
+      return '<p class="sayl">' + fz + (q.over ? "This is the budget. The choices ask for more than there is." : q.full ? "This is the budget. There is none left: that is the maximum." : "This is the budget. There is still room in it.") + go + '</p><p class="saywhy">' + money(q.b[0]) + " upfront and " + money(q.b[1]) + " a year, the developer’s offer for the community to share out. " + (tk.length ? "So far: " + tk.join(", ") + (en0 && fe > 0 ? ", and " + en0.what + " takes the " + money(fe) + " left upfront" : "") + "." : "Nothing is spent yet.") + " Example prices.</p>"; }
     if (MD.freeze === "q") return '<p class="sayl">' + fz + (un.length ? "These are questions. Nobody has answered them yet." : "There is no open question for these choices.") + go + '</p>' + (un.length ? '<p class="saywhy">' + un.slice(0, 3).map(function(u){ return esc(u.t); }).join(" · ") + (un.length > 3 ? " · and " + (un.length - 3) + " more, under “The wheel, the sources and questions”." : ".") + '</p>' : "");
     if (/^face:/.test(MD.freeze || "")){ var f = facesData(st)[+MD.freeze.slice(5)]; return '<p class="sayl">' + fz + ["These are the nearest neighbors.", "This is the wider community.", "This is the water.", "This is the grid, and the climate.", "This is the developer."][+MD.freeze.slice(5)] + go + '</p><p class="saywhy">' + f.why + '</p>'; }
     if (!fr) return st.length || un.length ? '<p class="saywhy">Tap a figure to see why.</p>' : '';   // the counts are already on the two lists and in the circle
@@ -2046,7 +2067,7 @@ function wordsFill(){
   [].forEach.call(document.querySelectorAll('[data-w="ledger"]'), function(el){ el.innerHTML = ledgerHTML(st, un); });
   [].forEach.call(document.querySelectorAll('[data-w="wheel"]'), function(el){ var big = el.getAttribute("data-size") === "big"; el.innerHTML = (big ? WTAP : "") + wheelSVG(st, SEL.ax ? null : SEL.id, el.getAttribute("data-size")) + (big ? WHOW : WKEY); });
   [].forEach.call(document.querySelectorAll('[data-w="trace"]'), function(el){ el.innerHTML = traceHTML(st, un); });
-  if (MD.freeze && MD.freeze !== "q" && !/^face:/.test(MD.freeze) && st.concat(un).filter(function(y){ return y.id === MD.freeze; }).length === 0) MD.freeze = null;
+  if (MD.freeze && MD.freeze !== "q" && MD.freeze !== "bud" && !/^face:/.test(MD.freeze) && st.concat(un).filter(function(y){ return y.id === MD.freeze; }).length === 0) MD.freeze = null;
   [].forEach.call(document.querySelectorAll('[data-w="bubbles"]'), function(el){ el.innerHTML = bubblesHTML(st, un); el.classList.toggle("frozen", !!MD.freeze); });
   [].forEach.call(document.querySelectorAll('[data-w="faces"]'), function(el){ el.innerHTML = facesHTML(st); });
   [].forEach.call(document.querySelectorAll('[data-w="bwhy"]'), function(el){ el.innerHTML = bwhyHTML(st, un); });
@@ -2872,6 +2893,7 @@ document.addEventListener("click", function(ev){
   if ((b = T.closest("[data-fq]"))){ MD.q = b.getAttribute("data-fq"); wordsFill(); return; }
   if ((b = T.closest("[data-face]"))){ var fk = "face:" + b.getAttribute("data-face"); MD.freeze = MD.freeze === fk ? null : fk; wordsFill(); return; }
   if ((b = T.closest("[data-qs]"))){ MD.freeze = MD.freeze === "q" ? null : "q"; wordsFill(); return; }
+  if ((b = T.closest("[data-bud]"))){ MD.freeze = MD.freeze === "bud" ? null : "bud"; wordsFill(); return; }
   if ((b = T.closest("[data-ball]"))){ MD.all = b.getAttribute("data-ball") === "1"; wordsFill(); return; }
   if ((b = T.closest("[data-stm]"))){ var sid = b.getAttribute("data-stm"); if (b.closest(".measure.film")){ MD.freeze = MD.freeze === sid ? null : sid; MD.q = "why"; } SEL.id = sid; SEL.ax = null; SEL.msg = ""; wordsFill(); return; }
   if ((b = T.closest("[data-wax]"))){ pickSpoke(b.getAttribute("data-wax")); return; }
@@ -2948,7 +2970,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-221137";
+var BUILD = "20261123-221542";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
