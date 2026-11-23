@@ -587,6 +587,7 @@ body.imm .tour{display:flex} body.nopanels .tour{display:none}
 .zoomc .seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
 .zoomc .mic{width:2.3rem;height:2.3rem;border-radius:9px;border:0;background:var(--sunk)}
 .zoomc .mic.on{background:var(--over)}
+.zoomc .mic.spk.on{background:var(--ink);color:#fff;animation:none}
 .heard{position:absolute;left:50%;bottom:4.6rem;transform:translateX(-50%);z-index:3;max-width:62%;background:#1c2a28;color:#fff;border-radius:999px;padding:.45rem 1.1rem;font-size:.95rem;font-weight:600;box-shadow:0 4px 14px rgba(20,40,34,.3)}
 .vrow .mic{align-self:center}
 
@@ -841,6 +842,12 @@ html.checking .app{visibility:hidden}
 .measure.simple.film:not(.night) > .reveal{background:radial-gradient(ellipse at 50% 50%,#f4f2eaf5 0,#f4f2eafa 70%)}
 .measure.simple.film:not(.night) > .rwattr{color:#0d0e0f;background:#f4f2eab8}
 .measure.simple.film:not(.night) .frz{color:#f4f2ea}
+/* the words are black or white with the ground; the graphics keep their colors: green for what is gained, red for what is given up, one color per chapter */
+.measure.simple.film{--kD:#c9a2ff} .measure.simple.film:not(.night){--kD:#7a3fe0;--gain:#0b8a62;--loss:#e0431a}
+.measure.simple.film > .reveal.g{--c:var(--gain)} .measure.simple.film > .reveal.l{--c:var(--loss)}
+.measure.simple.film .bud .rD{stroke:var(--kD)} .measure.simple.film .acts .kD::after{background:var(--kD)}
+.measure.simple.film .bud .rl.lD{fill:var(--kD)} .measure.simple.film .bud .rl.lT{fill:var(--kT)} .measure.simple.film .bud .rl.lE{fill:var(--kE)}
+.measure.simple.film .bud .ax,.measure.simple.film .bud .tk{stroke:var(--dim)}
 .film.cut .acts button.hit{animation:hit .7s ease-out both}
 @keyframes hit{0%{background:#f1eee3;color:#0d0e0f}100%{background:none}}
 @media (prefers-reduced-motion: reduce){ .film .whip{display:none} .film.cut .bub,.film.cut .acts button.hit,.stamp.slam{animation:none} }
@@ -1590,7 +1597,7 @@ function editorHTML(bare){
       return '<label class="opt' + (no ? " no" : "") + '"><input type="' + (P.multi ? "checkbox" : "radio") + '" name="opt" id="opt-' + c + '" value="' + c + '"' + (on ? " checked" : "") + (no ? " disabled" : "") + '><span><span class="code">' + c + '</span><span class="nm">' + op[1] + '</span><span class="sub">' + (no ? "Does not fit the budget: " + shortWords(sh) + "." : op[2]) + '</span><span class="end"><span class="val">' + val + '</span><span class="dot"></span></span></span></label>'; }).join("") +
     '<p class="exnote">' + (ST.ch === "energy" ? "Energy takes what the other choices leave of the upfront budget." : "Example prices, not the developer’s.") + '</p>' + ownHTML() +
     '</div>' + pricerHTML() + '<div class="budget" aria-live="polite">' + ominiHTML() + '</div>' +
-    '<div class="zoomc"><button type="button" data-zoom="out" aria-label="Zoom out">−</button><button type="button" data-zoom="in" aria-label="Zoom in">+</button><button type="button" data-zoom="reset" aria-label="Reset the map view">⤢</button>' + (geoOK() ? '<span class="seg" role="group" aria-label="Ground"><button type="button" data-base="map" aria-pressed="' + (GEO.base === "map") + '">Map</button><button type="button" data-base="satellite" aria-pressed="' + (GEO.base !== "map") + '">Aerial</button></span>' + micBtn("cmd") : '') + '</div>' +
+    '<div class="zoomc"><button type="button" data-zoom="out" aria-label="Zoom out">−</button><button type="button" data-zoom="in" aria-label="Zoom in">+</button><button type="button" data-zoom="reset" aria-label="Reset the map view">⤢</button>' + (geoOK() ? '<span class="seg" role="group" aria-label="Ground"><button type="button" data-base="map" aria-pressed="' + (GEO.base === "map") + '">Map</button><button type="button" data-base="satellite" aria-pressed="' + (GEO.base !== "map") + '">Aerial</button></span>' + micBtn("cmd") + (S().open ? '<button type="button" class="mic spk' + (AXO.on ? " on" : "") + '" data-snd="' + (AXO.on ? "off" : "on") + '" aria-pressed="' + !!AXO.on + '" aria-label="Listen to the plant from the “You” pin" title="Listen to the plant from where “You” stands: drag the pin and the sound follows">' + SPKSVG + '</button>' : '') : '') + '</div>' +
     '<div class="heard" id="heard" aria-live="polite"' + (PTT.note && Date.now() - PTT.t < 6000 ? '' : ' hidden') + '>' + esc(PTT.note) + '</div></div>';
 }
 var LIVE = false;   // true once the original DataScope answers; until then, and where it cannot be framed, the pictures are shown
@@ -1986,7 +1993,7 @@ function budBubHTML(i){   // the budget is the community's to share out. The bub
   function rad(v){ return R0 + (R - R0) * Math.max(0, Math.min(1, v / tot)); }
   var parts = [["D", "Design", price(ST.d)[0]], ["T", "Technology", price(ST.t)[0]], ["E", en ? en.what.charAt(0).toUpperCase() + en.what.slice(1) : "", f.e > 0 ? f.e : 0]].filter(function(p){ return p[2] > 0; });
   parts.forEach(function(p){ if (left <= 0){ outs.push(p[1] + " " + money(r2(p[2]))); return; } var r = rad(left), sd = n++ % 2 ? 1 : -1; left = r2(left - p[2]);
-    o += '<circle class="rg r' + p[0] + '" r="' + r.toFixed(1) + '"/><line class="tk" x1="-4" x2="4" y1="' + (-r).toFixed(1) + '" y2="' + (-r).toFixed(1) + '"/><text class="rl" x="' + (sd * 8) + '" y="' + (-r + 3).toFixed(1) + '" text-anchor="' + (sd < 0 ? "end" : "start") + '">' + p[1] + ' −' + money(r2(p[2])) + '</text>'; });
+    o += '<circle class="rg r' + p[0] + '" r="' + r.toFixed(1) + '"/><line class="tk" x1="-4" x2="4" y1="' + (-r).toFixed(1) + '" y2="' + (-r).toFixed(1) + '"/><text class="rl l' + p[0] + '" x="' + (sd * 8) + '" y="' + (-r + 3).toFixed(1) + '" text-anchor="' + (sd < 0 ? "end" : "start") + '">' + p[1] + ' −' + money(r2(p[2])) + '</text>'; });
   var comm = Math.max(0, left), rb = rad(comm), rc = comm > 0 ? Math.min(rb, rb * Math.sqrt(Math.min(1, ben / comm))) : 0, free = r2(comm - ben);
   var note = (q.over ? '<em>The choices ask for ' + (q.left0 < 0 ? money(-q.left0) : money(-q.left1) + " a year") + ' more than there is' + (outs.length ? ": " + outs.join(", ") + " does not fit" : "") + '.</em> ' : (ben ? money(ben) + " in benefits" : "No benefit chosen yet") + (free > 0 ? ", " + money(free) + " not allocated yet. " : ". Nothing is left to allocate. ")) +
     (q.left1 < 0 ? "" : money(q.left1) + ' of ' + money(q.b[1]) + ' a year left. ') + 'Example prices.';
@@ -2637,8 +2644,8 @@ function axoDraw(stage){
     AXO.loading = false; var st = document.querySelector('.stage[data-view="axo"]'); if (!st) return; axoInit(st, light);
   }).catch(function(e){ AXO.loading = false; AXO.failed = true; if (window.console) console.warn("Axonometric view unavailable", e); render(); });
 }
-// The sound of the equipment, made in the browser: a rush of air and a low hum. How loud it is follows the distance and the cooling package,
-// decibel for decibel; how it is colored (brighter and more fan for dry cooling, softer for the economizers) is an impression, not a recording.
+// The sound of the equipment, made in the browser: a rush of air and a low hum. How loud it is follows what the model says is heard at the pin
+// (distance, design, cooling, what stands in the way), through the table SNDT below; how it is colored (brighter and more fan for dry cooling, softer for the economizers) is an impression, not a recording.
 function audioStart(){
   var A = window.AudioContext || window.webkitAudioContext; if (!A) return false;
   if (!AXO.audio){ var ctx = new A(), len = Math.floor(ctx.sampleRate * 3), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0), b0 = 0, b1 = 0, b2 = 0, R = rng(9), i, F = 3000;
@@ -2652,17 +2659,25 @@ function audioStart(){
     AXO.audio = {ctx:ctx, lp:lp, hum:hum, hg:hg, out:out, amb:amb}; }
   try { AXO.audio.ctx.resume(); } catch(e){} return true;
 }
+// What is played for what the model says is heard where "You" stands. The figure on the screens is always the model's (distance, the design, the
+// cooling, what stands in the way); the loudspeaker follows this table, read between its rows, so that moving the pin or changing the design is a step
+// the ear cannot miss: nothing below 30 dBA, the plant filling the room at the fence. It is staged for the ear, like the background: not a measurement.
+var SNDT = [[30, 0], [35, .03], [40, .07], [45, .15], [50, .3], [55, .52], [60, .82], [65, 1.15], [70, 1.5]];   // dBA at the pin -> level played (1 = full)
+function sndGain(L){ if (!(L > SNDT[0][0])) return 0; for (var i = 1; i < SNDT.length; i++) if (L <= SNDT[i][0]){ var p = SNDT[i - 1], q = SNDT[i]; return p[1] + (q[1] - p[1]) * (L - p[0]) / (q[0] - p[0]); } return SNDT[SNDT.length - 1][1]; }
 function audioSet(){
-  var a = AXO.audio; if (!a) return; var live = AXO.on && AXO.el && AXO.el.isConnected, now = a.ctx.currentTime, L = AXO.earL, T = {T1:[900, 110, .05], T2:[1700, 146, .17], T3:[620, 92, .03], T4:[900, 110, .05]}[ST.t];
-  a.out.gain.setTargetAtTime(live && L > 18 ? Math.min(1.5, Math.pow(10, (L - 62) / 20)) : 0, now, .2);   // 62 dBA plays at full level; every 20 dB less is a tenth of it
-  if (a.amb) a.amb.gain.setTargetAtTime(live ? Math.pow(10, ((AXO.night ? 45 - NIGHTDB : 45) - 62) / 20) : 0, now, .6);   // the background, for the ear only: played as 45 dBA by day (the lower contour) and 10 dB less at night
-  a.lp.frequency.setTargetAtTime(T[0] * Math.max(.4, Math.min(1, 220 / Math.max(40, AXO.earD || 1e4))), now, .3); a.hum.frequency.setTargetAtTime(T[1], now, .3); a.hg.gain.setTargetAtTime(T[2], now, .3);
+  var a = AXO.audio; if (!a) return; var wall = !!(AXO.el && AXO.el.isConnected && AXO.sc), live = AXO.on && (wall || S().open), now = a.ctx.currentTime, L = AXO.earL, D = AXO.earD, T = {T1:[900, 110, .05], T2:[1700, 146, .17], T3:[620, 92, .03], T4:[900, 110, .05]}[ST.t];
+  if (live && !wall){ var h = heard2(ST); L = h.now; D = h.far; }   // the table alone, with no wall in this window: the same level, taken at the pin
+  var g = live ? sndGain(L + (wall && AXO.night ? NIGHTDB : 0)) : 0;   // at night the same sound counts as 10 dB more
+  a.out.gain.setTargetAtTime(g, now, .2);
+  if (a.amb) a.amb.gain.setTargetAtTime(live ? (AXO.night ? .03 : .07) : 0, now, .6);   // the background the plant is heard against, for the ear only: softer at night
+  a.lp.frequency.setTargetAtTime(T[0] * Math.max(.4, Math.min(1, 220 / Math.max(40, D || 1e4))), now, .3); a.hum.frequency.setTargetAtTime(T[1], now, .3); a.hg.gain.setTargetAtTime(T[2] * Math.min(1, g * 2 + .15), now, .3);   // farther away it is duller, and the hum sinks with it
 }
 // ---------- put that there: point at a thing, point at a place, say what to do ----------
 // Pointing always works: tap the data center, then tap where it should go. Where the browser can listen (Chrome, Edge, Safari) the microphone
 // takes commands on the table, dictates a voice on the sentiment map and asks questions on the right wall. The browser's own service turns speech into text.
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition || null, REC = null, PTT = {that:false, wait:false, note:"", t:0};
 var MICSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+var SPKSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
 function micBtn(kind){ return SR ? '<button type="button" class="mic" data-mic="' + kind + '" aria-label="Speak" title="Speak">' + MICSVG + '</button>' : ''; }
 function listen(kind, btn){
   if (REC){ try { REC.stop(); } catch(e){} return; }
@@ -2987,7 +3002,7 @@ document.addEventListener("click", function(ev){
   if ((b = T.closest("[data-prices]"))){ PRED = !PRED; render(); return; }
   if ((b = T.closest("[data-gv]"))){ GV.on = b.getAttribute("data-gv") === "on"; GV.auto = true; GV.bTo = null; GV.to = null; gvSave(); if (ST.look != null){ ST.look = null; tell(); } render(); return; }
   if ((b = T.closest("[data-gh]"))){ GV.h = +b.getAttribute("data-gh"); GV.tilt = GVTILT[GV.h]; gvSave(); gvCam(); axoKey(); return; }   // the wall beside it, in another window, hears of the new eye height through the saved setting
-  if ((b = T.closest("[data-snd]"))){ AXO.on = b.getAttribute("data-snd") === "on" && audioStart(); axoEar(); axoKey(); return; }
+  if ((b = T.closest("[data-snd]"))){ AXO.on = b.getAttribute("data-snd") === "on" && audioStart(); axoEar(); axoKey(); audioSet(); if (b.classList.contains("spk")){ b.classList.toggle("on", !!AXO.on); b.setAttribute("aria-pressed", String(!!AXO.on)); b.setAttribute("data-snd", AXO.on ? "off" : "on"); } return; }
   if ((b = T.closest("[data-tod]"))){ AXO.night = b.getAttribute("data-tod") === "night"; try { localStorage.setItem("dcscope-night", AXO.night ? "1" : ""); } catch(e){} nightSync(); rwbNight(); axoHear(); axoEar(); axoKey(); return; }
   if ((b = T.closest("[data-hot]"))){ var hk = b.getAttribute("data-hot"); hotPick(HOT.list.map(function(x){ return x.k; }).indexOf(hk), false); AXO.hold = performance.now() + 15000; return; }
   if ((b = T.closest("[data-tour]"))){ var tw = b.getAttribute("data-tour");
@@ -3032,7 +3047,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-223918";
+var BUILD = "20261123-224759";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
