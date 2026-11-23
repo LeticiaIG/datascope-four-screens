@@ -34,6 +34,8 @@ On the Texas table, under Design, the heights of the D2 berm and the D3 walls ca
 
 **The ground from the ground.** In the view from the ground (center wall and the backdrop of the right wall) the land is the table's map, with its pale ground, green, water and white roads, and the aerial photograph (Esri World Imagery) mixed into it at about half strength and less saturated. Darker corners and a warm-to-cool wash are laid over it, as through a lens: scenery, like the sky. Immersive is the first person: the eye comes down to 2 m, a person's height, and goes back to the height chosen on leaving.
 
+**Reading the right wall.** The simple view carries no title or slate: the two lists say whose they are, and each figure says what it measures (water and electricity are the plant's own use, sound is at the "You" pin on the table, money is part of the budget). The landscape is darkened only behind the words, so its middle stays clear. A tapped figure is held and can be asked three things: why, what would change it (the alternatives listed can be chosen there) and who says so. The budget reads across in two lines, upfront and yearly: the amount, one piece per chapter in the chapter's color with what it takes, and what is left. Prices are examples.
+
 **Closing a scenario.** On the right wall, "Close this scenario as agreed" keeps the scenario with what it gains, gives up and leaves unknown. It then appears on the sentiment map (Texas), where people can say what they think of it; their answers are counted on the closed scenario on both walls. A closed scenario can be shown again or reopened.
 
 **Examples** (`#examples`): a photomontage of the room in use (a generated image) and the annotated captures of the four screens.

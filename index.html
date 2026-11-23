@@ -689,7 +689,19 @@ html.checking .app{visibility:hidden}
    Two typefaces: Jost (light) for figures and sentences, Space Mono for labels. Three colors carry meaning: mint for what is gained, orange for
    what is given up, grey for what is not known. */
 .measure.simple.film{--bg:#0d0e0f;--fg:#f1eee3;--dim:#8e8c84;--gain:#8df0bd;--loss:#ff6a3d;--line:#f1eee333;font-family:"Jost","Futura","Century Gothic",var(--font);color:var(--fg);gap:1rem;padding:4.9rem 2.4rem 1.2rem}
-.measure.simple.film > .rwbg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 46%,#0d0e0f52 0,#0d0e0f8c 62%,#0d0e0fc7 100%),linear-gradient(#0d0e0fb8 0,#0d0e0f00 20%,#0d0e0f00 62%,#0d0e0fd1 100%)}   /* a grade and a vignette: the landscape stays in view, the words stay readable */
+.measure.simple.film > .rwbg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0d0e0f8c 0,#0d0e0f73 24%,#0d0e0f0f 43%,#0d0e0f0f 60%,#0d0e0f66 80%,#0d0e0f8c 100%),linear-gradient(#0d0e0fa6 0,#0d0e0f00 22%,#0d0e0f00 60%,#0d0e0f80 74%,#0d0e0fd9 100%)}   /* dark only behind the words: the two sides, the top row and the foot. The middle of the landscape is left clear */
+.measure.simple.film .ph{text-shadow:0 1px 3px #0d0e0fcc,0 2px 22px #0d0e0fcc}
+.measure.simple.film .bubs .bcol h4,.measure.simple.film .bubs .bcol h4 i{font-size:1rem} .measure.simple.film .bcol h4,.film .face b,.measure.simple.film .fcap,.film .saywhy{text-shadow:0 1px 3px #0d0e0fcc,0 0 14px #0d0e0fb3}
+.measure.simple.film .acts{grid-template-columns:repeat(4,minmax(0,1fr)) auto;align-items:center}
+.measure.simple.film .acts button{background:#0d0e0f66}
+.measure.simple.film .acts button.mdb{flex-direction:row;align-items:center;margin:0;padding:.3rem .85rem;font-size:.68rem;border:1px solid var(--fg);border-radius:999px;background:#0d0e0f66} .film .acts button.mdb::after{display:none}
+.measure.simple.film .acts button.mdb:hover{background:var(--fg);color:var(--bg)}
+.measure.simple.film .moneybar{gap:.4rem 1.3rem} .film .mcap{grid-column:1 / -1;font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);opacity:.8}
+.film .pot,.film .lft{font-size:.95rem;white-space:nowrap;text-shadow:0 1px 3px #0d0e0fcc} .film .pot b,.film .lft b{font-size:1.6rem;font-weight:300;font-variant-numeric:tabular-nums} .film .lft{text-align:right} .film .lft.bad,.film .lft.bad b{color:var(--loss)}
+.film .moneybar .strip{height:1.5rem} .film .moneybar .strip i{justify-content:flex-start;padding:0 .45rem;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap} .film .moneybar .strip i b{line-height:1.5rem;padding:0}
+.film .fqs{display:flex;gap:.5rem;justify-content:center;margin:.1rem 0} .film .fqs .go{margin:0;vertical-align:0} .film .fqs .go[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.film .alts2{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:.4rem} .film .alts2 .setb{display:inline-flex;align-items:center;gap:.45rem;background:#0d0e0f66;border:1px solid var(--fg);border-radius:999px;padding:.2rem .8rem .2rem .3rem;color:var(--fg);font-size:.9rem;cursor:pointer} .film .alts2 .setb b{font-size:.9rem;font-weight:400} .film .alts2 .setb small{display:none}
+.film .bubs.frozen:has(.ph.sel) ~ .faces{display:none}   /* a held figure takes the room of the faces for its questions */
 .measure.simple.film.night > .rwbg::after{background:linear-gradient(#0d0e0f99 0,#0d0e0f00 20%,#0d0e0f00 62%,#0d0e0fb3 100%)}
 .film button{font-family:inherit;color:inherit}
 .film .slate,.film .acts small,.film .bcol h4,.film .fcap,.film .face b,.film .bub span,.film .mcell small,.film .strips,.film .frz,.film .go,.film .bmore,.film .mdb{font-family:"Space Mono",ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.14em;font-weight:400}
@@ -1883,12 +1895,12 @@ function counted(st){ return st.filter(function(x){ var b = bigOf(x)[0]; return 
 var ARROW = {d:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2h8v10h6L12 22 2 12h6z"/></svg>', u:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 22h8V12h6L12 2 2 12h6z"/></svg>', r:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8v8h10v6l10-10L12 2v6z"/></svg>'};
 function phraseOf(x){   // [arrow, figure, words]
   var b = bigOf(x), n = b[0].replace(/^[−+]/, ""), up = b[0].charAt(0) === "+", t = TECH[x.code], en = ENERGY[x.code];
-  if (x.ax === "water" && t) return [up ? "u" : "d", n, (up ? "more" : "less") + " cooling water"];
-  if (x.ax === "power" && t) return [up ? "u" : "d", n, (up ? "more" : "less") + " electricity"];
-  if (x.ax === "quiet") return /\d/.test(n) ? [up ? "u" : "d", n, /pin/.test(b[1]) ? (up ? "louder" : "quieter") + " where you stand" : up ? "louder on hot days" : "quieter equipment"] : [x.dir > 0 ? "d" : "u", x.dir > 0 ? "Quieter" : "Louder", "for the nearest neighbors"];
+  if (x.ax === "water" && t) return [up ? "u" : "d", n, (up ? "more" : "less") + " water used by the plant"];
+  if (x.ax === "power" && t) return [up ? "u" : "d", n, (up ? "more" : "less") + " electricity used by the plant"];   // the plant's own use, not anyone's bill: the words say so
+  if (x.ax === "quiet") return /\d/.test(n) ? [up ? "u" : "d", n, /pin/.test(b[1]) ? (up ? "louder" : "quieter") + " at the “You” pin" : up ? "louder on hot days" : "quieter equipment"] : [x.dir > 0 ? "d" : "u", x.dir > 0 ? "Quieter" : "Louder", "for the nearest neighbors"];
   if (x.ax === "clean") return ["u", n, x.code === "E4" ? "of six microreactors paid for" : "of the power from new " + en.what];
   if (x.ax === "money" && x.code.charAt(0) === "B") return ["r", n, {B1:"in grants for local projects", B2:"for the city's share of the plant", B3:"for the most affected homes", B4:"for training and internships"}[x.code]];
-  if (x.ax === "money" && en) return ["r", n, "to " + en.what + ", not to benefits"];
+  if (x.ax === "money" && en) return ["r", n, "of the budget buys " + en.what + ", so it cannot pay for benefits"];
   if (x.ax === "money") return ["r", "Heat", "from the servers, for nearby customers"];
   if (x.ax === "places") return ["u", "Places", "a pool, a spa, rooms and cafes"];
   if (x.ax === "views") return ["d", "Less", "of the building in view"];
@@ -1925,9 +1937,13 @@ function bwhyHTML(st, un){   // the bubble in question, in one breath: what, bec
     var go = '<button type="button" class="go" data-unfreeze>▶ Go on</button>', fz = '<i class="frz">Freeze</i>';
     if (MD.freeze === "q") return '<p class="sayl">' + fz + (un.length ? "These are questions. Nobody has answered them yet." : "There is no open question for these choices.") + go + '</p>' + (un.length ? '<p class="saywhy">' + un.slice(0, 3).map(function(u){ return esc(u.t); }).join(" · ") + (un.length > 3 ? " · and " + (un.length - 3) + " more, under “The wheel, the sources and questions”." : ".") + '</p>' : "");
     if (/^face:/.test(MD.freeze || "")){ var f = facesData(st)[+MD.freeze.slice(5)]; return '<p class="sayl">' + fz + ["These are the nearest neighbors.", "This is the wider community.", "This is the water.", "This is the grid, and the climate.", "This is the developer."][+MD.freeze.slice(5)] + go + '</p><p class="saywhy">' + f.why + '</p>'; }
-    if (!fr) return '<p class="sayl run">' + (st.length || un.length ? "This is the bargain: <b class=\"g\">" + g + " gained</b>, <b class=\"l\">" + l + " given up</b>, <b>" + un.length + " not known yet</b>." : "This is the conventional data center. Nothing gained, nothing given up.") + '</p>';
+    if (!fr) return st.length || un.length ? '<p class="saywhy">Tap a figure to see why.</p>' : '';   // the counts are already on the two lists and in the circle
     var op0 = x.code === "ADD" ? ["", "what was added on the table"] : optOf(x.code);
-    return '<p class="sayl">' + fz + sayYou(x) + go + '</p><p class="saywhy">Because of <span class="cd c' + x.code.charAt(0) + '">' + x.code + '</span> ' + op0[1] + '. ' + (x.un ? esc(x.t) + ": the brief asks the developer for this." : x.why) + '</p>';
+    // held on one figure: one line says what it is, and three questions can be asked of it
+    var q = x.un ? "why" : MD.q || "why", alt = q !== "change" ? [] : [x.code.charAt(0) === "B" ? '<button type="button" class="setb" data-set="' + x.code + '"><span class="cd c' + x.code.charAt(0) + '">' + x.code + '</span><b>Leave it out</b></button>' : x.calc ? "" : setBtn(x.code.charAt(0) + "1", "back to the baseline")].concat(others(x.ax, x.code)).filter(function(y){ return y; });
+    var body = q === "source" ? srcOf(x.src) : q === "change" ? (alt.length ? '<span class="alts2">' + alt.slice(0, 5).join("") + '</span>' : "Nothing else on the table changes this.") :
+      'Because of <span class="cd c' + x.code.charAt(0) + '">' + x.code + '</span> ' + op0[1] + '. ' + (x.un ? esc(x.t) + ": the brief asks the developer for this." : x.why + (x.num ? " " + x.num : ""));
+    return '<p class="sayl">' + fz + sayYou(x) + go + '</p>' + (x.un ? "" : '<p class="fqs">' + [["why", "Why?"], ["change", "What would change it?"], ["source", "Says who?"]].map(function(k){ return '<button type="button" class="go" data-fq="' + k[0] + '" aria-pressed="' + (q === k[0]) + '">' + k[1] + '</button>'; }).join("") + '</p>') + '<p class="saywhy">' + body + '</p>';
   }
   if (!x) return '<p class="bw0">Tap a bubble to see why it is there and where its figure comes from.</p>';
   var op = x.code === "ADD" ? ["", "What was added on the table"] : optOf(x.code), head = '<span class="cd c' + x.code.charAt(0) + '">' + x.code + '</span> ' + op[1];
@@ -1935,19 +1951,16 @@ function bwhyHTML(st, un){   // the bubble in question, in one breath: what, bec
   var b = bigOf(x);
   return '<p><b class="' + (x.dir > 0 ? "g" : "l") + '">' + b[0] + '</b> ' + b[1] + ' <span class="bfrom">because of ' + head + '.</span> ' + x.why + (x.num ? ' ' + x.num : x.how ? ' How much: ' + x.how + '.' : '') + '</p><p class="bsrc">Source: ' + srcOf(x.src) + '</p>';
 }
-function stripsHTML(){   // the budget as two strips: a part for each choice that spends from it, and the energy that takes what is left upfront
-  var b = bud(), f = funds(), codes = [ST.d, ST.t].concat(modules());
-  function strip(i){ var tot = b[i], used = 0, parts = codes.map(function(c){ return [c, price(c)[i]]; }).filter(function(p){ return p[1] > 0; });
-    if (!i && f.e > 0) parts.push([ST.e, f.e]);
-    parts.forEach(function(p){ used += p[1]; }); var den = Math.max(tot, used) || 1, n = !i && tot === Math.round(tot) && tot >= 4 && tot <= 40 ? tot : 10;
-    return '<span class="strip' + (used > tot + 1e-9 ? " over" : "") + '" style="--n:' + n + '" role="img" aria-label="' + money(used) + " of " + money(tot) + (i ? " a year" : " upfront") + ' spent: ' + (parts.length ? parts.map(function(p){ return p[0] + " " + money(p[1]); }).join(", ") : "nothing yet") + '">' +
-      parts.map(function(p){ return '<i class="p' + p[0].charAt(0) + '" style="width:' + (p[1] / den * 100).toFixed(2) + '%" title="' + p[0] + " " + money(p[1]) + '"><b>' + p[0] + '</b></i>'; }).join("") + '</span>'; }
-  return '<div class="strips"><span>Upfront</span>' + strip(0) + '<span>A year</span>' + strip(1) + '</div>';
-}
-function moneyHTML(){   // the money in one line: what there is, how the choices fill it, what is left
-  var en = ENERGY[ST.e], b = bud(), l = leftOf(ST), f = funds(), over = overBudget(), left0 = Math.max(0, r2(l[0] - (f.e > 0 ? f.e : 0)));
-  var res = over ? '<small>Over by</small><b>' + [l[0] < 0 ? money(-l[0]) : "", l[1] < 0 ? money(-l[1]) + " a year" : ""].filter(function(x){ return x; }).join(" + ") + '</b>' : '<small>Left</small><b>' + money(left0) + ' + ' + money(Math.max(0, l[1])) + ' a year</b>';
-  var out = '<div class="card moneybar"><div class="mcell"><small>The budget</small><b>' + money(b[0]) + ' + ' + money(b[1]) + ' a year</b></div>' + stripsHTML() + '<div class="mcell ' + (over ? "bad" : "ok") + '">' + res + '</div>' + (over ? '<em class="stamp' + (MD.wasOver ? "" : " slam") + '">Does not fit</em>' : "") + '</div>';
+function moneyHTML(){   // the money as two lines to read across: the pot, where the choices put it (one piece per chapter, in the chapter's color), and what is left
+  var en = ENERGY[ST.e], bd = bud(), f = funds(), over = overBudget(), bens = modules();
+  function row(i){ var tot = bd[i], used = 0, parts = [["D", "Design", price(ST.d)[i]], ["T", "Technology", price(ST.t)[i]], ["B", "Benefits", bens.reduce(function(a, c){ return a + price(c)[i]; }, 0)]];
+    if (!i && f.e > 0) parts.push(["E", en.what.charAt(0).toUpperCase() + en.what.slice(1), f.e]);
+    parts = parts.filter(function(p){ return p[2] > 0; }); parts.forEach(function(p){ used += p[2]; }); used = r2(used); var den = Math.max(tot, used) || 1, left = r2(tot - used);
+    return '<span class="pot"><b>' + money(tot) + '</b> ' + (i ? "a year" : "upfront") + '</span>' +
+      '<span class="strip' + (left < 0 ? " over" : "") + '" role="img" aria-label="' + money(tot) + (i ? " a year" : " upfront") + ': ' + (parts.length ? parts.map(function(p){ return p[1] + " " + money(r2(p[2])); }).join(", ") : "nothing spent yet") + '">' +
+      parts.map(function(p){ return '<i class="p' + p[0] + '" style="width:' + (p[2] / den * 100).toFixed(2) + '%"><b>' + p[1] + " " + money(r2(p[2])) + '</b></i>'; }).join("") + '</span>' +
+      '<span class="lft' + (left < 0 ? " bad" : "") + '"><b>' + money(Math.abs(left)) + '</b> ' + (left < 0 ? "over" : "left") + '</span>'; }
+  var out = '<div class="card moneybar"><small class="mcap">The developer’s budget, and what each chapter of choices takes from it. Example prices.</small>' + row(0) + row(1) + (over ? '<em class="stamp' + (MD.wasOver ? "" : " slam") + '">Does not fit</em>' : "") + '</div>';
   MD.wasOver = over; return out;
 }
 function ledgerHTML(st, un){
@@ -2676,8 +2689,8 @@ function metricsHTML(bare){
   var key = chosen(ST).join(" ") + "|" + ST.site, was = MD.key, cut = !bare && was != null && was !== key, hit = ""; MD.key = bare && was != null ? was : key;
   if (cut){ var a0 = was.split("|")[0].split(" "), a1 = chosen(ST); hit = ["D", "T", "E", "B"].filter(function(g){ return a0.filter(function(c){ return c.charAt(0) === g; }).join() !== a1.filter(function(c){ return c.charAt(0) === g; }).join(); })[0] || ""; }
   var acts = '<div class="chosen acts">' + [["design", "D", "Design", chosenName("d")], ["technology", "T", "Technology", chosenName("t")], ["energy", "E", "Energy", chosenName("e")], ["benefits", "B", "Benefits", [b.length ? b.join(" ") : "B", b.length ? b.map(function(c){ return optOf(c)[1]; }).join(" · ") : "No benefit yet"]]].map(function(c, i){
-    return '<button type="button" data-ch="' + c[0] + '" class="k' + c[1] + (ST.ch === c[0] ? " now" : "") + (hit === c[1] ? " hit" : "") + '"><small>' + (i + 1) + ' · ' + c[2] + '</small><em>' + c[3][1] + '</em></button>'; }).join("") + '</div>';
-  return '<div class="card measure simple film' + (cut ? " cut" : "") + '"><div class="rwbg" aria-hidden="true"></div>' + (cut ? '<i class="whip" aria-hidden="true"></i>' : '') + '<div class="slate"><span>A better bargain</span><span>Live analysis</span><span class="scn">' + chosen(ST).join(" · ") + '</span><button type="button" class="mdb" data-md="1">Wheel · sources · questions ›</button></div><div class="hd"><span>What this plan means for the neighborhood</span></div>' + acts +
+    return '<button type="button" data-ch="' + c[0] + '" class="k' + c[1] + (ST.ch === c[0] ? " now" : "") + (hit === c[1] ? " hit" : "") + '"><small>' + (i + 1) + ' · ' + c[2] + '</small><em>' + c[3][1] + '</em></button>'; }).join("") + '<button type="button" class="mdb" data-md="1">Wheel · sources · questions ›</button></div>';
+  return '<div class="card measure simple film' + (cut ? " cut" : "") + '" aria-label="What this plan means for the neighborhood"><div class="rwbg" aria-hidden="true"></div>' + (cut ? '<i class="whip" aria-hidden="true"></i>' : '') + '' + acts +
     '<div class="bubs" data-w="bubbles"></div><div class="faces" data-w="faces"></div><div class="bwhy" data-w="bwhy"></div>' + moneyHTML() + '<i class="crop" aria-hidden="true"></i>' +
     '<p class="rwattr">Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community. Buildings © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="https://openmaptiles.org/">OpenMapTiles</a>, <a href="https://openfreemap.org/">OpenFreeMap</a></p></div>';
 }
@@ -2856,10 +2869,11 @@ document.addEventListener("click", function(ev){
   var T = ev.target.closest ? ev.target : null; if (!T) return; var b;
   if ((b = T.closest("[data-mic]"))){ listen(b.getAttribute("data-mic"), b); return; }
   if ((b = T.closest("[data-unfreeze]"))){ MD.freeze = null; wordsFill(); return; }
+  if ((b = T.closest("[data-fq]"))){ MD.q = b.getAttribute("data-fq"); wordsFill(); return; }
   if ((b = T.closest("[data-face]"))){ var fk = "face:" + b.getAttribute("data-face"); MD.freeze = MD.freeze === fk ? null : fk; wordsFill(); return; }
   if ((b = T.closest("[data-qs]"))){ MD.freeze = MD.freeze === "q" ? null : "q"; wordsFill(); return; }
   if ((b = T.closest("[data-ball]"))){ MD.all = b.getAttribute("data-ball") === "1"; wordsFill(); return; }
-  if ((b = T.closest("[data-stm]"))){ var sid = b.getAttribute("data-stm"); if (b.closest(".measure.film")) MD.freeze = MD.freeze === sid ? null : sid; SEL.id = sid; SEL.ax = null; SEL.msg = ""; wordsFill(); return; }
+  if ((b = T.closest("[data-stm]"))){ var sid = b.getAttribute("data-stm"); if (b.closest(".measure.film")){ MD.freeze = MD.freeze === sid ? null : sid; MD.q = "why"; } SEL.id = sid; SEL.ax = null; SEL.msg = ""; wordsFill(); return; }
   if ((b = T.closest("[data-wax]"))){ pickSpoke(b.getAttribute("data-wax")); return; }
   if ((b = T.closest("[data-md]"))){ MD.detail = b.getAttribute("data-md") === "1"; render(); return; }
   if ((b = T.closest("[data-q]"))){ SEL.q = b.getAttribute("data-q"); SEL.msg = ""; wordsFill(); return; }
@@ -2934,7 +2948,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-220103";
+var BUILD = "20261123-221021";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
