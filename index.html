@@ -594,7 +594,7 @@ body.imm .tour{display:flex} body.nopanels .tour{display:none}
 /* the listener, and what is added on the table */
 .you{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:grab;pointer-events:auto}
 .you i{order:2;width:18px;height:18px;border-radius:50%;background:#1c2a28;border:3px solid #fbfdfc;box-shadow:0 2px 6px rgba(0,0,0,.35)}
-.you b{order:1;font-family:var(--font);font-size:12px;font-weight:700;color:#fff;background:#1c2a28;border-radius:999px;padding:1px 8px}
+.you b{white-space:nowrap;order:1;font-family:var(--font);font-size:12px;font-weight:700;color:#fff;background:#1c2a28;border-radius:999px;padding:1px 8px}
 .youw{background:none;border:0}
 .own{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-size:.85rem;font-weight:700;border-top:1px solid var(--line);padding-top:.45rem}
 .own .sw button{font-size:.76rem;padding:.2rem .55rem}
@@ -848,6 +848,28 @@ html.checking .app{visibility:hidden}
 .measure.simple.film .bud .rD{stroke:var(--kD)} .measure.simple.film .acts .kD::after{background:var(--kD)}
 .measure.simple.film .bud .rl.lD{fill:var(--kD)} .measure.simple.film .bud .rl.lT{fill:var(--kT)} .measure.simple.film .bud .rl.lE{fill:var(--kE)}
 .measure.simple.film .bud .ax,.measure.simple.film .bud .tk{stroke:var(--dim)}
+/* ---------- as drawn by a graphics program: flat color, heavy type, fine lines, no grey boxes ---------- */
+/* the chapters: no boxes. A small number and name of the chapter, the choice in the heavy type of the wall, and a bar in the chapter's color; the one being chosen is the strong one */
+.measure.simple.film:not(.zz) .acts{gap:1.8rem;align-items:end}
+.measure.simple.film:not(.zz) .acts button{background:none;border:0;border-bottom:4px solid var(--k,var(--kD));border-radius:0;box-shadow:none;transform:none;padding:0 0 .5rem;opacity:.72;text-shadow:0 0 3px var(--halo),0 0 14px var(--halo)}
+.measure.simple.film:not(.zz) .acts .kT{--k:var(--kT)} .measure.simple.film:not(.zz) .acts .kE{--k:var(--kE)} .measure.simple.film:not(.zz) .acts .kB{--k:var(--gain)}
+.measure.simple.film:not(.zz) .acts button.now{opacity:1;border-bottom-width:8px;padding-bottom:.38rem}
+.measure.simple.film:not(.zz) .acts button::after{display:none}
+.measure.simple.film:not(.zz) .acts small{font-size:.74rem;font-weight:800;letter-spacing:.08em;color:var(--fg)}
+.measure.simple.film:not(.zz) .acts em{font-size:1.3rem;font-weight:800;text-transform:uppercase;letter-spacing:-.015em;line-height:1.02;white-space:normal;overflow:visible;text-align:left}
+.measure.simple.film:not(.zz) .acts button.mdb{align-self:end;border:0;border-bottom:4px solid var(--fg);border-radius:0;background:none;padding:0 0 .5rem;font-size:.8rem;font-weight:800;letter-spacing:.08em;opacity:1}
+.measure.simple.film:not(.zz) .acts button.mdb:hover{background:none;color:var(--fg);border-bottom-width:8px;padding-bottom:.38rem}
+/* the bubble: flat and exact. What is not allocated yet is a light disc of the same color with a firm edge; the benefits are the solid core; the rings are fine dotted lines */
+.measure.simple.film .bud .bb{fill-opacity:.2;stroke-width:2.6} .measure.simple.film .bud .bc{fill-opacity:1}
+.measure.simple.film .bud.max .bb,.measure.simple.film .bud.over .bb{fill-opacity:.12;stroke-dasharray:1 5;stroke-linecap:round}
+.measure.simple.film .bud .rg{stroke-width:2.2;stroke-dasharray:.1 5.4;stroke-linecap:round}
+.measure.simple.film .bud .bn{font-size:21px;font-weight:900} .measure.simple.film .bud .rl{font-weight:800;font-size:10.5px;letter-spacing:.01em}
+.measure.simple.film .ph.q.bud .bl{font-weight:700;font-size:.9rem;max-width:22rem}
+/* who it is good for: the face and one word, so a plain face is not left to be guessed */
+.measure.simple.film .face.m1 svg *{stroke:var(--fg)} .measure.simple.film .face.m1 svg circle + circle,.measure.simple.film .face.m1 svg circle + circle + circle{fill:var(--fg)}
+.measure.simple.film .face b::after{font-weight:900;margin-left:.5em}
+.measure.simple.film .face.m2 b::after{content:"better";color:var(--gain)} .measure.simple.film .face.m0 b::after{content:"worse";color:var(--loss)} .measure.simple.film .face.m1 b::after{content:"same";opacity:.7}
+.measure.simple.film .face b{font-size:.74rem;font-weight:800}
 .film.cut .acts button.hit{animation:hit .7s ease-out both}
 @keyframes hit{0%{background:#f1eee3;color:#0d0e0f}100%{background:none}}
 @media (prefers-reduced-motion: reduce){ .film .whip{display:none} .film.cut .bub,.film.cut .acts button.hit,.stamp.slam{animation:none} }
@@ -1400,7 +1422,7 @@ function geoDraw(){
     (ST.x || []).forEach(function(o, i){ var ly = o.k === "trees" ? L.polygon(belt(o.a, o.b, o.v).map(mll), {color:"#3b7a66", weight:1.4, fillColor:"#7db3a8", fillOpacity:.55}) : L.polyline([mll(o.a), mll(o.b)], {color:o.k === "wall" ? "#4f5c58" : "#6f9a5c", weight:o.k === "wall" ? 5 : 10, lineCap:"butt"});
       ly.addTo(g).bindTooltip(OWNS[o.k][0] + " · " + o.v + OWNS[o.k][2] + " · tap to remove", {sticky:true}); ly.on("click", function(ev){ L.DomEvent.stop(ev); ST.x.splice(i, 1); render(); tell(); }); });
     if (OWN.a) L.circleMarker(mll(OWN.a), {radius:6, color:"#1c2a28", weight:2, fillColor:"#fbfdfc", fillOpacity:1, interactive:false}).addTo(g);
-    var you = L.marker(mll(ear()), {draggable:true, zIndexOffset:600, title:"Drag to stand somewhere else", icon:L.divIcon({className:"youw", html:'<div class="you"><i></i><b>You</b></div>', iconSize:[44, 40], iconAnchor:[22, 40]})}).addTo(g);
+    var you = L.marker(mll(ear()), {draggable:true, zIndexOffset:600, title:"Drag to stand somewhere else", icon:L.divIcon({className:"youw", html:'<div class="you"><i></i><b>You' + (S().open ? ' · ' + Math.round(Math.max(0, heard2(ST).now)) + ' dBA' : '') + '</b></div>', iconSize:[120, 40], iconAnchor:[60, 40]})}).addTo(g);
     you.on("dragend", function(){ var q = you.getLatLng(), c0 = S().center; standAt([(q.lng - c0[1]) * MXs(), (c0[0] - q.lat) * MY]); });
   } else {
     L.circle(ll(c[0], c[1]), {radius:r * 3.16, color:"#7d3a6c", weight:1.6, dashArray:"4 6", fill:false, interactive:false}).addTo(g);
@@ -2669,7 +2691,7 @@ function audioSet(){
   if (live && !wall){ var h = heard2(ST); L = h.now; D = h.far; }   // the table alone, with no wall in this window: the same level, taken at the pin
   var g = live ? sndGain(L + (wall && AXO.night ? NIGHTDB : 0)) : 0;   // at night the same sound counts as 10 dB more
   a.out.gain.setTargetAtTime(g, now, .2);
-  if (a.amb) a.amb.gain.setTargetAtTime(live ? (AXO.night ? .03 : .07) : 0, now, .6);   // the background the plant is heard against, for the ear only: softer at night
+  if (a.amb) a.amb.gain.setTargetAtTime(live && g > 0 ? (AXO.night ? .02 : .04) : 0, now, .6);   // a soft background behind the plant, for the ear only, softer at night; where the plant is not heard there is no sound at all, so far away is silence
   a.lp.frequency.setTargetAtTime(T[0] * Math.max(.4, Math.min(1, 220 / Math.max(40, D || 1e4))), now, .3); a.hum.frequency.setTargetAtTime(T[1], now, .3); a.hg.gain.setTargetAtTime(T[2] * Math.min(1, g * 2 + .15), now, .3);   // farther away it is duller, and the hum sinks with it
 }
 // ---------- put that there: point at a thing, point at a place, say what to do ----------
@@ -3047,7 +3069,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-224759";
+var BUILD = "20261123-230150";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
