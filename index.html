@@ -572,7 +572,7 @@ body.imm .axo.gv .gmist{display:block}
 .hot b{font-family:var(--font);font-size:12px;font-weight:700;color:#1c2a28;background:#fbfdfcf0;border:1px solid #b9cec4;border-radius:999px;padding:1px 9px;white-space:nowrap}
 .hot i{width:16px;height:16px;border-radius:50%;background:var(--accent);border:3px solid #fbfdfc;box-shadow:0 0 0 0 rgba(59,122,102,.5),0 2px 6px rgba(0,0,0,.35);animation:hotp 2.4s ease-out infinite}
 .hot b{visibility:hidden} .hot:hover b,.hot:focus-visible b,.hot.on b{visibility:visible;background:#1c2a28;border-color:#1c2a28;color:#fff} .hot.on i{background:#1c2a28;animation:none}   /* a dot is named when it is pointed at or chosen: named all at once, they hid one another */
-body.imm .axo .amk.dk,body.imm .axo .amk.en,body.imm .axo .amk.sn{display:none}
+body.imm .axo .amk.dk,body.imm .axo .amk.en,body.imm .axo .amk.sn,body.nopanels .axo .amk.dk,body.nopanels .axo .amk.en{display:none}
 .axo.gv .maplibregl-canvas{filter:blur(1px)}
 /* the first person's readout of the sound: five bars that move when Listen is on, the level where you stand, and whether you would hear it */
 .sndchip{display:none} body.imm .stage[data-view="axo"] .sndchip{display:flex;align-items:center;gap:.85rem;position:absolute;left:1.5rem;bottom:1.5rem;z-index:6;padding:.6rem 1.25rem .6rem 1rem;border-radius:999px;background:color-mix(in srgb,var(--surface) 62%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid color-mix(in srgb,var(--line) 55%,transparent);color:var(--ink);pointer-events:none}
@@ -2880,10 +2880,10 @@ function ngonLL(e, s, r, rot, n){ var o = []; for (var i = 0; i < n; i++){ var a
 function paler(c, k){ var v = parseInt(c.slice(1), 16), r = v >> 16, g = v >> 8 & 255, b = v & 255; r = Math.round(r + (255 - r) * k); g = Math.round(g + (255 - g) * k); b = Math.round(b + (255 - b) * k); return "#" + (16777216 + (r << 16) + (g << 8) + b).toString(16).slice(1); }
 function hexLL(e, s, r, rot){ var o = []; for (var i = 0; i < 6; i++){ var a = rot + i * 1.0472; o.push(ll(e + Math.cos(a) * r, s + Math.sin(a) * r)); } return o; }
 function treeAt(out, e, s, u, base){   // a planted tree: a slim trunk and a round crown, built of four rounded tiers that pale towards the top; u, from 0 to 1, sets its size and its green
-  var r = 2.5 + u * 2.3, h = 7 + ((u * 7.3) % 1) * 5, c = TREEC[Math.floor(u * 3.999)], b = base || 0, y0 = .28, n = 7;
+  var r = 2.5 + u * 2.3, h = 7 + ((u * 7.3) % 1) * 5, c = TREEC[Math.floor(u * 3.999)], b = base || 0, y0 = .28, n = 14;   // fourteen thin tiers: the steps of the crown are too small to read as blocks
   out.push(poly(ngonLL(e, s, .34, 0, 8), {h:b + h * .36, b:b, c:"#a3978c"}));
   for (var i = 0; i < n; i++){ var k = Math.pow(Math.sin(Math.PI * (i + .5) / n), .6);   // the crown's outline is close to a sphere
-    out.push(poly(ngonLL(e, s, r * k, u * 6 + i * .2, 20), {h:b + h * (y0 + (1 - y0) * (i + 1) / n), b:b + h * (y0 + (1 - y0) * i / n), c:paler(c, i * .04)})); }
+    out.push(poly(ngonLL(e, s, r * k, u * 6, 20), {h:b + h * (y0 + (1 - y0) * (i + 1) / n), b:b + h * (y0 + (1 - y0) * i / n), c:paler(c, i * .04)})); }
 }
 function beltTrees(out, a, b, w, base, seed){   // a planted belt as trees: about one for every 7 m square, fewer in a very large belt
   var len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, step = Math.max(7, Math.sqrt(len * w / 500)), nx = Math.max(1, Math.round(len / step)), nz = Math.max(1, Math.round(w / step)), R = rng(seed), ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len;
@@ -3625,7 +3625,7 @@ function immersive(on){
   var b = document.querySelector('[data-az="imm"]'); if (b) b.setAttribute("aria-pressed", String(on)); if (AXO.map) setTimeout(function(){ if (AXO.el.isConnected) AXO.map.resize(); }, 350);
 }
 document.addEventListener("fullscreenchange", function(){ if (!document.fullscreenElement && document.body.classList.contains("imm")) immersive(false); });
-document.addEventListener("keydown", function(ev){ if ((ev.key === "h" || ev.key === "H") && document.body.classList.contains("imm") && !/INPUT|TEXTAREA/.test(ev.target.tagName || "")) document.body.classList.toggle("nopanels"); });
+document.addEventListener("keydown", function(ev){ if ((ev.key === "h" || ev.key === "H") && (document.body.classList.contains("imm") || (VIEW === "view" && gvOn())) && !/INPUT|TEXTAREA/.test(ev.target.tagName || "")) document.body.classList.toggle("nopanels"); });   // H clears the view: in Immersive, and from the ground too
 document.addEventListener("submit", function(ev){ if (!ev.target || ev.target.id !== "askf") return; ev.preventDefault(); var t = ev.target.q.value.trim(); if (t) askFree(t); });
 document.addEventListener("input", function(ev){ if (ev.target && ev.target.id === "askq") SEL.text = ev.target.value; });
 document.addEventListener("keydown", function(ev){ if ((ev.key === "Enter" || ev.key === " ") && ev.target && ev.target.hasAttribute && ev.target.hasAttribute("data-wax")){ ev.preventDefault(); pickSpoke(ev.target.getAttribute("data-wax")); } });
@@ -3767,7 +3767,7 @@ function filmCard(){
 route();
 if (FILM) filmCard();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-181727";
+var BUILD = "20261124-182117";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
