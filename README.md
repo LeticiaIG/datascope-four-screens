@@ -64,7 +64,7 @@ On the Texas table, under Design, the heights of the D2 berm and the D3 walls ca
 
 **A softer ground.** From the ground the land is the drawn map, flat and pale, with the aerial photograph laid over it as a blurred wash at under half its strength, and the whole scene is in slightly soft focus. Labels and panels stay sharp.
 
-**The painted look.** From the ground the center wall stays in three dimensions but is seen as through a painting: the aerial photograph comes forward, and the whole drawing is moved a little, as by a brush, and diffused. The landscape behind the right wall is painted the same way. It is drawn by a filter over the map, so the text, the labels and the bubble stay sharp. `?paint=0` in the address leaves it out.
+**The painted look.** From the ground the center wall stays in three dimensions but is seen as through a painting: the aerial photograph comes forward, and the whole drawing is moved a little, as by a brush, and diffused. The landscape behind the right wall is painted the same way. It is drawn by a filter over the map, so the text, the labels and the bubble stay sharp. The haze on the horizon has no edge of its own: it lies soft across the line where the ground ends, so the ground is not cut by a white line. `?paint=0` in the address leaves it out.
 
 **The reveal.** When a choice arrives on the right wall, the card that names it is now set as the rest of that wall: the serif, no capitals, and the place still seen through it.
 

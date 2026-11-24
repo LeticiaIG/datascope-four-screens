@@ -576,6 +576,9 @@ body.imm .axo .amk.dk,body.imm .axo .amk.en,body.imm .axo .amk.sn,body.nopanels 
 .axo.gv .maplibregl-canvas{filter:blur(1px)}
 /* the painted look: the brush filter instead of the soft focus, on the center wall from the ground and on the landscape behind the right wall */
 .axo.gv.paint canvas.maplibregl-canvas{filter:url(#vg) saturate(1.12)}
+/* the haze on the horizon has no edge of its own: faintest above and below, it lies across the line where the ground ends, so the painted ground is not cut by a white line */
+.axo.gv.paint .ghaze{background:linear-gradient(#eef3f300 0,#eef3f350 46%,#eef3f300 100%);transform:translateY(-46%) scaleY(1.9);filter:blur(4px)}
+.axo.gv.paint.night .ghaze{background:linear-gradient(#0a142c00 0,#0a142c66 46%,#0a142c00 100%)}
 .axo.gv.paint{background:linear-gradient(180deg,#b7cde6 0,#dfe8ee 34%,#c7d5bf 40%,#aebfa6 100%)} .axo.gv.paint.night{background:linear-gradient(180deg,#1a2028 0,#232a30 38%,#1b211f 42%,#141917 100%)}   /* behind the drawing, so the brush leaves no white at its edges */
 /* the first person's readout of the sound: five bars that move when Listen is on, the level where you stand, and whether you would hear it */
 .sndchip{display:none} body.imm .stage[data-view="axo"] .sndchip,body.nopanels .stage[data-view="axo"] .sndchip{display:flex;align-items:center;gap:.85rem;position:absolute;left:1.5rem;bottom:1.5rem;z-index:6;padding:.6rem 1.25rem .6rem 1rem;border-radius:999px;background:color-mix(in srgb,var(--surface) 62%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid color-mix(in srgb,var(--line) 55%,transparent);color:var(--ink);pointer-events:none}
@@ -3781,7 +3784,7 @@ function filmCard(){
 route();
 if (FILM) filmCard();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-185414";
+var BUILD = "20261124-195955";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
