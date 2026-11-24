@@ -1092,6 +1092,18 @@ html.checking .app{visibility:hidden}
 /* the bubble lets the landscape through while nobody is at it */
 .measure.simple.film:not(.zz) .bud .bfig{transition:opacity .45s ease}
 .measure.simple.film:not(.zz):not(.open) .bud:not(:hover):not(:focus-visible) .bfig{opacity:.62}
+/* the film: nothing of the page's own chrome, no pointer, the narration under the picture */
+.filming .top,.filming .akey,.filming .stage[data-view="axo"] .zoomc,.filming .tour{display:none !important} .filming .measure.simple.film{padding-bottom:7.6rem} .filming,.filming *{cursor:none !important} .filming .fstart,.filming .fstart *{cursor:pointer !important}
+.fsub{position:fixed;left:0;right:0;bottom:5.4vh;z-index:200;display:flex;justify-content:center;pointer-events:none;opacity:0;transform:translateY(10px);transition:opacity .35s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.fsub.in{opacity:1;transform:none}
+.fsub span{max-width:min(64rem,84vw);padding:.75rem 1.5rem .85rem;border-radius:1.3rem;background:#221f33cc;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#fff;font-family:"Instrument Serif","Times New Roman",serif;font-size:clamp(1.35rem,3.1vh,2.5rem);line-height:1.16;text-align:center;text-wrap:balance}
+.fstart,.fend{position:fixed;inset:0;z-index:300;display:grid;place-items:center;text-align:center}
+.fstart{background:#e8eee1;color:#2c2a35;transition:opacity .9s ease} .fstart.go{opacity:0}
+.fend{background:linear-gradient(180deg,#6c67a3,#b3a9dc);color:#fff;opacity:0;transition:opacity 1.2s ease} .fend.in{opacity:1}
+.fstart h1,.fend h1{margin:0;font-family:"Instrument Serif","Times New Roman",serif;font-weight:400;font-size:clamp(4rem,15vh,11rem);letter-spacing:-.02em;line-height:1}
+.fstart p,.fend p{margin:.8rem 0 0;font-family:"Instrument Serif","Times New Roman",serif;font-size:clamp(1.3rem,3.2vh,2.5rem);line-height:1.2}
+.fstart p{font-family:var(--font);font-size:1.05rem;color:#716e7e}
+.fstart button{margin-top:1.4rem;font:inherit;font-weight:700;font-size:1.1rem;padding:.7rem 2.2rem;border:0;border-radius:999px;background:#2c2a35;color:#fff}
 /* the ribbons from the bubble to the physical model, on the right wall and carried on by the center wall */
 svg.ribs path{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0}
 svg.ribs .rb{stroke:var(--c);stroke-width:6.5;opacity:.95} svg.ribs .rh{stroke:#fff;stroke-width:1.5;opacity:.7}
@@ -3603,9 +3615,65 @@ try { var saved = localStorage.getItem("dcscope-v5"); if (saved) adopt(saved); }
 try { var qs = new URLSearchParams(location.search).get("site"); if (qs) ST.site = /^t/i.test(qs) ? "tx" : "mi"; } catch(e){}
 try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b = {B1:false, B2:false, B3:false, B4:false}; pk.toUpperCase().split(/[^A-Z0-9]+/).forEach(function(c){ if (/^D[1-4]$/.test(c)) ST.d = c; else if (/^T[1-4]$/.test(c)) ST.t = c; else if (/^E[1-4]$/.test(c)) ST.e = c; else if (/^B[1-4]$/.test(c)) ST.b[c] = true; });
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
+// ---------- the film: the tool plays itself through one story, to be recorded from the screen ----------
+// ?film=1 shows a card; a click on it starts the sound and the telling. One example is followed through the four screens in about a minute and a
+// half: the place at a person's height, the "You" pin on the table and what is heard there, day to night, two choices, the bubble, a voice added,
+// the four screens together. The words under the picture are the narration; &subs=0 leaves them out. Every figure shown is the tool's own.
+var FILM = /[?&]film=1/.test(location.search), FSUBS = !/[?&]subs=0/.test(location.search);
+function filmGo(){
+  var sub = document.createElement("div"), saved = null; sub.className = "fsub"; sub.setAttribute("aria-live", "polite"); document.body.appendChild(sub);
+  try { saved = localStorage.getItem("dcscope-voices"); } catch(e){}
+  function say(t){ sub.classList.remove("in"); if (!FSUBS) return; setTimeout(function(){ sub.innerHTML = t ? "<span>" + t + "</span>" : ""; if (t) sub.classList.add("in"); }, 260); }
+  function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  function until(f, ms){ return new Promise(function(r){ var t0 = Date.now(); (function p(){ if (f() || Date.now() - t0 > ms) r(); else setTimeout(p, 120); })(); }); }
+  function view(h){ if (location.hash !== "#" + h) location.hash = h; else render(); return wait(800); }
+  function tap(sel){ var e = document.querySelector(sel); if (e) e.click(); return !!e; }
+  function night(on){ AXO.night = !!on; try { localStorage.setItem("dcscope-night", on ? "1" : ""); } catch(e){} nightSync(); rwbNight(); axoHear(); axoEar(); axoKey(); audioSet(); }
+  function glide(to, ms){ var from = ear().slice(), t0 = performance.now(); return new Promise(function(done){ (function step(){ var u = Math.min(1, (performance.now() - t0) / ms), e = u * u * (3 - 2 * u); ST.ear = [Math.round(from[0] + (to[0] - from[0]) * e), Math.round(from[1] + (to[1] - from[1]) * e)]; render(); tell(); if (u < 1) setTimeout(step, 120); else done(); })(); }); }
+  function type(el, text, ms){ return new Promise(function(done){ var i = 0; (function k(){ el.value = text.slice(0, ++i); el.dispatchEvent(new Event("input", {bubbles:true})); if (i < text.length) setTimeout(k, ms / text.length); else done(); })(); }); }
+  (async function(){
+    // the same start every time: College Station, the conventional campus, solar bought with what is left, no benefit yet, nobody walking about
+    ST.site = "tx"; ST.d = "D1"; ST.t = "T1"; ST.e = "E2"; ST.b = {B1:false, B2:false, B3:false, B4:false}; ST.ag = false; ST.ear = null; ST.pan = [0, 0]; ST.look = null; ST.x = []; setPose(0, 0, 0);
+    MD.focus = null; MD.freeze = null; MD.open = false; MD.pin = false; VO.sel = null; VO.selV = null; VF.left = true; VF.right = true; night(false); tell();
+    // 1 · the place, at a person's height
+    await view("view"); await until(function(){ return AXO.map && GV.pos; }, 9000); immersive(true); document.body.classList.add("nopanels"); await wait(1200);
+    say("A data center is coming to your town. This is your street, about " + about(Math.round(AXO.earD || heard2(ST).far)) + " metres from the site."); await wait(9000);   // the distance as the wall's own panel gives it
+    // 2 · the table: you put yourself on the map, and hear it
+    say("On the table you put yourself on the map. Walk towards the plant and you hear it grow. Walk away, and it fades."); await view("editor");
+    var home = ear().slice(); await wait(1500); await glide([home[0] * .32, home[1] * .32], 3800); await wait(1000); await glide([home[0] * 1.55, home[1] * 1.55], 4200); await wait(700);
+    // 3 · day to night, back where you live
+    say("By day the town covers the hum. At night, when everything else goes quiet, it is the plant you hear."); ST.ear = home; render(); tell(); await view("view"); await until(function(){ return AXO.map && GV.pos; }, 6000);
+    await wait(3600); night(true); await wait(8200);
+    // 4 · bargaining: two choices on the table, and the plant that comes of them
+    say("So you start to bargain. Turn the building, screen it, change how it is cooled, and listen again."); night(false); await view("editor");
+    await wait(1600); tap('.alts [data-ch="design"]'); await wait(900); choose("D2"); await wait(2700); tap('.alts [data-ch="technology"]'); await wait(900); choose("T3"); await wait(2700);
+    await view("view"); await until(function(){ return AXO.map && GV.pos; }, 6000); await wait(4200);
+    // 5 · the bubble: the offer is one fixed sum
+    say("None of this is free. The developer’s offer to the community is one fixed sum. Every choice takes a layer of it, and what goes to one cannot go to another."); await view("analysis");
+    await wait(2800); rwOpen(true, true); await wait(2800); choose("B4"); await wait(6400); MD.focus = "D"; wordsFill(); await wait(4400); MD.focus = null; wordsFill(); await wait(500);
+    // 6 · your voice, and where the town stands
+    say("Then you say what you think, in one sentence, and see where the town stands."); rwOpen(false, false); await view("sentiment"); await wait(1500);
+    var f = $("vadd"); if (f){ var r = f.querySelector('input[name="vs"][value="cond"]'); if (r){ r.checked = true; r.dispatchEvent(new Event("change", {bubbles:true})); }
+      await type(f.vt, "Fine by me, if it is quiet at night and it hires here.", 2600); await wait(600); var go = f.querySelector(".vgo"); if (go && !go.disabled) go.click(); }
+    await wait(1600); if (VO.list && VO.list.length > 2) voSelect(2, "list"); await wait(4200); voSelect(null);
+    // 7 · the four screens
+    say("Four screens, one conversation: the place, the trade-offs and the people, before anything is built."); immersive(false); await view("all"); await wait(8600);
+    // 8 · the end
+    say(""); var end = document.createElement("div"); end.className = "fend"; end.innerHTML = "<div><h1>DataScope.</h1><p>Four screens, one conversation.</p></div>"; document.body.appendChild(end); await wait(60); end.classList.add("in"); await wait(5200);
+    try { if (saved == null) localStorage.removeItem("dcscope-voices"); else localStorage.setItem("dcscope-voices", saved); } catch(e){}   // the voice typed for the film is not kept
+    AXO.on = false; audioSet(); document.documentElement.setAttribute("data-film", "over");
+  })();
+}
+function filmCard(){
+  var c = document.createElement("div"); c.className = "fstart"; c.innerHTML = '<div><h1>DataScope.</h1><p>The film of the tool: about a minute and a half, with sound.<br>Start the screen recording, then click.</p><button type="button">Start</button></div>'; document.body.appendChild(c);
+  document.documentElement.classList.add("filming");
+  c.addEventListener("click", function(){ try { AXO.on = !!audioStart(); audioSet(); } catch(e){} try { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); } catch(e){}   // the click is what lets the sound start and the page fill the screen
+    c.classList.add("go"); setTimeout(function(){ c.remove(); filmGo(); }, 1400); }, {once:true});
+}
 route();
+if (FILM) filmCard();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-163926";
+var BUILD = "20261124-164943";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
