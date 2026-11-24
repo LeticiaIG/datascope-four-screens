@@ -911,7 +911,33 @@ html.checking .app{visibility:hidden}
 .measure.simple.film .bud .rl,.measure.simple.film .bud .rl.lD,.measure.simple.film .bud .rl.lT,.measure.simple.film .bud .rl.lE{fill:var(--fg);stroke:var(--halo);stroke-width:2.2px;paint-order:stroke}
 .measure.simple.film .bud .bb,.measure.simple.film .bud.max .bb{fill:#ffffff;fill-opacity:.45;stroke:#ffffff;stroke-width:1} .measure.simple.film .bud .bc{fill:url(#budfill);fill-opacity:.9}
 .measure.simple.film .bud .bn,.measure.simple.film .bud .bs{fill:var(--fg);stroke:var(--halo);stroke-width:2.6px;paint-order:stroke}
-.measure.simple.film .ph.q.bud .bl{font-size:.9rem;max-width:24rem;margin-top:1.5rem}
+.measure.simple.film .ph.q.bud .bl{font-size:.9rem;max-width:27rem;margin-top:.4rem;display:flex;flex-direction:column;gap:.3rem}
+.measure.simple.film .bud .bl b{display:block;color:var(--fg);font-weight:800;font-size:1rem;line-height:1.2} .measure.simple.film .bud .bl b.bad{color:var(--loss)}
+.measure.simple.film .bud .bl i{display:block;font-style:normal;font-weight:600;font-size:.82rem;line-height:1.25;opacity:.8}
+.measure.simple.film .bud .rg,.measure.simple.film .bud .rT,.measure.simple.film .bud .rE,.measure.simple.film .bud .rB{fill:none;stroke:var(--kD);stroke-opacity:.62;stroke-dasharray:none;transform:rotate(-90deg)}
+.measure.simple.film .bud .rT{stroke:var(--kT)} .measure.simple.film .bud .rE{stroke:var(--kE)} .measure.simple.film .bud .rB{stroke:#4fcf9f}
+/* ---------- motion ----------
+   The type moves as type: a figure tips up into place, the words open out from narrow to their width, each line a beat after the one before. The bands
+   of the bubble are drawn round in turn. All of it happens once, when a choice changes; nothing loops. */
+/* the card that shows one choice stands on its own ground, so it may be flat and solid: the color of its chapter, with black or white type */
+.measure.simple.film > .reveal.kD,.measure.simple.film:not(.night) > .reveal.kD{background:#3a2bff;--fg:#fff;--dim:#ffffffb3;--c:#fff;color:#fff}
+.measure.simple.film > .reveal.kT,.measure.simple.film:not(.night) > .reveal.kT{background:#e87bb3;--fg:#0d0e0f;--dim:#0d0e0fb3;--c:#0d0e0f;color:#0d0e0f}
+.measure.simple.film > .reveal.kE,.measure.simple.film:not(.night) > .reveal.kE{background:#f2b63c;--fg:#0d0e0f;--dim:#0d0e0fb3;--c:#0d0e0f;color:#0d0e0f}
+.measure.simple.film > .reveal.kB,.measure.simple.film:not(.night) > .reveal.kB{background:#a8f0cf;--fg:#0d0e0f;--dim:#0d0e0fb3;--c:#0d0e0f;color:#0d0e0f}
+@keyframes tipup{from{transform:perspective(700px) rotateX(-86deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes openout{from{transform:scaleX(.3);opacity:0}to{transform:none;opacity:1}}
+@keyframes sweep{from{stroke-dasharray:0 100}to{stroke-dasharray:100 0}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.film .reveal .rv{animation:none} .film .reveal em{display:inline-block;transform-origin:50% 50%;animation:openout .5s cubic-bezier(.2,.9,.2,1) both}
+.film .reveal .rv b,.film .reveal .rv .ar{transform-origin:50% 100%;animation:tipup .6s cubic-bezier(.2,1.2,.3,1) .18s both}
+.film .reveal .rv span,.film .reveal .rv0{display:inline-block;transform-origin:0 50%;animation:openout .5s cubic-bezier(.2,.9,.2,1) .42s both} .film .reveal .rv0{transform-origin:50% 50%}
+.film .reveal .rc,.film .reveal u{animation:fadein .5s ease .75s both}
+.film.cut .ft{animation:none} .film.cut .ft b{display:inline-block;transform-origin:50% 100%;animation:tipup .55s cubic-bezier(.2,1.2,.3,1) both;animation-delay:calc(160ms + var(--i, 0) * 90ms)}
+.film.cut .ft span{display:inline-block;transform-origin:0 50%;animation:openout .45s cubic-bezier(.2,.9,.2,1) both;animation-delay:calc(300ms + var(--i, 0) * 90ms)}
+.film.cut .fcol h4{animation:fadein .5s ease both}
+.film.cut .bud .rg{animation:sweep .9s cubic-bezier(.3,.7,.2,1) both;animation-delay:calc(200ms + var(--j, 0) * 170ms)} .film.cut .bud .rl{animation:fadein .4s ease both;animation-delay:calc(800ms + var(--j, 0) * 170ms)}
+.film.cut.rev .ft b{animation-delay:calc(3s + var(--i, 0) * 90ms)} .film.cut.rev .ft span{animation-delay:calc(3.14s + var(--i, 0) * 90ms)} .film.cut.rev .bud .rg{animation-delay:calc(3s + var(--j, 0) * 170ms)} .film.cut.rev .bud .rl{animation-delay:calc(3.6s + var(--j, 0) * 170ms)}
+@media (prefers-reduced-motion: reduce){ .film .reveal *,.film.cut .ft b,.film.cut .ft span,.film.cut .fcol h4,.film.cut .bud .rg,.film.cut .bud .rl{animation:none} }
 .measure.simple.film:not(.zz) .phs .nil{font-weight:800;text-transform:uppercase;letter-spacing:-.01em;font-size:1.4rem;opacity:.45}
 .film.cut .acts button.hit{animation:hit .7s ease-out both}
 @keyframes hit{0%{background:#f1eee3;color:#0d0e0f}100%{background:none}}
@@ -2050,19 +2076,22 @@ function budState(){
   var b = bud(), l = leftOf(ST), f = funds(), left0 = r2(l[0] - (f.e > 0 ? f.e : 0)), left1 = l[1], over = left0 < 0 || left1 < 0;
   return {b:b, left0:left0, left1:left1, over:over, full:!over && (left0 <= 0 || left1 <= 0), used:Math.max(b[0] > 0 ? (b[0] - left0) / b[0] : 0, b[1] > 0 ? (b[1] - left1) / b[1] : 0)};   // used: the fuller of the two parts, upfront or yearly
 }
-function budBubHTML(i){   // the budget is the community's to share out. The bubble is what stays with the community: the benefits chosen (the solid core) and what is not allocated yet (the paler rest).
-  // Every choice made about the plant itself (its design, its cooling, its energy) leaves a dashed ring, named, with what it took: the bubble has shrunk from each ring to the next.
-  var q = budState(), bens = modules(), f = funds(), en = ENERGY[ST.e], tot = q.b[0] || 1, R = 100, R0 = 32, left = tot, o = "", n = 0, outs = [], ben = r2(bens.reduce(function(a, c){ return a + price(c)[0]; }, 0));
+function budBubHTML(i){   // The one bubble is the developer's offer to the community: a fixed share (20% of the profits in the brief), not as much as one would like.
+  // Its outer ring is the whole offer. Every use it is put to leaves a translucent ring, named, with what it took: the plant's design, its cooling, each benefit,
+  // and last the energy, which takes what is left. The middle is what is still to be allocated. Under it the trade is said in one line: every dollar is used once.
+  var q = budState(), bens = modules(), f = funds(), en = ENERGY[ST.e], tot = q.b[0] || 1, R = 100, R0 = 30, left = tot, o = "", n = 0, outs = [], BN = {B1:"Endowment", B2:"Ownership", B3:"Household protection", B4:"Jobs and training"};
   function rad(v){ return R0 + (R - R0) * Math.max(0, Math.min(1, v / tot)); }
-  var parts = [["D", "Design", price(ST.d)[0]], ["T", "Technology", price(ST.t)[0]], ["E", en ? en.what.charAt(0).toUpperCase() + en.what.slice(1) : "", f.e > 0 ? f.e : 0]].filter(function(p){ return p[2] > 0; });
-  parts.forEach(function(p){ if (left <= 0){ outs.push(p[1] + " " + money(r2(p[2]))); return; } var r = rad(left); n++; left = r2(left - p[2]); var rn = rad(left), th = r - rn;   // a flat band from the size before this choice to the size after it
-    o += '<circle class="rg r' + p[0] + '" r="' + r.toFixed(1) + '"/>' + (th >= 7.5 ? '<text class="rl l' + p[0] + '" x="0" y="' + (-(r + rn) / 2 + 3).toFixed(1) + '" text-anchor="middle" style="font-size:' + Math.min(9.5, th - 1.5).toFixed(1) + 'px">' + p[1] + ' ' + money(r2(p[2])) + '</text>' : ''); });
-  var comm = Math.max(0, left), rb = rad(comm), rc = comm > 0 ? Math.min(rb, rb * Math.sqrt(Math.min(1, ben / comm))) : 0, free = r2(comm - ben);
-  var note = (q.over ? '<em>The choices ask for ' + (q.left0 < 0 ? money(-q.left0) : money(-q.left1) + " a year") + ' more than there is' + (outs.length ? ": " + outs.join(", ") + " does not fit" : "") + '.</em> ' : (ben ? money(ben) + " in benefits" : "No benefit chosen yet") + (free > 0 ? ", " + money(free) + " not allocated yet. " : ". Nothing is left to allocate. ")) +
-    (q.left1 < 0 ? "" : money(q.left1) + ' of ' + money(q.b[1]) + ' a year left. ') + 'Example prices.';
-  return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.freeze === "bud" ? " sel" : "") + '" style="--i:' + i + '" data-bud aria-label="The budget, ' + money(tot) + ' upfront, is the community’s to share out. ' + (parts.length ? "The choices about the plant take: " + parts.map(function(p){ return p[1] + " " + money(r2(p[2])); }).join(", ") + ". " : "") + money(comm) + ' stays with the community' + (ben ? ", " + money(ben) + " of it in benefits" : "") + '.">' +
-    '<svg viewBox="-112 -110 224 216" aria-hidden="true"><defs><radialGradient id="budfill" cx="34%" cy="28%" r="85%"><stop offset="0" stop-color="#e3fff4"/><stop offset=".5" stop-color="#6fdcb0"/><stop offset="1" stop-color="#1f9d74"/></radialGradient><linearGradient id="budedge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb057"/><stop offset=".5" stop-color="#e85cb8"/><stop offset="1" stop-color="#4f7dff"/></linearGradient></defs>' + o + (n ? '<text class="rl" x="0" y="' + (R + 12) + '" text-anchor="middle" style="font-size:9.5px">The whole budget ' + money(tot) + '</text>' : '') + '<circle class="bb" r="' + rb.toFixed(1) + '"/>' + (rc > 0 ? '<circle class="bc" r="' + rc.toFixed(1) + '"/>' : '') +
-    '<text class="bn" y="2" text-anchor="middle">' + (q.over ? "−" + (q.left0 < 0 ? money(-q.left0) : money(-q.left1)) : money(comm)) + '</text><text class="bs" y="14" text-anchor="middle">' + (q.over ? (q.left0 < 0 ? "over the budget" : "a year over the budget") : "for the community") + '</text></svg><span class="bl">' + note + '</span></button></div>';
+  var harm = r2(price(ST.d)[0] + price(ST.t)[0]), ben = r2(bens.reduce(function(a, c){ return a + price(c)[0]; }, 0)), ene = f.e > 0 ? r2(f.e) : 0;
+  var parts = [["D", "Design", price(ST.d)[0]], ["T", "Technology", price(ST.t)[0]]].concat(bens.map(function(c){ return ["B", BN[c] || c, price(c)[0]]; })).concat([["E", en ? en.what.charAt(0).toUpperCase() + en.what.slice(1) : "", ene]]).filter(function(p){ return p[2] > 0; });
+  parts.forEach(function(p){ if (left <= 0){ outs.push(p[1] + " " + money(r2(p[2]))); return; } var r = rad(left); n++; left = r2(left - p[2]); var rn = rad(left), th = r - rn;   // a ring from the size before this use to the size after it
+    o += '<circle class="rg r' + p[0] + '" r="' + ((r + rn) / 2).toFixed(1) + '" pathLength="100" style="stroke-width:' + Math.max(1, th - 1.2).toFixed(1) + 'px;--j:' + (n - 1) + '"/>' + (th >= 7.5 ? '<text class="rl l' + p[0] + '" x="0" y="' + (-(r + rn) / 2 + 3).toFixed(1) + '" text-anchor="middle" style="font-size:' + Math.min(9.5, th - 1.5).toFixed(1) + 'px;--j:' + (n - 1) + '">' + p[1] + ' ' + money(r2(p[2])) + '</text>' : ''); });
+  var free = Math.max(0, left), rb = rad(free), used = [harm ? money(harm) + " to make the plant bother less" : "", ene ? money(ene) + " to buy " + en.what : "", ben ? money(ben) + " straight to people" : ""].filter(function(x){ return x; });
+  var rest = Object.keys(BN).filter(function(c){ return bens.indexOf(c) < 0; }).map(function(c){ return BN[c] + " " + money(price(c)[0]) + (fits(c) ? "" : " (does not fit)"); });
+  var note = (q.over ? '<b class="bad">The choices ask for ' + (q.left0 < 0 ? money(-q.left0) : money(-q.left1) + " a year") + ' more than the offer' + (outs.length ? ": " + outs.join(", ") + " does not fit" : "") + '.</b>' : '<b>Every dollar is used once' + (used.length ? ": " + used.join(", ") : "") + '.</b>') +
+    (rest.length ? '<i>Not chosen: ' + rest.join(", ") + '.' + (ene ? " Adding one takes that much from " + en.what + "." : "") + '</i>' : '') + '<i>' + (q.left1 < 0 ? "" : money(q.left1) + ' of ' + money(q.b[1]) + ' a year left. ') + 'Example prices.</i>';
+  return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.freeze === "bud" ? " sel" : "") + '" style="--i:' + i + '" data-bud aria-label="The developer’s offer to the community, ' + money(tot) + ' upfront. ' + (parts.length ? parts.map(function(p){ return p[1] + " takes " + money(r2(p[2])); }).join(", ") + ". " : "") + money(free) + ' is left to allocate.">' +
+    '<svg viewBox="-112 -110 224 232" aria-hidden="true">' + o + '<text class="rl" x="0" y="' + (R + 13) + '" text-anchor="middle" style="font-size:9.5px">The offer to the community: ' + money(tot) + '</text>' +
+    '<circle class="bb" r="' + rb.toFixed(1) + '"/><text class="bn" y="2" text-anchor="middle">' + (q.over ? "−" + (q.left0 < 0 ? money(-q.left0) : money(-q.left1)) : money(free)) + '</text><text class="bs" y="14" text-anchor="middle">' + (q.over ? (q.left0 < 0 ? "over the offer" : "a year over") : "left to allocate") + '</text></svg><span class="bl">' + note + '</span></button></div>';
 }
 // The story in one picture. On the left the money, as one bubble that has shrunk with every choice. Then one bubble for every result, floating over the
 // group it lands on: green where something is gained, red where it is given up, larger for more, an outline where the size is not known. Who gains and
@@ -2092,7 +2121,7 @@ function bwhyHTML(st, un){   // the bubble in question, in one breath: what, bec
   if (document.querySelector(".measure.film")){   // on the staged wall the picture runs until something is tapped; then it holds, and one line speaks to you
     var go = '<button type="button" class="go" data-unfreeze>▶ Go on</button>', fz = '<i class="frz">Freeze</i>';
     if (MD.freeze === "bud"){ var q = budState(), en0 = ENERGY[ST.e], fe = funds().e, bens = modules(), tk = [["design", price(ST.d)], ["technology", price(ST.t)], ["benefits", [bens.reduce(function(a, c){ return a + price(c)[0]; }, 0), bens.reduce(function(a, c){ return a + price(c)[1]; }, 0)]]].filter(function(p){ return p[1][0] || p[1][1]; }).map(function(p){ return p[0] + " " + priceWords([r2(p[1][0]), r2(p[1][1])]); });
-      return '<p class="sayl">' + fz + (q.over ? "This is the budget. The choices ask for more than there is." : q.full ? "This is what stays with the community. Nothing is left to allocate." : "This is what stays with the community. There is still room in it.") + go + '</p><p class="saywhy">' + money(q.b[0]) + " upfront and " + money(q.b[1]) + " a year, the developer’s offer for the community to share out. " + (tk.length ? "So far: " + tk.join(", ") + (en0 && fe > 0 ? ", and " + en0.what + " takes the " + money(fe) + " left upfront" : "") + "." : "Nothing is spent yet.") + " Example prices.</p>"; }
+      return '<p class="sayl">' + fz + (q.over ? "This is the budget. The choices ask for more than there is." : q.full ? "This is the developer’s offer to the community, a fixed share. All of it is allocated." : "This is the developer’s offer to the community, a fixed share. Part of it is still to be allocated.") + go + '</p><p class="saywhy">' + money(q.b[0]) + " upfront and " + money(q.b[1]) + " a year, the developer’s offer for the community to share out. " + (tk.length ? "So far: " + tk.join(", ") + (en0 && fe > 0 ? ", and " + en0.what + " takes the " + money(fe) + " left upfront" : "") + "." : "Nothing is spent yet.") + " Example prices.</p>"; }
     if (MD.freeze === "q") return '<p class="sayl">' + fz + (un.length ? "These are questions. Nobody has answered them yet." : "There is no open question for these choices.") + go + '</p>' + (un.length ? '<p class="saywhy">' + un.slice(0, 3).map(function(u){ return esc(u.t); }).join(" · ") + (un.length > 3 ? " · and " + (un.length - 3) + " more, under “The wheel, the sources and questions”." : ".") + '</p>' : "");
     if (/^face:/.test(MD.freeze || "")){ var f = facesData(st)[+MD.freeze.slice(5)]; return '<p class="sayl">' + fz + ["These are the nearest neighbors.", "This is the wider community.", "This is the water.", "This is the grid, and the climate.", "This is the developer."][+MD.freeze.slice(5)] + go + '</p><p class="saywhy">' + f.why + '</p>'; }
     if (!fr) return st.length || un.length ? '<p class="saywhy">Tap a figure to see why.</p>' : '';   // the counts are already on the two lists and in the circle
@@ -3120,7 +3149,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261123-232836";
+var BUILD = "20261124-143703";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
