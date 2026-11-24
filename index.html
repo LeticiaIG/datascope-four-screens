@@ -1081,9 +1081,9 @@ html.checking .app{visibility:hidden}
    stays whole. It folds to a small tab with the button in its corner; the tab opens while the pointer is over it, and a tap unfolds it for good. */
 .stage[data-view="axo"] .akey{max-height:calc(100% - 5.6rem);overflow:hidden auto;scrollbar-width:thin;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:background-color .35s ease,border-color .35s ease,box-shadow .35s ease,max-height .5s cubic-bezier(.2,.8,.2,1),width .5s cubic-bezier(.2,.8,.2,1),border-radius .4s ease}
 .stage[data-view="axo"] .akey > *{transition:opacity .3s ease}
-.stage[data-view="axo"] .akey:not(:hover):not(:has(:focus-visible)):not(.on){background:color-mix(in srgb,var(--surface) 24%,transparent);border-color:color-mix(in srgb,var(--line) 35%,transparent);box-shadow:none}
-.stage[data-view="axo"] .akey:not(:hover):not(:has(:focus-visible)):not(.on) > *:not(.hd){opacity:0}
-.stage[data-view="axo"] .akey:not(:hover):not(:has(:focus-visible)):not(.on) > .hd{opacity:.8}
+html:not(.fkey) .stage[data-view="axo"] .akey:not(:hover):not(:has(:focus-visible)):not(.on){background:color-mix(in srgb,var(--surface) 24%,transparent);border-color:color-mix(in srgb,var(--line) 35%,transparent);box-shadow:none}
+html:not(.fkey) .stage[data-view="axo"] .akey:not(:hover):not(:has(:focus-visible)):not(.on) > *:not(.hd){opacity:0}
+html:not(.fkey) .stage[data-view="axo"] .akey:not(:hover):not(:has(:focus-visible)):not(.on) > .hd{opacity:.8}
 .akey .hd{position:relative;flex:none;padding-right:1.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .amin{position:absolute;right:0;top:50%;transform:translateY(-50%);width:1.55rem;height:1.55rem;display:grid;place-items:center;border:0;border-radius:50%;background:none;color:var(--muted);font:inherit;font-size:1.15rem;font-weight:700;line-height:1;cursor:pointer} .amin:hover,.amin:focus-visible{background:var(--sunk);color:var(--ink)}
 .stage[data-view="axo"] .akey.min{width:18.5rem;max-height:2.95rem;overflow:hidden;border-radius:1.5rem;cursor:pointer}
@@ -1104,6 +1104,12 @@ html.checking .app{visibility:hidden}
 .fstart p,.fend p{margin:.8rem 0 0;font-family:"Instrument Serif","Times New Roman",serif;font-size:clamp(1.3rem,3.2vh,2.5rem);line-height:1.2}
 .fstart p{font-family:var(--font);font-size:1.05rem;color:#716e7e}
 .fstart button{margin-top:1.4rem;font:inherit;font-weight:700;font-size:1.1rem;padding:.7rem 2.2rem;border:0;border-radius:999px;background:#2c2a35;color:#fff}
+/* the parts of the film: a drawn pointer, the thread and ribbons left out, the center wall's panel shown solid in its own part */
+.fcur{position:fixed;left:52%;top:62%;z-index:400;width:27px;height:27px;margin:-3px 0 0 -5px;pointer-events:none;transition:left .75s cubic-bezier(.3,.1,.2,1),top .75s cubic-bezier(.3,.1,.2,1)}
+.fcur svg{display:block;width:100%;height:100%;fill:#141318;stroke:#fff;stroke-width:1.5;stroke-linejoin:round;filter:drop-shadow(0 2px 3px #0006)}
+.fcur i{position:absolute;left:-3px;top:-4px;width:16px;height:16px;border-radius:50%;border:2px solid #141318;opacity:0;transform:scale(.4);transition:transform .32s ease,opacity .32s ease} .fcur.dn i{opacity:.75;transform:scale(2.4)}
+.fpart .vthread,.fpart svg.ribs{display:none !important}
+html.fp3 body:not(.nopanels) .akey,html.fp3 body:not(.nopanels) .stage[data-view="axo"] .zoomc{display:flex !important} .filming.fpart .measure.simple.film{padding-bottom:1.2rem}
 /* the ribbons from the bubble to the physical model, on the right wall and carried on by the center wall */
 svg.ribs path{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0}
 svg.ribs .rb{stroke:var(--c);stroke-width:6.5;opacity:.95} svg.ribs .rh{stroke:#fff;stroke-width:1.5;opacity:.7}
@@ -1137,7 +1143,13 @@ html[data-look="d"] .measure.simple.film:not(.zz) .tlead{font-size:1.55rem;font-
 html[data-look="d"] .measure.simple.film:not(.zz) .tkb b,html[data-look="d"] .measure.simple.film:not(.zz) .trow .ft b{font-weight:900;letter-spacing:-.045em}
 html[data-look="b"] .measure.simple.film:not(.zz) .bud .ll,html[data-look="d"] .measure.simple.film:not(.zz) .bud .ll{font-family:var(--font);font-size:9.5px;font-weight:600;fill:#fff}
 html[data-look="b"] .measure.simple.film:not(.zz) > .reveal,html[data-look="d"] .measure.simple.film:not(.zz) > .reveal{background:#0b0c0d}
-html[data-look="c"] .measure.simple.film:not(.zz) > .reveal{background:linear-gradient(180deg,#6c67a3,#b3a9dc)}
+html[data-look="c"] .measure.simple.film:not(.zz) > .reveal{background:linear-gradient(180deg,#5f5a98e6,#8a81bfdb 55%,#b3a9dcd1);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);--fg:#fff;--dim:#ffffffc7;--c:#fff;color:#fff}
+/* the reveal speaks as the rest of the wall does: the serif for what is said, no capitals, nothing heavy */
+.measure.simple.film:not(.zz) .reveal small{font-family:inherit;font-weight:500;font-size:1rem;letter-spacing:.01em;text-transform:none}
+.measure.simple.film:not(.zz) .reveal em{font-family:"Instrument Serif","Times New Roman",serif;font-weight:400;font-size:2.9rem;line-height:1.02;letter-spacing:-.012em;text-transform:none}
+.measure.simple.film:not(.zz) .reveal .rv b{font-family:"Instrument Serif","Times New Roman",serif;font-weight:400;letter-spacing:-.02em}
+.measure.simple.film:not(.zz) .reveal .rv span,.measure.simple.film:not(.zz) .reveal .rv0{font-family:"Instrument Serif","Times New Roman",serif;font-weight:400;font-size:min(3.5rem,7.4vh);line-height:1.02;letter-spacing:-.012em;text-transform:none}
+.measure.simple.film:not(.zz) .reveal .rc{font-weight:400} .measure.simple.film:not(.zz) .reveal u{font-family:inherit;font-weight:500;letter-spacing:.01em;text-transform:none}
 @media (prefers-reduced-motion: reduce){ .film .reveal *,.film.cut .ft b,.film.cut .ft span,.film.cut .fcol h4{animation:none} }
 .measure.simple.film:not(.zz) .phs .nil{font-weight:800;text-transform:uppercase;letter-spacing:-.01em;font-size:1.4rem;opacity:.45}
 .film.cut .acts button.hit{animation:hit .7s ease-out both}
@@ -3619,7 +3631,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
 // ?film=1 shows a card; a click on it starts the sound and the telling. One example is followed through the four screens in about a minute and a
 // half: the place at a person's height, the "You" pin on the table and what is heard there, day to night, two choices, the bubble, a voice added,
 // the four screens together. The words under the picture are the narration; &subs=0 leaves them out. Every figure shown is the tool's own.
-var FILM = /[?&]film=1/.test(location.search), FSUBS = !/[?&]subs=0/.test(location.search);
+var FILM = /[?&]film=1/.test(location.search), FSUBS = !/[?&]subs=0/.test(location.search), FPART = +((location.search.match(/[?&]part=([1-5])/) || [])[1] || 0);   // &part=1..5: one section alone, with a pointer that shows what is pressed, and no words under the picture
 function filmGo(){
   var sub = document.createElement("div"), saved = null; sub.className = "fsub"; sub.setAttribute("aria-live", "polite"); document.body.appendChild(sub);
   try { saved = localStorage.getItem("dcscope-voices"); } catch(e){}
@@ -3635,6 +3647,7 @@ function filmGo(){
     // the same start every time: College Station, the conventional campus, solar bought with what is left, no benefit yet, nobody walking about
     ST.site = "tx"; ST.d = "D1"; ST.t = "T1"; ST.e = "E2"; ST.b = {B1:false, B2:false, B3:false, B4:false}; ST.ag = false; ST.ear = null; ST.pan = [0, 0]; ST.look = null; ST.x = []; setPose(0, 0, 0);
     MD.focus = null; MD.freeze = null; MD.open = false; MD.pin = false; VO.sel = null; VO.selV = null; VF.left = true; VF.right = true; night(false); tell();
+    if (FPART){ await filmPart(FPART, {wait:wait, until:until, view:view, night:night, type:type, glide:glide}); try { if (saved == null) localStorage.removeItem("dcscope-voices"); else localStorage.setItem("dcscope-voices", saved); } catch(e){} document.documentElement.setAttribute("data-film", "over"); return; }
     // 1 · the place, at a person's height
     await view("view"); await until(function(){ return AXO.map && GV.pos; }, 9000); immersive(true); document.body.classList.add("nopanels"); await wait(1200);
     say("A data center is coming to your town. This is your street, about " + about(Math.round(AXO.earD || heard2(ST).far)) + " metres from the site."); await wait(9000);   // the distance as the wall's own panel gives it
@@ -3664,8 +3677,65 @@ function filmGo(){
     AXO.on = false; audioSet(); document.documentElement.setAttribute("data-film", "over");
   })();
 }
+// One section at a time, as someone would use it: a drawn pointer goes to each thing and presses it. 1 the voices: read what is on the map, then add one.
+// 2 the table: the four dimensions of a scenario. 3 the center wall: night, walking, a person's height. 4 the right wall: the offer and what each
+// choice takes and gives. 5 the four screens together: one choice changes them all. The thread and the ribbons are left out here.
+async function filmPart(n, h){
+  var wait = h.wait, cur = document.createElement("div"); cur.className = "fcur"; cur.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 8-6.4 1.7L9.4 19z"/></svg><i></i>'; document.body.appendChild(cur);
+  document.documentElement.classList.add("fpart", "fp" + n);
+  function pt(t){ if (Array.isArray(t)) return t; var r = t.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }
+  function go(t, ms){ var p = pt(t); ms = ms || 750; cur.style.transitionDuration = ms + "ms"; cur.style.left = p[0] + "px"; cur.style.top = p[1] + "px"; return wait(ms + 140); }
+  async function press(t, ms, quiet){ var at = Array.isArray(t), el = typeof t === "string" ? document.querySelector(t) : at ? document.elementFromPoint(t[0], t[1]) : t; if (!el) return false; await go(at ? t : el, ms);
+    if (typeof t === "string") el = document.querySelector(t) || el; cur.classList.add("dn"); await wait(170); cur.classList.remove("dn");
+    if (!quiet){ var p = at ? t : pt(el); el.dispatchEvent(new MouseEvent("click", {bubbles:true, cancelable:true, clientX:p[0], clientY:p[1], view:window})); } await wait(320); return true; }
+  function chip(re){ return [].filter.call(document.querySelectorAll(".vchip"), function(c){ return re.test(c.textContent.trim()); })[0]; }
+  function onMap(ll0){ var p = VO.map.latLngToContainerPoint(ll0), r = VO.el.getBoundingClientRect(); return [r.left + p.x, r.top + p.y]; }
+  if (n === 1){   // read the voices that are there, then add your own and see it arrive
+    await h.view("sentiment"); await h.until(function(){ return VO.map && VO.list && VO.list.length; }, 8000); await wait(1400);
+    var i1 = 1, i2 = 4, q1 = ptsOf(VO.list[i1])[0], q2 = ptsOf(VO.list[i2])[0];
+    if (q1){ await go(onMap(q1), 900); cur.classList.add("dn"); await wait(170); cur.classList.remove("dn"); voSelect(i1, "map"); await wait(2200); }
+    if (q2){ await go(onMap(q2), 900); cur.classList.add("dn"); await wait(170); cur.classList.remove("dn"); voSelect(i2, "map"); await wait(2000); } voSelect(null);
+    await press(chip(/^Social media/), 800); await wait(1700); await press(chip(/^Reported/), 600); await wait(1500); await press(chip(/^All/), 600); await wait(900);
+    var f = $("vadd"), pl = S().places[1] || S().places[0];
+    await go(onMap([pl[1], pl[2]]), 900); cur.classList.add("dn"); await wait(170); cur.classList.remove("dn"); voMark(L.latLng(pl[1], pl[2]), pl[0].split(" · ")[0]); await wait(1100);
+    await press(f.querySelector('input[name="vs"][value="cond"]').parentNode, 900, true); var r = f.querySelector('input[name="vs"][value="cond"]'); r.checked = true; r.dispatchEvent(new Event("change", {bubbles:true})); await wait(500);
+    await press(f.vt, 600, true); await h.type(f.vt, "Fine by me, if it is quiet at night and it hires here.", 2800); await wait(600);
+    await press(f.querySelector(".vgo"), 700); await wait(1200); var c0 = document.querySelector('.vlist .vcard[data-vi="0"]'); if (c0) await go(c0, 900); await wait(2600);
+  }
+  if (n === 2){   // a scenario is a choice in each of four dimensions
+    await h.view("editor"); await wait(1600);
+    await press('.alts [data-ch="design"]', 800); await wait(700); await press("#opt-D2", 700); await wait(1900); await press("#opt-D3", 600); await wait(1900); await press("#opt-D2", 600); await wait(1200);
+    await press('.alts [data-ch="technology"]', 700); await wait(700); await press("#opt-T3", 700); await wait(1900);
+    await press('.alts [data-ch="energy"]', 700); await wait(700); await press("#opt-E3", 700); await wait(1500); await press("#opt-E2", 600); await wait(1500);
+    await press('.alts [data-ch="benefits"]', 700); await wait(700); await press("#opt-B4", 700); await wait(1500); await press("#opt-B1", 600); await wait(2400);
+  }
+  if (n === 3){   // the place itself: walk and turn, the night, then down to a person's height
+    choose("D2"); choose("T3"); await h.view("view"); await h.until(function(){ return AXO.map && GV.pos; }, 9000); await wait(2400);
+    function panel(on){ var k = document.querySelector(".akey"); if (k) k.classList.remove("min"); document.documentElement.classList.toggle("fkey", !!on); }   // the panel is a ghost until the pointer is on it
+    function keyp(k){ document.body.dispatchEvent(new KeyboardEvent("keydown", {key:k, bubbles:true, cancelable:true})); }
+    await press('[data-az="in"]', 900); await wait(2200); await press('[data-az="right"]', 500); await wait(1500); await press('[data-az="right"]', 200); await wait(1900); await press('[data-az="left"]', 500); await wait(1000); await press('[data-az="left"]', 200); await wait(1900);
+    panel(true); await press('[data-tod="night"]', 900); await wait(800); await go([innerWidth * .62, innerHeight * .56], 900); panel(false); await wait(3800);
+    panel(true); await press('[data-tod="day"]', 900); await wait(800); await press('[data-az="imm"]', 1000); panel(false); document.body.classList.add("nopanels"); await go([innerWidth * .5, innerHeight * .62], 700);
+    await wait(2200); keyp("w"); await wait(1500); keyp("w"); await wait(1500); keyp("e"); await wait(1300); keyp("q"); await wait(1300); keyp("q"); await wait(1500); keyp("e"); await wait(1500); immersive(false);
+  }
+  if (n === 4){   // what a scenario would mean: the bubble at rest over the place, then layer by layer what each choice takes of the offer and what it gives
+    choose("D2"); choose("T3"); choose("B4"); MD.key = null; MD.rev = null; await h.view("analysis"); await wait(3400);
+    await press(".bud .ll.kE", 1100); await wait(3600); await press('.tkb[data-fc="T"]', 900); await wait(3200); await press('.tkb[data-fc="B"]', 800); await wait(3200); await press(".bud .ll.kD", 1000); await wait(3400);
+    await press([innerWidth * .09, innerHeight * .8], 1000); await wait(3400);
+  }
+  if (n === 5){   // one scenario on four screens: what is chosen on the table changes the walls, and so does where you stand
+    choose("D1"); choose("T1"); MD.key = null; MD.rev = null; await h.view("all"); await h.until(function(){ return document.querySelector(".scr.tb #opt-D1"); }, 8000); await wait(3400);
+    var tb = ".scr.tb ", you = function(){ return document.querySelector(tb + ".you"); };
+    await press(tb + '.alts [data-ch="design"]', 1000); await wait(500); await press(tb + "#opt-D2", 700); await wait(4600);
+    await press(tb + '.alts [data-ch="technology"]', 700); await wait(500); await press(tb + "#opt-T3", 700); await wait(4600);
+    await press(tb + '.alts [data-ch="benefits"]', 700); await wait(500); await press(tb + "#opt-B4", 700); await wait(4600);
+    if (you()){ await go(you(), 1000); cur.classList.add("dn"); var e0 = ear().slice(), follow = setInterval(function(){ var y = you(); if (y){ var p = pt(y); cur.style.transitionDuration = "130ms"; cur.style.left = p[0] + "px"; cur.style.top = p[1] + "px"; } }, 130);
+      await h.glide([e0[0] * .4, e0[1] * .4], 2600); clearInterval(follow); cur.classList.remove("dn"); await wait(3800); }
+  }
+  await wait(900); cur.remove();
+}
 function filmCard(){
-  var c = document.createElement("div"); c.className = "fstart"; c.innerHTML = '<div><h1>DataScope.</h1><p>The film of the tool: about a minute and a half, with sound.<br>Start the screen recording, then click.</p><button type="button">Start</button></div>'; document.body.appendChild(c);
+  var c = document.createElement("div"); c.className = "fstart"; c.innerHTML = '<div><h1>DataScope.</h1><p>' + (FPART ? "Part " + FPART + " of 5: " + ["", "the voices", "the scenario on the table", "the place", "what it would mean", "the four screens together"][FPART] + ", with a pointer." : "The film of the tool: about a minute and a half, with sound.") + '<br>Start the screen recording, then click.</p><button type="button">Start</button></div>'; document.body.appendChild(c);
   document.documentElement.classList.add("filming");
   c.addEventListener("click", function(){ try { AXO.on = !!audioStart(); audioSet(); } catch(e){} try { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); } catch(e){}   // the click is what lets the sound start and the page fill the screen
     c.classList.add("go"); setTimeout(function(){ c.remove(); filmGo(); }, 1400); }, {once:true});
@@ -3673,7 +3743,7 @@ function filmCard(){
 route();
 if (FILM) filmCard();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-173021";
+var BUILD = "20261124-175507";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
