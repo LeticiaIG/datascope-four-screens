@@ -2396,17 +2396,17 @@ var BFS = ["#ifdef GL_FRAGMENT_PRECISION_HIGH", "precision highp float;", "#else
   "   vec3 n=normalize(k.xyy*sd(q+k.xyy*e)+k.yyx*sd(q+k.yyx*e)+k.yxy*sd(q+k.yxy*e)+k.xxx*sd(q+k.xxx*e));",
   "   vec3 Ld=normalize(vec3(-.45,.7,.55)),H=normalize(Ld+vec3(0.,0.,1.));",
   "   float dif=dot(n,Ld)*.5+.5,fr=pow(1.-clamp(n.z,0.,1.),2.4),sp=max(dot(n,H),0.),ca=cos(TA),sa=sin(TA);",
-  "   float wave=uSl*.045*sin(q.x/uR*3.3+uT*9.)+.005*sin(q.x/uR*8.+uT*2.3),top=uL.w+wave;",
+  "   float wave=uSl*.045*sin(q.x/uR*3.3+uT*9.)+.014*sin(q.x/uR*5.+uT*1.7)+.008*sin(q.x/uR*9.-uT*2.4),top=uL.w+wave;",
   "   float h=(q.y*ca+q.z*sa)/uR+wave;",
   "   vec3 base;float al=1.,lit=1.;",
-  "   if(h<=top||uL.w>.995){base=liq(min(h-wave,uL.w));lit=1.;}",
+  "   if(h<=top||uL.w>.995){base=liq(min(h-wave,uL.w));lit=1.;al=.84;}",
   "   else{",
   "    float zp=(top*uR-q.y*ca)/sa;",   // the line of sight passes the glass and meets the level of what is inside
   "    if(uL.w>-.985&&p.x*p.x+q.y*q.y+zp*zp<uR*uR*.985&&zp<q.z){base=liq(uL.w)*1.05+.07+.018*sin(length(vec2(p.x,zp))/uR*16.-uT*2.4);al=.98;}",
   "    else{base=mix(vec3(.9,.95,1.),vec3(1.),.4);al=.07+uNight*.05;}",
   "   }",
-  "   float core=pow(clamp(1.-length(p)/uR,0.,1.),1.2);",   // lit from within: white at the heart, its own color at the edge, and no reflection on it
-  "   col=mix(base*lit,vec3(1.),core*.56*al)+fr*.08*base;",
+  "   vec2 cc=vec2(.22*sin(uT*.55),.17*cos(uT*.41))*uR;float core=pow(clamp(1.-length(p-cc)/uR,0.,1.),1.2),flow=nz(vec3(p/uR*1.7,uT*.5)+2.);",   // lit from within: white at the heart, its own color at the edge, and no reflection on it
+  "   col=mix(base*lit,vec3(1.),clamp(core*.56+flow*.08,0.,1.))+fr*.08*base;",
   "   a=cov*clamp(al+(1.-al)*fr*.6,0.,1.)*mix(1.,.86,pow(fr,4.));",
   "  }",
   " }",
@@ -2433,7 +2433,7 @@ function blobInit(){
 function blobAim(){ var s = MD.seq; return !s || (s.t0 && Date.now() < s.t0) ? null : s; }   // while the card of a choice is up, it stays as it was
 function blobDraw(){
   var gl = BLOB.gl, c = BLOB.c, u = BLOB.u, b = BLOB.b; gl.viewport(0, 0, c.width, c.height); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
-  gl.uniform2f(u.uRes, c.width, c.height); gl.uniform1f(u.uT, BLOB.still ? 2.4 : (performance.now() - BLOB.t00) / 1000 * .42); gl.uniform1f(u.uR, 100 / 128); gl.uniform1f(u.uAmp, .028 + BLOB.sl * .03); gl.uniform1f(u.uNight, BLOB.night ? 1 : 0);
+  gl.uniform2f(u.uRes, c.width, c.height); gl.uniform1f(u.uT, BLOB.still ? 2.4 : (performance.now() - BLOB.t00) / 1000 * .6); gl.uniform1f(u.uR, 100 / 128); gl.uniform1f(u.uAmp, .05 + BLOB.sl * .03); gl.uniform1f(u.uNight, BLOB.night ? 1 : 0);
   gl.uniform3fv(u.CA, BLOB.ca || [.93, .5, .92]); gl.uniform3fv(u.CB, BLOB.cb || [.74, .68, .99]);
   gl.uniform1f(u.uOv, BLOB.ov); gl.uniform1f(u.uSl, BLOB.sl); gl.uniform1f(u.uF, BLOB.fi || 0); gl.uniform1f(u.uFa, BLOB.fa || 0); gl.uniform4f(u.uL, b[0], b[1], b[2], b[3]); gl.drawArrays(gl.TRIANGLES, 0, 3); BLOB.drawn = performance.now();
 }
@@ -3673,7 +3673,7 @@ function filmCard(){
 route();
 if (FILM) filmCard();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-171840";
+var BUILD = "20261124-173021";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
