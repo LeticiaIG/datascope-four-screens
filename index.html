@@ -1056,6 +1056,31 @@ html.checking .app{visibility:hidden}
 .measure.simple.film:not(.zz) .bud .ll,.measure.simple.film:not(.zz) .bud .ll.kB{font-family:"Instrument Serif","Times New Roman",serif;font-size:12px;font-weight:400;fill:#57207a}
 .measure.simple.film:not(.zz) .bud.over .ll{fill:#fff}
 .measure.simple.film:not(.zz) > .reveal,.measure.simple.film:not(.zz) > .reveal.kD,.measure.simple.film:not(.zz) > .reveal.kT,.measure.simple.film:not(.zz) > .reveal.kE,.measure.simple.film:not(.zz) > .reveal.kB{background:linear-gradient(180deg,#3a82ca 0,#7fbbe9 100%)}
+/* Four looks to try, on all four screens at once: ?look=a, b, c or d (remembered for every window; ?look=0 goes back to the way it was).
+   A look sets the same few things everywhere: the ground, the surfaces, the ink, one accent, the face of headings, and the bubble's two colors.
+   a sky and pink light (Turrell) · b blurred steel blue, thin type (The Outcome) · c pale painted paper, lilac · d black, heavy white type. */
+html[data-look="a"]{--bg:#bfdaf2;--surface:#ffffffde;--sunk:#e6f0fa;--ink:#17365c;--muted:#4f7096;--line:#b7d1ec;--accent:#cf5bd6;--accent-soft:#f5dcf7;--dface:"Instrument Serif","Times New Roman",serif}
+html[data-look="b"]{color-scheme:dark;--bg:#16263a;--surface:#213750e6;--sunk:#2b4763;--ink:#f1f5f9;--muted:#a8bbcf;--line:#ffffff2b;--accent:#9cc4ea;--accent-soft:#2f4f6d;--dface:var(--font);--ba:#de8f8a;--bb:#6699d1}
+html[data-look="c"]{--bg:#e8eee1;--surface:#fcfbf5;--sunk:#f0eee3;--ink:#2c2a35;--muted:#716e7e;--line:#dbd8cd;--accent:#8469cf;--accent-soft:#e8e1f8;--dface:"Instrument Serif","Times New Roman",serif;--ba:#f2b79a;--bb:#b9a6ec}
+html[data-look="d"]{color-scheme:dark;--bg:#0b0c0d;--surface:#151718f2;--sunk:#222527;--ink:#f4f2ea;--muted:#9c9fa1;--line:#ffffff26;--accent:#f4f2ea;--accent-soft:#2b2e31;--dface:var(--font);--ba:#e6736a;--bb:#618cee}
+html[data-look] h1,html[data-look] h2,html[data-look] h3,html[data-look] .brand{font-family:var(--dface);font-weight:400;letter-spacing:-.01em}
+html[data-look="a"] h3,html[data-look="c"] h3{font-size:1.45em}
+html[data-look="b"] h1,html[data-look="b"] h2,html[data-look="b"] h3{font-weight:300}
+html[data-look="d"] h1,html[data-look="d"] h2,html[data-look="d"] h3,html[data-look="d"] .brand{font-weight:800;letter-spacing:-.03em}
+html[data-look] .card{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+html[data-look="b"] textarea,html[data-look="b"] input,html[data-look="b"] select,html[data-look="d"] textarea,html[data-look="d"] input,html[data-look="d"] select{background:var(--sunk);color:var(--ink);border-color:var(--line)}
+html[data-look="b"] .measure.simple.film:not(.zz) > .fpage,html[data-look="b"] .measure.simple.film:not(.zz).night > .fpage{background:linear-gradient(90deg,#10233800 0,#1023384d 22%,#10233866 50%,#0c1a2a80 80%,#0a1420a3 100%),linear-gradient(#10233857 0,#10233800 46%)}
+html[data-look="c"] .measure.simple.film:not(.zz) > .fpage{background:linear-gradient(180deg,#6c67a3d6 0,#8f86c2cc 55%,#b3a9dcc2 100%)}
+html[data-look="d"] .measure.simple.film:not(.zz) > .fpage,html[data-look="d"] .measure.simple.film:not(.zz).night > .fpage{background:linear-gradient(90deg,#0b0c0d00 0,#0b0c0d8f 26%,#0b0c0dd1 60%,#0b0c0df0 100%)}
+html[data-look="b"] .measure.simple.film:not(.zz),html[data-look="d"] .measure.simple.film:not(.zz){--loss:#f2aaa2}
+html[data-look="b"] .measure.simple.film:not(.zz) .tlead,html[data-look="b"] .measure.simple.film:not(.zz) .tkb b,html[data-look="b"] .measure.simple.film:not(.zz) .trow .ft b,html[data-look="d"] .measure.simple.film:not(.zz) .tlead,html[data-look="d"] .measure.simple.film:not(.zz) .tkb b,html[data-look="d"] .measure.simple.film:not(.zz) .trow .ft b{font-family:var(--font)}
+html[data-look="b"] .measure.simple.film:not(.zz) .tlead{font-size:1.5rem;font-weight:600;line-height:1.24} html[data-look="b"] .measure.simple.film:not(.zz) .tlead span{font-weight:300}
+html[data-look="b"] .measure.simple.film:not(.zz) .tkb b,html[data-look="b"] .measure.simple.film:not(.zz) .trow .ft b{font-weight:200}
+html[data-look="d"] .measure.simple.film:not(.zz) .tlead{font-size:1.55rem;font-weight:800;line-height:1.12;letter-spacing:-.02em}
+html[data-look="d"] .measure.simple.film:not(.zz) .tkb b,html[data-look="d"] .measure.simple.film:not(.zz) .trow .ft b{font-weight:900;letter-spacing:-.045em}
+html[data-look="b"] .measure.simple.film:not(.zz) .bud .ll,html[data-look="d"] .measure.simple.film:not(.zz) .bud .ll{font-family:var(--font);font-size:9.5px;font-weight:600;fill:#fff}
+html[data-look="b"] .measure.simple.film:not(.zz) > .reveal,html[data-look="d"] .measure.simple.film:not(.zz) > .reveal{background:#0b0c0d}
+html[data-look="c"] .measure.simple.film:not(.zz) > .reveal{background:linear-gradient(180deg,#6c67a3,#b3a9dc)}
 @media (prefers-reduced-motion: reduce){ .film .reveal *,.film.cut .ft b,.film.cut .ft span,.film.cut .fcol h4{animation:none} }
 .measure.simple.film:not(.zz) .phs .nil{font-weight:800;text-transform:uppercase;letter-spacing:-.01em;font-size:1.4rem;opacity:.45}
 .film.cut .acts button.hit{animation:hit .7s ease-out both}
@@ -1082,6 +1107,7 @@ html.checking .app{visibility:hidden}
   .stage > .note{position:static;width:auto;max-width:none}
 }
 </style>
+<script>(function(){ try { var m = location.search.match(/[?&]look=([abcd0])/), k = "dcscope-look"; if (m){ if (m[1] === "0") localStorage.removeItem(k); else localStorage.setItem(k, m[1]); } var v = localStorage.getItem(k); if (v) document.documentElement.setAttribute("data-look", v); window.addEventListener("storage", function(ev){ if (ev.key === k){ if (ev.newValue) document.documentElement.setAttribute("data-look", ev.newValue); else document.documentElement.removeAttribute("data-look"); } }); } catch(e){} })();</script>
 </head>
 <body>
 <script>
@@ -2232,7 +2258,7 @@ var BVS = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
 var BFS = ["#ifdef GL_FRAGMENT_PRECISION_HIGH", "precision highp float;", "#else", "precision mediump float;", "#endif",
   "uniform vec2 uRes;uniform float uT,uR,uAmp,uNight,uOv,uSl,uF,uFa;uniform vec4 uL;",
   "const float TA=" + BTILT.toFixed(2) + ";",
-  "const vec3 CA=vec3(.93,.5,.92),CB=vec3(.74,.68,.99);",
+  "uniform vec3 CA,CB;",
   "float nz(vec3 p){return sin(p.x*1.7+uT*.9)*sin(p.y*1.9-uT*.7)*sin(p.z*1.6+uT*.5)*.6+sin(p.x*3.1-uT*.6+1.3)*sin(p.y*2.7+uT*.8+.7)*sin(p.z*3.3-uT*.4)*.28+sin(dot(p,vec3(1.1,1.3,.9))*2.2+uT*1.1)*.22;}",
   "float sd(vec3 p){float l=length(p);return l-uR*(1.+uAmp*nz(p/max(l,1e-4)*1.35));}",
   "vec3 liq(float h){",   // what is in the glass runs from one soft color at the bottom to the other at the top, and no more; a fine light seam where two layers meet
@@ -2286,7 +2312,7 @@ function blobInit(){
   var pr = gl.createProgram(); gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr); if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return false;
   gl.useProgram(pr); gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
   var loc = gl.getAttribLocation(pr, "a"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  BLOB.u = {}; ["uRes", "uT", "uR", "uAmp", "uNight", "uOv", "uSl", "uF", "uFa", "uL"].forEach(function(k){ BLOB.u[k] = gl.getUniformLocation(pr, k); });
+  BLOB.u = {}; ["uRes", "uT", "uR", "uAmp", "uNight", "uOv", "uSl", "uF", "uFa", "uL", "CA", "CB"].forEach(function(k){ BLOB.u[k] = gl.getUniformLocation(pr, k); });
   c.addEventListener("webglcontextlost", function(){ BLOB.dead = true; var b = c.closest(".bud"); if (b) b.classList.remove("gl"); if (c.parentNode) c.parentNode.removeChild(c); });   // the flat drawing takes over
   BLOB.c = c; BLOB.gl = gl; BLOB.t00 = performance.now(); return true;
 }
@@ -2294,6 +2320,7 @@ function blobAim(){ var s = MD.seq; return !s || (s.t0 && Date.now() < s.t0) ? n
 function blobDraw(){
   var gl = BLOB.gl, c = BLOB.c, u = BLOB.u, b = BLOB.b; gl.viewport(0, 0, c.width, c.height); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
   gl.uniform2f(u.uRes, c.width, c.height); gl.uniform1f(u.uT, BLOB.still ? 2.4 : (performance.now() - BLOB.t00) / 1000 * .42); gl.uniform1f(u.uR, 100 / 128); gl.uniform1f(u.uAmp, .028 + BLOB.sl * .03); gl.uniform1f(u.uNight, BLOB.night ? 1 : 0);
+  gl.uniform3fv(u.CA, BLOB.ca || [.93, .5, .92]); gl.uniform3fv(u.CB, BLOB.cb || [.74, .68, .99]);
   gl.uniform1f(u.uOv, BLOB.ov); gl.uniform1f(u.uSl, BLOB.sl); gl.uniform1f(u.uF, BLOB.fi || 0); gl.uniform1f(u.uFa, BLOB.fa || 0); gl.uniform4f(u.uL, b[0], b[1], b[2], b[3]); gl.drawArrays(gl.TRIANGLES, 0, 3); BLOB.drawn = performance.now();
 }
 function blobWords(){   // the words ride on their layers
@@ -2319,6 +2346,7 @@ function blobMount(){   // every drawing of the wall makes its words anew; the l
   if (c.parentNode !== host) host.appendChild(c); bud.classList.add("gl");
   var px = Math.round(Math.min(800, host.clientWidth * Math.min(2, window.devicePixelRatio || 1))) || 320; if (c.width !== px){ c.width = px; c.height = px; }
   BLOB.night = !!host.closest(".night"); BLOB.still = still;
+  var cs = getComputedStyle(host); ["ca", "cb"].forEach(function(k, n){ var h = (cs.getPropertyValue(n ? "--bb" : "--ba") || "").trim().match(/^#([0-9a-f]{6})$/i); BLOB[k] = h ? [0, 2, 4].map(function(o){ return parseInt(h[1].substr(o, 2), 16) / 255; }) : null; });   // the two colors of the look, when it names them
   if (!BLOB.b) BLOB.b = [-1, -1, -1, -1];   // the first time the glass is empty, and fills
   if (still){ BLOB.fa = MD.focus ? 1 : 0; if (MD.focus) BLOB.fi = "DTEB".indexOf(MD.focus); }
   if (still && s){ BLOB.b = s.B.slice(); BLOB.bT = s.B; BLOB.bv = [0, 0, 0, 0]; BLOB.ov = BLOB.ovT = s.over ? 1 : 0; BLOB.sl = 0; }
@@ -3414,7 +3442,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-154833";
+var BUILD = "20261124-155346";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
