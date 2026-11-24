@@ -271,7 +271,9 @@ a.lab{text-decoration:none}
 .vleft .vadd{position:relative} .vadd h3{padding-right:1.6rem}
 .vclose{position:absolute;top:.45rem;right:.5rem;width:1.7rem;height:1.7rem;display:grid;place-items:center;font:inherit;font-size:1.25rem;line-height:1;border:0;border-radius:50%;background:none;color:var(--muted);cursor:pointer} .vclose:hover,.vclose:focus-visible{background:var(--sunk);color:var(--ink)}
 .vopen{position:absolute;z-index:2;left:.9rem;top:4.6rem;display:none;font:inherit;font-size:.86rem;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;background:var(--surface);color:var(--ink);box-shadow:0 6px 22px rgba(20,40,34,.16);cursor:pointer}
-.stage.vclosed .vleft{display:none} .stage.vclosed .vopen{display:inline-flex}
+.stage.vclosed .vleft{display:none} .stage.vclosed .vopen:not(.r){display:inline-flex}
+.vopen.r{left:auto;right:.9rem} .stage.vrclosed .vpanel{display:none} .stage.vrclosed .vopen.r{display:inline-flex}
+.vpanel .hd{padding-right:2.4rem}
 .stage.vclosed[data-view="voices"] .leaflet-bottom.leaflet-left{left:.9rem}
 .vthread{position:absolute;left:0;top:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
 .vthread path{fill:none;stroke:var(--c,#1c2a28);stroke-width:2.4;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0} .vthread path.new{animation:vthread .45s cubic-bezier(.3,.7,.2,1) both} .vthread circle{fill:var(--c,#1c2a28)}
@@ -611,6 +613,9 @@ body.imm .tour{display:flex} body.nopanels .tour{display:none}
 .you i{order:2;width:18px;height:18px;border-radius:50%;background:#1c2a28;border:3px solid #fbfdfc;box-shadow:0 2px 6px rgba(0,0,0,.35)}
 .you b{white-space:nowrap;order:1;font-family:var(--font);font-size:12px;font-weight:700;color:#fff;background:#1c2a28;border-radius:999px;padding:1px 8px}
 .youw{background:none;border:0}
+.vhand{width:26px;height:26px;border-radius:50%;background:#fbfdfc;border:3px solid #1c2a28;box-shadow:0 2px 6px rgba(0,0,0,.3);cursor:grab;display:grid;place-items:center;pointer-events:auto}
+.vhand::after{content:"";width:9px;height:9px;border:2px solid #1c2a28;border-left-color:transparent;border-radius:50%}
+.vhand:active{cursor:grabbing}
 .own{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-size:.85rem;font-weight:700;border-top:1px solid var(--line);padding-top:.45rem}
 .own .sw button{font-size:.76rem;padding:.2rem .55rem}
 .alts p.vhint{font-size:.78rem;font-weight:600}
@@ -1026,8 +1031,8 @@ html.checking .app{visibility:hidden}
 /* At rest the wall is the landscape, with the bubble alone at its right. Open, the bubble moves in and the page of words stands beside it. */
 .measure.simple.film:not(.zz) > .fpage{opacity:0;transition:opacity .7s ease} .measure.simple.film:not(.zz).open > .fpage{opacity:1}
 .measure.simple.film:not(.zz) .fmoney{transform:translateX(calc(143.9% + 2rem));transition:transform .75s cubic-bezier(.2,.8,.2,1)} .measure.simple.film:not(.zz).open .fmoney{transform:none}
-.measure.simple.film:not(.zz) .ftx.tt{opacity:0;pointer-events:none;transform:translateX(1.5rem);transition:opacity .3s ease,transform .5s ease}
-.measure.simple.film:not(.zz).open .ftx.tt{opacity:1;pointer-events:auto;transform:none;transition:opacity .45s ease .28s,transform .6s cubic-bezier(.2,.8,.2,1) .2s}
+.measure.simple.film:not(.zz) .ftx.tt{opacity:0;visibility:hidden;pointer-events:none;transform:translateX(1.5rem);transition:opacity .3s ease,transform .5s ease,visibility 0s linear .3s}
+.measure.simple.film:not(.zz).open .ftx.tt{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:opacity .45s ease .28s,transform .6s cubic-bezier(.2,.8,.2,1) .2s,visibility 0s}
 .measure.simple.film:not(.zz) .bwhy,.measure.simple.film:not(.zz) .acts.solo{opacity:0;pointer-events:none;transition:opacity .3s ease}
 .measure.simple.film:not(.zz).open .bwhy,.measure.simple.film:not(.zz).open .acts.solo{opacity:1;pointer-events:auto}
 @media (prefers-reduced-motion: reduce){ .measure.simple.film:not(.zz) > .fpage,.measure.simple.film:not(.zz) .fmoney,.measure.simple.film:not(.zz) .ftx.tt,.measure.simple.film:not(.zz) .bwhy,.measure.simple.film:not(.zz) .acts.solo{transition:none} }
@@ -1071,6 +1076,15 @@ html.checking .app{visibility:hidden}
 .measure.simple.film:not(.zz) .bud .ll,.measure.simple.film:not(.zz) .bud .ll.kB{font-family:"Instrument Serif","Times New Roman",serif;font-size:12px;font-weight:400;fill:#57207a}
 .measure.simple.film:not(.zz) .bud.over .ll{fill:#fff}
 .measure.simple.film:not(.zz) > .reveal,.measure.simple.film:not(.zz) > .reveal.kD,.measure.simple.film:not(.zz) > .reveal.kT,.measure.simple.film:not(.zz) > .reveal.kE,.measure.simple.film:not(.zz) > .reveal.kB{background:linear-gradient(180deg,#3a82ca 0,#7fbbe9 100%)}
+/* the ribbons from the bubble to the physical model, on the right wall and carried on by the center wall */
+svg.ribs path{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0}
+svg.ribs .rb{stroke:var(--c);stroke-width:6.5;opacity:.95} svg.ribs .rh{stroke:#fff;stroke-width:1.5;opacity:.7}
+svg.ribs circle{fill:#fff;stroke:var(--c);stroke-width:3} svg.ribs g{transition:opacity .25s} svg.ribs g.off{opacity:.22}
+svg.ribs g.new path{animation:vthread 1s cubic-bezier(.3,.7,.2,1) both} svg.ribs g.new circle{animation:fadein .3s ease .9s both}
+svg.ribs g.new.late path{animation-delay:.85s} svg.ribs g.new.late circle{animation-delay:1.75s}
+@media (prefers-reduced-motion: reduce){ svg.ribs g.new path,svg.ribs g.new circle{animation:none} }
+.measure.simple.film:not(.zz) .acts.solo{display:flex;gap:.5rem}
+.measure.simple.film:not(.zz) .tlead{margin-right:7rem}
 /* Four looks to try, on all four screens at once: ?look=a, b, c or d (remembered for every window; ?look=0 goes back to the way it was).
    A look sets the same few things everywhere: the ground, the surfaces, the ink, one accent, the face of headings, and the bubble's two colors.
    a sky and pink light (Turrell) · b blurred steel blue, thin type (The Outcome) · c pale painted paper, lilac · d black, heavy white type. */
@@ -1653,6 +1667,15 @@ function geoDraw(){
     if (OWN.a) L.circleMarker(mll(OWN.a), {radius:6, color:"#1c2a28", weight:2, fillColor:"#fbfdfc", fillOpacity:1, interactive:false}).addTo(g);
     var you = L.marker(mll(ear()), {draggable:true, zIndexOffset:600, title:"Drag to stand somewhere else", icon:L.divIcon({className:"youw", html:'<div class="you"><i></i><b>You' + (S().open ? ' · ' + Math.round(Math.max(0, heard2(ST).now)) + ' dBA' : '') + '</b></div>', iconSize:[120, 40], iconAnchor:[60, 40]})}).addTo(g);
     you.on("dragend", function(){ var q = you.getLatLng(), c0 = S().center; standAt([(q.lng - c0[1]) * MXs(), (c0[0] - q.lat) * MY]); });
+    // The cone of view: from the listener, the way the center wall looks and as wide as that wall shows (about 61 degrees across, the central field of
+    // a person's sight). Its handle turns it, and the center wall turns with it; a wall turned by hand turns the cone.
+    var q0 = ear(), CONE = 30.5, CLEN = 240, bb = ST.look != null ? ST.look : gvFace(q0);
+    var conePts = function(b){ var pts = [ll(q0[0], q0[1])], a, r; for (a = -CONE; a <= CONE + .01; a += 6.1){ r = (b + a) * Math.PI / 180; pts.push(ll(q0[0] + Math.sin(r) * CLEN, q0[1] - Math.cos(r) * CLEN)); } return pts; };
+    var hpos = function(b){ var r = b * Math.PI / 180; return ll(q0[0] + Math.sin(r) * CLEN, q0[1] - Math.cos(r) * CLEN); };
+    var cone = L.polygon(conePts(bb), {className:"vcone", color:"#1c2a28", weight:1.3, opacity:.6, fillColor:"#1c2a28", fillOpacity:.14, interactive:false}).addTo(g);
+    var hd = L.marker(hpos(bb), {draggable:true, zIndexOffset:590, title:"Drag to look another way", icon:L.divIcon({className:"youw", html:'<div class="vhand" role="img" aria-label="Turn the view"></div>', iconSize:[26, 26], iconAnchor:[13, 13]})}).addTo(g);
+    hd.on("drag", function(){ var p = hd.getLatLng(), c0 = S().center, b = Math.atan2((p.lng - c0[1]) * MXs() - q0[0], -((c0[0] - p.lat) * MY - q0[1])) * 180 / Math.PI, now = Date.now(); cone.setLatLngs(conePts(b)); hd._b = b; if (!hd._t || now - hd._t > 80){ hd._t = now; lookSet(b); } });
+    hd.on("dragend", function(){ if (hd._b != null){ lookSet(hd._b); hd.setLatLng(hpos(hd._b)); } });
   } else {
     L.circle(ll(c[0], c[1]), {radius:r * 3.16, color:"#7d3a6c", weight:1.6, dashArray:"4 6", fill:false, interactive:false}).addTo(g);
     L.circle(ll(c[0], c[1]), {radius:r, color:"#7d3a6c", weight:1.8, dashArray:"4 6", fillColor:"#b0609a", fillOpacity:.16, interactive:false}).addTo(g);
@@ -1941,6 +1964,7 @@ function vcard(v, i){   // i: its place in the list shown, when it is in the lis
 // A point tapped brings its card into view; a card tapped brings its point into view. A tap on the bare map lets go.
 function voSelect(i, from){
   VO.sel = i == null || VO.sel === i ? null : i; VO.selV = VO.sel != null && VO.list ? VO.list[VO.sel] : null; var body = $("vbody"), v = VO.selV, q = v ? ptsOf(v) : [];
+  if (v && VF.right === false){ VF.right = true; var sr = VO.el && VO.el.parentNode; if (sr) sr.classList.remove("vrclosed"); }   // a point tapped while the list is away brings the list back, to show its voice
   if (body) [].forEach.call(body.querySelectorAll(".vcard[data-vi]"), function(c){ var on = +c.getAttribute("data-vi") === VO.sel; c.classList.toggle("sel", on); c.setAttribute("aria-pressed", on ? "true" : "false"); });
   if (v && from === "map" && body){ var card = body.querySelector('.vcard[data-vi="' + VO.sel + '"]'); if (card) card.scrollIntoView({block:"nearest"}); }
   if (v && from === "list" && q.length && VO.map && !VO.map.getBounds().pad(-.12).contains(q[0])) VO.map.panTo(q[0], {animate:true});
@@ -1961,12 +1985,13 @@ function voThread(fresh){
 document.addEventListener("scroll", function(ev){ if (ev.target && ev.target.classList && ev.target.classList.contains("vlist") && VO.selV) voThread(); }, true);
 window.addEventListener("resize", function(){ if (VO.selV) voThread(); });
 document.addEventListener("click", function(ev){ var T = ev.target; if (!T || !T.closest) return; var b = T.closest("[data-vl]");
-  if (b){ VF.left = b.getAttribute("data-vl") === "1"; var st = b.closest('.stage[data-view="voices"]'); if (st) st.classList.toggle("vclosed", !VF.left); return; }   // the panel on the left can be put away, to see the map whole
+  if (b){ VF.left = b.getAttribute("data-vl") === "1"; var st = b.closest('.stage[data-view="voices"]'); if (st) st.classList.toggle("vclosed", !VF.left); return; }
+  if ((b = T.closest("[data-vr]"))){ VF.right = b.getAttribute("data-vr") === "1"; var sr = b.closest('.stage[data-view="voices"]'); if (sr) sr.classList.toggle("vrclosed", !VF.right); voThread(); return; }   // and so can the list of voices on the right   // the panel on the left can be put away, to see the map whole
   var c = T.closest(".vlist .vcard[data-vi]"); if (c && !T.closest("a")) voSelect(+c.getAttribute("data-vi"), "list"); });
 document.addEventListener("keydown", function(ev){ if ((ev.key === "Enter" || ev.key === " ") && ev.target && ev.target.matches && ev.target.matches(".vlist .vcard[data-vi]")){ ev.preventDefault(); voSelect(+ev.target.getAttribute("data-vi"), "list"); } });
 function sessName(){ try { return (localStorage.getItem("dcscope-session") || "").slice(0, 40); } catch(e){ return ""; } }
 function voicesHTML(){
-  return '<div class="card stage' + (VF.left === false ? " vclosed" : "") + '" data-view="voices"><button type="button" class="vopen" data-vl="1">Add your voice +</button><div class="vleft"><form class="vadd" id="vadd" autocomplete="off"><button type="button" class="vclose" data-vl="0" aria-label="Close this panel" title="Close">×</button><h3>Add your voice</h3>' +
+  return '<div class="card stage' + (VF.left === false ? " vclosed" : "") + (VF.right === false ? " vrclosed" : "") + '" data-view="voices"><button type="button" class="vopen" data-vl="1">Add your voice +</button><button type="button" class="vopen r" data-vr="1">Voices +</button><div class="vleft"><form class="vadd" id="vadd" autocomplete="off"><button type="button" class="vclose" data-vl="0" aria-label="Close this panel" title="Close">×</button><h3>Add your voice</h3>' +
     '<p class="vhint" id="vwhere">' + MARKS[Math.min(2, VO.pts.length)] + '</p>' +
     '<div class="stances" role="radiogroup" aria-label="Your position">' + Object.keys(STANCE).map(function(k){ return '<label style="--c:' + STANCE[k][1] + '"><input type="radio" name="vs" value="' + k + '"><span>' + STANCE[k][0] + '</span></label>'; }).join("") + '</div>' +
     '<textarea name="vt" maxlength="160" placeholder="One sentence: your opinion" aria-label="Your sentence"></textarea>' +
@@ -1975,7 +2000,7 @@ function voicesHTML(){
     '<div class="vrow">' + micBtn("voice") + '<button class="vgen" type="button" data-vg disabled>Generate image</button><button class="vgo" type="submit" disabled>Add</button></div>' +
     '<p class="vhint" id="vhint">Filed under Sessions. The image is optional: to draw it, your sentence is sent to an image service. The rest stays on this device.</p></form>' +
     '<div class="vfilt" id="vfilt"></div></div>' +
-    '<div class="vpanel"><div class="hd">Voices · ' + (ST.site === "tx" ? "College Station" : S().name) + '</div><div class="vbody" id="vbody"></div>' +
+    '<div class="vpanel"><button type="button" class="vclose" data-vr="0" aria-label="Close the list of voices" title="Close">×</button><div class="hd">Voices · ' + (ST.site === "tx" ? "College Station" : S().name) + '</div><div class="vbody" id="vbody"></div>' +
     '<div class="vfoot"><button type="button" data-vx="export">Export sessions</button><button type="button" data-vx="clear">Clear sessions</button></div></div></div>';
 }
 function vfiltHTML(all){   // what is on the map, by kind, by network and by topic; counts are for the topic chosen
@@ -2386,7 +2411,8 @@ function blobTick(){
     if (Math.abs(BLOB.bv[k]) > .004 || Math.abs(BLOB.b[k] - BLOB.bT[k]) > .002) rest = false; }
   BLOB.ov += (BLOB.ovT - BLOB.ov) * Math.min(1, dt * 4); BLOB.sl += (0 - BLOB.sl) * Math.min(1, dt * 1.6);
   var fT = MD.focus ? 1 : 0; if (MD.focus) BLOB.fi = "DTEB".indexOf(MD.focus); BLOB.fa = (BLOB.fa || 0) + (fT - (BLOB.fa || 0)) * Math.min(1, dt * 7); if (Math.abs(fT - BLOB.fa) > .01) rest = false;
-  if (!rest || now - (BLOB.drawn || 0) > 30){ blobDraw(); if (!rest || !BLOB.set) blobWords(); BLOB.set = rest; }   // at rest it still breathes, at half the rate
+  if (!rest || now - (BLOB.drawn || 0) > 30){ blobDraw(); if (!rest || !BLOB.set){ blobWords(); ribDraw(); } BLOB.set = rest; }   // at rest it still breathes, at half the rate
+  if (now - (BLOB.ribT || 0) > 450){ BLOB.ribT = now; ribDraw(); }   // the landscape may have come, or turned, since
   BLOB.raf = requestAnimationFrame(blobTick);
 }
 function blobMount(){   // every drawing of the wall makes its words anew; the live body is one and the same, and is put back in its place
@@ -2400,15 +2426,61 @@ function blobMount(){   // every drawing of the wall makes its words anew; the l
   if (!BLOB.b) BLOB.b = [-1, -1, -1, -1];   // the first time the glass is empty, and fills
   if (still){ BLOB.fa = MD.focus ? 1 : 0; if (MD.focus) BLOB.fi = "DTEB".indexOf(MD.focus); }
   if (still && s){ BLOB.b = s.B.slice(); BLOB.bT = s.B; BLOB.bv = [0, 0, 0, 0]; BLOB.ov = BLOB.ovT = s.over ? 1 : 0; BLOB.sl = 0; }
-  BLOB.set = false; blobWords(); blobDraw(); if (!still && !BLOB.raf) BLOB.raf = requestAnimationFrame(blobTick);
+  BLOB.set = false; blobWords(); blobDraw(); ribDraw(); if (!still && !BLOB.raf) BLOB.raf = requestAnimationFrame(blobTick);
 }
+// The ribbons tie the bubble to the physical model. A choice that changes the plant itself (its design, its technology) has a ribbon from its
+// layer of the bubble to the plant in the landscape, with a curl on the way, in the layer's own color: so it is seen where that part of the money
+// goes. Where the plant is not in the right wall's own picture the ribbon runs to the edge it lies beyond, and the center wall carries it on from
+// its own edge to the plant. Choices that are not a thing on the site (energy bought elsewhere, benefits) have none. They can be switched off.
+var RIBOFF = /[?&]ribbon=0/.test(location.search), RIBS = [];
+function ribOn(){ try { return !RIBOFF && localStorage.getItem("dcscope-rib") !== "0"; } catch(e){ return !RIBOFF; } }
+function ribSvg(host, cls){ var sv = host.querySelector("svg." + cls); if (!sv){ sv = document.createElementNS("http://www.w3.org/2000/svg", "svg"); sv.setAttribute("class", cls + " ribs"); sv.setAttribute("aria-hidden", "true"); sv.setAttribute("style", "position:absolute;left:0;top:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible"); host.appendChild(sv); } return sv; }
+function ribCurl(sx, sy, ex, ey, n){ var f = function(v){ return v.toFixed(1); }, dir = ex < sx ? -1 : 1, mx = sx + (ex - sx) * (.44 + n * .09), my = sy + (ey - sy) * .5, r = Math.max(8, Math.min(18, Math.abs(ex - sx) * .07));
+  return "M" + f(sx) + " " + f(sy) + "C" + f(sx + (mx - sx) * .6) + " " + f(sy) + " " + f(mx - dir * r * 2.2) + " " + f(my + r * .9) + " " + f(mx) + " " + f(my) +
+    "C" + f(mx + dir * r * 2.3) + " " + f(my - r * .9) + " " + f(mx + dir * r * 1.1) + " " + f(my - r * 3) + " " + f(mx - dir * r * .3) + " " + f(my - r * 1.7) +
+    "C" + f(mx - dir * r * 1.5) + " " + f(my - r * .6) + " " + f(mx + (ex - mx) * .45) + " " + f(ey) + " " + f(ex) + " " + f(ey); }
+function ribAim(map, eye){   // where the plant is in a wall's picture: its place if it is in view, else the edge it lies beyond
+  var t = [(ST.px || 0) * MSC, (ST.pz || 0) * MSC], q = ll(t[0], t[1]), brg = Math.atan2(t[0] - eye[0], -(t[1] - eye[1])) * 180 / Math.PI, off = ((brg - map.getBearing()) % 360 + 540) % 360 - 180, el = map.getContainer(), w = el.clientWidth || 1, h = el.clientHeight || 1, p = null;
+  if (Math.abs(off) < 80){ try { p = map.project([q[1], q[0]]); } catch(e){} }
+  if (p && p.x >= 0 && p.x <= w && p.y >= 0 && p.y <= h) return {x:p.x / w, y:p.y / h, vis:true};
+  return {x:off < 0 ? 0 : 1, y:p && isFinite(p.y) ? Math.max(.25, Math.min(.75, p.y / h)) : .4, vis:false};
+}
+function ribTell(list){ var raw = JSON.stringify(list); if (raw === RIBS.raw) return; RIBS = list; RIBS.raw = raw; try { localStorage.setItem("dcscope-ribs", raw); } catch(e){} ribCenter(); }
+function ribDraw(fresh){   // the right wall's part: from the layers to the plant, or to the edge beyond which it lies
+  var c = BLOB.c, wall = c && c.closest(".measure.simple.film"), B = BLOB.b || (MD.seq && MD.seq.B); if (!wall) return;
+  var sv = ribSvg(wall, "rib"), fig = wall.querySelector(".bud .bfig svg");
+  if (!fig || !B || !ribOn() || !RWB.map || !S().open || (MD.ribAt && Date.now() < MD.ribAt)){ if (sv.firstChild) sv.innerHTML = ""; sv._k = ""; ribTell([]); return; }
+  var W = wall.getBoundingClientRect(), k = W.width / (wall.offsetWidth || 1) || 1, F = fig.getBoundingClientRect(), cx = (F.left + F.width / 2 - W.left) / k, cy = (F.top + F.height / 2 - W.top) / k, R = F.width * 100 / 224 / k, ww = wall.offsetWidth, hh = wall.offsetHeight,
+    ca = BLOB.ca || [.93, .5, .92], cb = BLOB.cb || [.74, .68, .99], a = ribAim(RWB.map, ear()), out = "", said = [];
+  var fr = fresh || MD.focus !== sv._f; sv._f = MD.focus;
+  ["D", "T"].forEach(function(g, n){ var lo = n ? B[n - 1] : -1, hi = B[n]; if (hi - lo < .02 || MD.focus !== g) return;   // only the layer that was touched has its ribbon
+    var h = (lo + hi) / 2, yn = Math.sin(Math.asin(Math.max(-1, Math.min(1, h))) - BTILT), side = a.x * ww < cx ? -1 : 1, sx = cx + side * (R * Math.sqrt(Math.max(0, 1 - yn * yn)) + 2), sy = cy - R * yn, ex = a.x * ww + (a.vis ? (n ? 9 : -9) : 0), ey = a.y * hh + (n ? 13 : -13),
+      u = Math.max(0, Math.min(1, (h + .95) / 1.9)), u2 = u * u * (3 - 2 * u), col = "rgb(" + [0, 1, 2].map(function(i){ return Math.round((ca[i] + (cb[i] - ca[i]) * u2) * 255); }).join(",") + ")", d = ribCurl(sx, sy, ex, ey, n);
+    out += '<g class="' + (fr ? "new " : "") + '" style="--c:' + col + ';--n:' + n + '"><path class="rb" pathLength="1" d="' + d + '"/><path class="rh" pathLength="1" d="' + d + '"/>' + (a.vis ? '<circle cx="' + ex.toFixed(1) + '" cy="' + ey.toFixed(1) + '" r="5"/>' : '') + '</g>';
+    said.push({g:g, y:+(ey / hh).toFixed(3), c:col, edge:a.vis ? null : a.x}); });
+  var key = out.replace(/new /g, ""); if (key !== sv._k){ sv._k = key; sv.innerHTML = out; }   // left alone while nothing moves, so the drawing of it is not cut short
+  ribTell(said);
+}
+function ribCenter(){   // the center wall's part: from its right edge, at the height the right wall's ribbon left, to the plant
+  var el = AXO.el, map = AXO.map, host = el && el.parentNode; if (!host || !map) return; var sv = ribSvg(host, "ribc"), list = RIBS;
+  if (!gvOn() || !GV.pos || !ribOn() || !list.length){ if (sv.firstChild) sv.innerHTML = ""; sv._k = ""; sv._g = null; return; }
+  var a = ribAim(map, GV.pos), w = host.offsetWidth, h = host.offsetHeight, out = ""; if (!a.vis){ if (sv.firstChild) sv.innerHTML = ""; sv._k = ""; return; }
+  list.forEach(function(r, n){ if (r.edge !== 0) return; var ex = a.x * w + (n ? 9 : -9), ey = a.y * h + (n ? 7 : -7), d = ribCurl(w, r.y * h, ex, ey, n);
+    out += '<g class="' + (sv._g !== r.g ? "new late" : "") + '" style="--c:' + r.c + ';--n:0"><path class="rb" pathLength="1" d="' + d + '"/><path class="rh" pathLength="1" d="' + d + '"/><circle cx="' + ex.toFixed(1) + '" cy="' + ey.toFixed(1) + '" r="5"/></g>'; });
+  var key = out.replace(/new late/g, ""); if (key !== sv._k){ sv._k = key; sv.innerHTML = out; } sv._g = list.length ? list[0].g : null;
+}
+window.addEventListener("storage", function(ev){ if (ev.key === "dcscope-ribs"){ try { RIBS = JSON.parse(ev.newValue || "[]") || []; RIBS.raw = ev.newValue; } catch(e){ RIBS = []; } ribCenter(); } if (ev.key === "dcscope-rib"){ ribDraw(true); ribCenter(); ribBtn(); } });
+function ribBtn(){ [].forEach.call(document.querySelectorAll("[data-rib]"), function(b){ b.textContent = ribOn() ? "Ribbons on" : "Ribbons off"; b.setAttribute("aria-pressed", ribOn() ? "true" : "false"); }); }
+document.addEventListener("click", function(ev){ var b = ev.target && ev.target.closest ? ev.target.closest("[data-rib]") : null; if (!b) return; try { localStorage.setItem("dcscope-rib", ribOn() ? "0" : "1"); } catch(e){} ribBtn(); ribDraw(true); ribCenter(); });
 window.addEventListener("resize", function(){ clearTimeout(BLOB.rz); BLOB.rz = setTimeout(blobMount, 120); });
 // The right wall is first of all the landscape, with the bubble alone at its right. The page of words comes when the bubble is touched or the pointer
 // is over it, and goes when the pointer has left both for a moment, unless it was opened by a touch: then a touch on the landscape puts it away.
-function rwOpen(on, pin){ MD.open = !!on; if (pin != null) MD.pin = !!pin; clearTimeout(MD.closeT); [].forEach.call(document.querySelectorAll(".measure.simple.film"), function(el){ el.classList.toggle("open", MD.open); }); }
+function rwOpen(on, pin){ var was = MD.open; MD.open = !!on; if (pin != null) MD.pin = !!pin; clearTimeout(MD.closeT);
+  if (MD.open !== was){ MD.ribAt = Date.now() + 820; clearTimeout(MD.ribT); ribDraw(); MD.ribT = setTimeout(function(){ MD.ribAt = 0; ribDraw(true); }, 840); }   // the ribbons are drawn once the bubble has come to its place
+  [].forEach.call(document.querySelectorAll(".measure.simple.film"), function(el){ el.classList.toggle("open", MD.open); }); }
 document.addEventListener("pointerover", function(ev){ var T = ev.target, w = T && T.closest && T.closest(".measure.simple.film"); if (!w || ev.pointerType === "touch") return;
-  if (T.closest(".bud") || (MD.open && T.closest(".ftx,.bwhy,.acts"))){ clearTimeout(MD.closeT); if (!MD.open) rwOpen(true); }
-  else if (MD.open && !MD.pin){ clearTimeout(MD.closeT); MD.closeT = setTimeout(function(){ if (!MD.pin && !MD.focus && !MD.freeze) rwOpen(false); }, 900); } });
+  if (T.closest(".bud") || (MD.open && T.closest(".ftx,.bwhy,.acts"))){ clearTimeout(MD.closeT); if (!MD.open && !MD.hovT) MD.hovT = setTimeout(function(){ MD.hovT = 0; if (!MD.open) rwOpen(true); }, 380); }   // a pointer that stays, not one that is passing or about to tap a layer
+  else { clearTimeout(MD.hovT); MD.hovT = 0; if (MD.open && !MD.pin){ clearTimeout(MD.closeT); MD.closeT = setTimeout(function(){ if (!MD.pin && !MD.focus && !MD.freeze) rwOpen(false); }, 900); } } });
 document.addEventListener("visibilitychange", function(){ if (!document.hidden) blobMount(); });
 // The story in one picture. On the left the money, as one bubble that has shrunk with every choice. Then one bubble for every result, floating over the
 // group it lands on: green where something is gained, red where it is given up, larger for more, an outline where the size is not known. Who gains and
@@ -2743,7 +2815,7 @@ function beltTrees(out, a, b, w, base, seed){   // a planted belt as trees: abou
   for (var i = 0; i < nx; i++) for (var j = 0; j < nz; j++){ var t = (i + .2 + R() * .6) / nx * len, o = ((j + .2 + R() * .6) / nz - .5) * w; treeAt(out, a[0] + ux * t - uz * o, a[1] + uz * t + ux * o, R(), base); }
 }
 function gvSettle(){   // the eye has stopped: name the rings and bring the residents of the ground now in sight
-  if (!AXO.map || !gvOn() || !GV.pos) return; gvLabels(); gvShow(); moreBlocks();
+  if (!AXO.map || !gvOn() || !GV.pos) return; gvLabels(); ribCenter(); gvShow(); moreBlocks();
 }
 function gvGo(q, d){ if (!GV.pos) return; GV.silent = GV.nf = false; GV.from = GV.pos.slice(); GV.to = q; GV.t0 = performance.now(); GV.dur = Math.max(500, Math.min(2200, d * 3.5)); clearTimeout(GV.ct); GV.ct = 0; AXO.hold = GV.t0 + 6000; }   // walk there
 function gvAhead(m){ var p = GV.to || GV.pos, br = GV.b * Math.PI / 180; if (p) gvGo([p[0] + Math.sin(br) * m, p[1] - Math.cos(br) * m], Math.abs(m)); }
@@ -2972,7 +3044,7 @@ function axoSync(){   // everything that follows the table: the blocks, the ring
     if (GV.earKey !== ek || !GV.pos){ var far = GV.pos && GV.earKey && GV.earKey.split("|")[0] === ST.site ? Math.hypot(q[0] - GV.pos[0], q[1] - GV.pos[1]) : -1; GV.earKey = ek;   // the eye follows the listener, also when another screen moves it: it glides there if it is near
       if (far > 3 && far < 3000 && !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)){ GV.from = GV.pos.slice(); GV.to = [q[0], q[1]]; GV.silent = true; GV.nf = pure; GV.t0 = performance.now(); GV.dur = Math.max(350, Math.min(1500, far * 3)); }
       else { GV.pos = [q[0], q[1]]; GV.to = null; } }
-    if (GV.auto && !GV.to && !pure) GV.b = gvFace(GV.pos); gvCam(); gvLabels(); }
+    if (GV.auto && !GV.to && !pure) GV.b = gvFace(GV.pos); gvCam(); gvLabels(); ribCenter(); }
   else { (GV.lab || []).forEach(function(m){ m.remove(); }); GV.lab = [];
     if (!AXO.userMove){ var fl = focusLL(), fp = map.project([fl[1], fl[0]]); if (Math.hypot(fp.x - AXO.el.clientWidth / 2, fp.y - AXO.el.clientHeight / 2) > 3) map.easeTo({center:[fl[1], fl[0]], duration:450}); } }   // from above the wall is centred where the table is
   gvShow();
@@ -3248,6 +3320,7 @@ function rwbCam(){
   var up = (90 - tilt) * Math.PI / 180, hz = H / 2 - foc * Math.min(.85 * Math.tan(up), Math.tan(up - .75 * Math.PI / 180)), st = RWB.sky.firstChild.style;   // the sky is set down on the horizon, as on the center wall
   RWB.sky.style.height = Math.max(0, Math.round(hz) + 1) + "px"; RWB.haze.style.top = Math.max(0, Math.round(hz)) + "px"; RWB.haze.style.height = Math.round(foc * .04) + "px";
   st.height = Math.round(foc * .66) + "px"; st.backgroundSize = Math.round(foc * Math.PI / 180 * 120) + "px 100%"; st.backgroundPositionX = Math.round(-b * foc * Math.PI / 180 - GV.drift) + "px";
+  ribDraw();   // the ribbons follow the picture
 }
 function rwbNight(){   // day or night as on the center wall, which keeps it in this browser
   if (!RWB.el) return; var n = false; try { n = !!localStorage.getItem("dcscope-night"); } catch(e){} if (AXO.map) n = !!AXO.night;
@@ -3286,6 +3359,12 @@ function rwbDraw(host){
     });
     map.on("resize", rwbCam);
   }).catch(function(e){ RWB.loading = false; RWB.failed = true; if (window.console) console.warn("Right wall landscape unavailable", e); });
+}
+function gvLookTo(b){   // the center wall turns to a bearing it was given, the short way round
+  if (b == null || !isFinite(b)) return; var d = ((b - GV.b) % 360 + 540) % 360 - 180; if (Math.abs(d) < .5) return; GV.auto = false; GV.bTo = GV.b + d; AXO.hold = performance.now() + 6000;
+}
+function lookSet(b){   // the cone on the table was turned: the walls look that way, in this window and the others
+  var v = Math.round(((b % 360) + 360) % 360); if (ST.look === v) return; ST.look = v; tell(); gvLookTo(v); if (RWB.map) rwbCam();
 }
 function lookTell(b){   // the center wall was turned by hand: the wall beside it turns with it, also in another window
   var v = Math.round((((b == null ? GV.b : b) % 360) + 360) % 360); if (ST.look === v) return; ST.look = v; tell(); rwbCam();
@@ -3339,7 +3418,7 @@ function adopt(raw){
     if (typeof o.ag === "boolean") ST.ag = o.ag; if (typeof o.big === "boolean") ST.big = o.big;
     if ([3, 6, 9].indexOf(o.hw) >= 0) ST.hw = o.hw; if ([2, 4, 6].indexOf(o.hb) >= 0) ST.hb = o.hb;
     function pt(q){ return Array.isArray(q) && isFinite(q[0]) && isFinite(q[1]) && Math.abs(q[0]) < 30000 && Math.abs(q[1]) < 30000; }
-    ST.ear = pt(o.ear) ? [+o.ear[0], +o.ear[1]] : null; ST.pan = pt(o.pan) ? [+o.pan[0], +o.pan[1]] : [0, 0]; ST.look = typeof o.look === "number" && isFinite(o.look) ? o.look : null;
+    ST.ear = pt(o.ear) ? [+o.ear[0], +o.ear[1]] : null; ST.pan = pt(o.pan) ? [+o.pan[0], +o.pan[1]] : [0, 0]; var lk0 = ST.look; ST.look = typeof o.look === "number" && isFinite(o.look) ? o.look : null; if (ST.look != null && ST.look !== lk0) gvLookTo(ST.look);
     function pp(q){ return Array.isArray(q) && isFinite(q[0]) && isFinite(q[1]) && q[0] >= 0 && q[1] >= 0 && q[0] <= 100000 && q[1] <= 100000; }
     ST.bud = pp(o.bud) ? [+o.bud[0], +o.bud[1]] : null; ST.pr = {}; if (o.pr) PRICED.forEach(function(k){ if (pp(o.pr[k])) ST.pr[k] = [+o.pr[k][0], +o.pr[k][1]]; });
     ST.x = Array.isArray(o.x) ? o.x.filter(function(e){ return e && OWNS[e.k] && pt(e.a) && pt(e.b) && OWNS[e.k][1].indexOf(e.v) >= 0; }).slice(-12).map(function(e){ return {k:e.k, a:[+e.a[0], +e.a[1]], b:[+e.b[0], +e.b[1]], v:e.v}; }) : [];
@@ -3407,7 +3486,7 @@ document.addEventListener("click", function(ev){
   if ((b = T.closest("[data-fq]"))){ MD.q = b.getAttribute("data-fq"); wordsFill(); return; }
   if ((b = T.closest("[data-face]"))){ var fk = "face:" + b.getAttribute("data-face"); MD.freeze = MD.freeze === fk ? null : fk; wordsFill(); return; }
   if ((b = T.closest("[data-qs]"))){ MD.freeze = MD.freeze === "q" ? null : "q"; wordsFill(); return; }
-  if ((b = T.closest("[data-bud]")) && !MD.open){ rwOpen(true, true); return; }   // the first touch of the bubble opens the page beside it
+  if ((b = T.closest("[data-bud]")) && !MD.open){ clearTimeout(MD.hovT); MD.hovT = 0; rwOpen(true, true); }   // the first touch of the bubble opens the page beside it, and looks at the layer touched
   if (MD.open && T.closest(".measure.simple.film") && !T.closest(".bud,.ftx,.bwhy,.acts,.reveal,.rwattr")){ MD.focus = null; MD.freeze = null; rwOpen(false, false); wordsFill(); return; }   // a touch on the landscape puts it away again
   if (T.closest("[data-bud],[data-fc]")) MD.pin = true;
   if ((b = T.closest("[data-fc]"))){ var fg = b.getAttribute("data-fc"); MD.focus = MD.focus === fg ? null : fg; MD.freeze = null; wordsFill(); return; }
@@ -3492,7 +3571,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-160144";
+var BUILD = "20261124-162739";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
