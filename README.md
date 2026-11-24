@@ -64,7 +64,7 @@ On the Texas table, under Design, the heights of the D2 berm and the D3 walls ca
 
 **A softer ground.** From the ground the land is the drawn map, flat and pale, with the aerial photograph laid over it as a blurred wash at under half its strength, and the whole scene is in slightly soft focus. Labels and panels stay sharp.
 
-**A trial: the painted look.** With `?paint=1` in the address the center wall, seen from the ground, shows the aerial photograph at full strength and moved as if by a brush, and nothing stands up on it: the plant and its trees are drawn flat, as on a plan, and the town's buildings are not raised. It is a trial, and without the parameter the wall is as before.
+**A trial: the painted look.** With `?paint=1` in the address the center wall, seen from the ground, stays in three dimensions but is seen as through a painting: the aerial photograph comes forward, and the whole drawing is moved a little, as by a brush, and diffused. It is a trial, and without the parameter the wall is as before.
 
 **The reveal.** When a choice arrives on the right wall, the card that names it is now set as the rest of that wall: the serif, no capitals, and the place still seen through it.
 
