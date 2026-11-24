@@ -1856,7 +1856,7 @@ function noteHTML(n){ return NOTES_ON ? '<div class="note"><b>From the brief</b>
 // ---------- screens ----------
 // Four screens, one story. Scenario Editor: decide (the table). Sentiment map: listen; it stays the original DataScope screen and opens there.
 // Neighborhood view: see. Live analysis: measure.
-var SENTIMENT = "https://cityscope.media.mit.edu/DataScope/", VIEWS = [["editor", "Scenario Editor"], ["sentiment", "Sentiment map"], ["view", "Site layout"], ["analysis", "Live analysis"], ["examples", "Examples"], ["all", "All"]], VIEW = "all";
+var SENTIMENT = "https://cityscope.media.mit.edu/DataScope/", VIEWS = [["editor", "Scenario Editor"], ["sentiment", "Sentiment map"], ["view", "Site layout"], ["analysis", "Live analysis"], ["examples", "Process"], ["all", "All"]], VIEW = "all";
 function sayLine(page){
   if (page === "design") return {D1:"The conventional campus, as proposed.", D2:"The building moves back, behind setbacks, berms and planting.", D3:"Noisy equipment sits in a yard behind zigzag sound walls.", D4:"A walkable cluster of pool, spa, community rooms and cafes uses the waste heat."}[ST.d];
   if (page === "technology") return {T1:"Conventional cooling: the reference for every other package.", T2:"Almost no cooling water. More power on hot days and louder fans.", T3:"Less electricity and water than the baseline, and quieter.", T4:"Server heat is recovered and sold to nearby customers."}[ST.t];
@@ -2253,10 +2253,10 @@ function ccardHTML(c){
 }
 function examplesHTML(bare){
   function fig(src, cap, cls){ return '<figure' + (cls ? ' class="' + cls + '"' : '') + '><a href="' + src + '" target="_blank" rel="noopener"><img src="' + src + '" alt="' + cap + '" loading="lazy"></a><figcaption>' + cap + '</figcaption></figure>'; }
-  return '<div class="card exs"><div class="hd">Examples</div>' + fig("examples/room-people.jpg", "People deliberating around the four screens. One of them points at the right wall, where each choice is written as what it gains and what it gives up. The center wall is imagined as a place you could walk into, with the sound drawn as rings. AI-generated image: the room, the people and the landscape are imagined, and the screens are redrawn from the real ones, so small text is approximate.", "hero") +
+  return '<div class="card exs"><div class="hd">Process</div>' + fig("examples/room-current.jpg", "The room with the tool as it is now. Left wall: the sentiment map, with one voice tied by a thread to its place. Center wall: the site from the ground, the plant and its sound rings. Right wall: the same landscape carried on, with the bubble of the developer’s offer. Table: the scenario editor. The room and the people are an AI-generated image; the four screens are real captures of the tool, placed onto its walls and table.", "hero") +
     '<div class="exgrid">' + fig("guide/0-layout.jpg", "The room as the page lays it out") + fig("guide/1-left-wall.jpg", "Left wall · Sentiment map") +
     fig("guide/2-center-wall.jpg", "Center wall · Site layout") + fig("guide/3-table.jpg", "Table · Scenario Editor") + fig("guide/4-right-wall.jpg", "Right wall · Live analysis") + '</div>' +
-    '<div class="hd exsub">Showing the data · the process</div><div class="exgrid">' + fig("examples/process-rings.jpg", "A step on the way to the right wall: each result as a ring with one large figure, on a dark ground, here frozen on one of them. The wall now tells the same trade-off in words with arrows, over the landscape.") + '</div></div>';
+    '<div class="hd exsub">Showing the data · the process</div><div class="exgrid">' + fig("examples/room-people.jpg", "The first picture of the room, before this look. AI-generated: the room, the people and the landscape are imagined, and the screens were redrawn from the ones of that time, so small text is approximate.") + fig("examples/process-rings.jpg", "A step on the way to the right wall: each result as a ring with one large figure, on a dark ground, here frozen on one of them. The wall now tells the same trade-off in words with arrows, over the landscape.") + '</div></div>';
 }
 // A result as a bubble: one large figure, a few plain words, the code of the choice it comes from. The figure is the one the statement already
 // carries (the same numbers and sources as the lists and the wheel); where the size is not known the bubble says so in words and is dashed.
@@ -3673,7 +3673,7 @@ function filmCard(){
 route();
 if (FILM) filmCard();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-164943";
+var BUILD = "20261124-165722";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}

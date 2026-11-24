@@ -60,7 +60,7 @@ On the Texas table, under Design, the heights of the D2 berm and the D3 walls ca
 
 **Closing a scenario.** On the right wall, "Close this scenario as agreed" keeps the scenario with what it gains, gives up and leaves unknown. It then appears on the sentiment map (Texas), where people can say what they think of it; their answers are counted on the closed scenario on both walls. A closed scenario can be shown again or reopened.
 
-**Examples** (`#examples`): a photomontage of the room in use (a generated image) and the annotated captures of the four screens.
+**Process** (`#examples`; the tab used to be called Examples): at the top, the room with the tool as it is now, made by placing real captures of the four screens onto the walls and table of a generated image of the room and its people; then the annotated captures of the four screens, and steps on the way, the first picture of the room among them.
 
 **Access code.** The page asks for a code every time it is opened, before it shows anything; nothing is remembered on the device (only the reload the page does by itself when a new version is published passes without asking again). The code is set in `access.txt`, which holds its SHA-256; it is off while that file is empty. To change it, open the page with `?setcode`, type the new code, and put the line it gives in `access.txt`. This keeps casual visitors out; it is not security, because the code of the page is public.
 
