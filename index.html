@@ -975,6 +975,22 @@ html.checking .app{visibility:hidden}
 .film .fhead p{margin:.55rem 0 0;font-size:1rem;font-weight:600;line-height:1.3;color:var(--fg);opacity:.72;max-width:46rem}
 .film.cut .fhead{animation:fadein .5s ease both} .film.cut.rev .fhead{animation-delay:3s}
 @media (prefers-reduced-motion: reduce){ .film.cut .fhead{animation:none} }
+/* White words on a ground that darkens to the right, by day as by night; and two soft colors and no more, the warm and the cool one of the bubble.
+   What is given up is said in the warm one; everything else is white. */
+.measure.simple.film:not(.zz),.measure.simple.film:not(.zz):not(.night){--fg:#f6f4ee;--dim:#f6f4eeb3;--gain:#f6f4ee;--loss:#ff9d8f;--line:#f6f4ee47;--halo:transparent;color:var(--fg)}
+.measure.simple.film:not(.zz) > .fpage,.measure.simple.film:not(.zz).night > .fpage{inset:0 0 0 27%;background:linear-gradient(90deg,#0b0c0d00 0,#0b0c0dad 19%,#0b0c0de0 40%,#0b0c0df5 100%);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12%);mask-image:linear-gradient(90deg,transparent 0,#000 12%)}
+.measure.simple.film:not(.zz):not(.night) > .rwbg::after,.measure.simple.film:not(.zz).night > .rwbg::after{background:none}
+.measure.simple.film:not(.zz) .acts.solo{position:absolute;top:5rem;right:2.4rem;z-index:2;display:block;margin:0}
+.measure.simple.film:not(.zz) .acts.solo .mdb{color:var(--fg);border-color:var(--line);background:none}
+.measure.simple.film:not(.zz) > .crop{display:none}
+.measure.simple.film:not(.zz) .fcol{border-top:1px solid var(--line)}
+.measure.simple.film:not(.zz) .ftx{grid-template-rows:auto auto auto;align-content:center;gap:2.4rem 2.6rem}
+.measure.simple.film:not(.zz) .fhead{padding-bottom:.8rem} .measure.simple.film:not(.zz) .fhead h3{font-size:3.1rem}
+.measure.simple.film:not(.zz) .fhead p{font-size:1.05rem;opacity:.75}
+.measure.simple.film:not(.zz) .bud .ll,.measure.simple.film:not(.zz) .bud .ll.kB{fill:#fff}
+.measure.simple.film:not(.zz) .bud .bgl0{stroke:#fff}
+.measure.simple.film:not(.zz) > .reveal,.measure.simple.film:not(.zz) > .reveal.kD,.measure.simple.film:not(.zz) > .reveal.kT,.measure.simple.film:not(.zz) > .reveal.kE,.measure.simple.film:not(.zz) > .reveal.kB{background:#0b0c0d;--fg:#f6f4ee;--dim:#f6f4eeb3;--c:#f6f4ee;color:#f6f4ee}
+.measure.simple.film:not(.zz):not(.zy) > .reveal.l{--c:var(--loss)}
 @media (prefers-reduced-motion: reduce){ .film .reveal *,.film.cut .ft b,.film.cut .ft span,.film.cut .fcol h4{animation:none} }
 .measure.simple.film:not(.zz) .phs .nil{font-weight:800;text-transform:uppercase;letter-spacing:-.01em;font-size:1.4rem;opacity:.45}
 .film.cut .acts button.hit{animation:hit .7s ease-out both}
@@ -2118,7 +2134,7 @@ function budState(){
 // in the brief): one cannot have as much as one would like, only choose what it is made of. It is a glass drop filled from the bottom by the four
 // choices, each in the color of its chapter: design, technology, energy, benefits. What is not yet allocated stays empty glass at the top. A benefit
 // added is seen to rise as the energy under it gives way: that is the trade. Each layer says its name and what it took where there is room.
-var BTILT = .22, BCOL = [[79, 125, 255], [127, 107, 255], [181, 92, 240], [232, 92, 184], [255, 176, 87]];
+var BTILT = .22;
 function budParts(){   // what each chapter takes of the offer upfront; the energy takes what the others leave
   var bens = modules(), f = funds(), ene = f.e > 0 ? r2(f.e) : 0;
   return [["D", "Design", r2(price(ST.d)[0])], ["T", "Technology", r2(price(ST.t)[0])], ["E", "Energy", ene], ["B", "Benefits", r2(bens.reduce(function(a, c){ return a + price(c)[0]; }, 0))]];
@@ -2137,15 +2153,13 @@ function budBubHTML(i){
   var ck = chosen(ST).join(" ");
   if (!sq || sq.key !== key){ var last = sq && sq.tot === tot && sq.ck !== ck ? parts.map(function(p, k){ var d = r2(p[2] - sq.parts[k][2]); return d ? [p[1].toLowerCase(), d] : null; }).filter(function(x){ return x; }) : [];   // what the last choice moved, and from where
     MD.seq = sq = {key:key, ck:ck, tot:tot, parts:parts, B:B, over:q.over, last:last.length ? last : sq && sq.tot === tot ? sq.last : [], t0:!motion ? 0 : nowT + (MD.rev && nowT - MD.rev.t0 < 3000 ? 3100 - (nowT - MD.rev.t0) : sq ? 200 : 700)}; }   // it moves once the card of that choice has gone
-  function css(c){ return "rgb(" + c.join(",") + ")"; }
-  var defs = "", bands = "", labs = "", lo = -1;
+  var bands = "", labs = "", lo = -1;
   parts.forEach(function(p, k){ var hi = B[k], g = labGeo(lo, hi, 0, (p[1] + " " + money(p[2])).length);
-    defs += '<linearGradient id="bl' + k + '" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + css(BCOL[k]) + '"/><stop offset="1" stop-color="' + css(BCOL[k + 1]) + '"/></linearGradient>';
-    if (hi - lo > .001) bands += '<rect x="-100" width="200" y="' + (-100 * hi).toFixed(1) + '" height="' + (100 * (hi - lo)).toFixed(1) + '" fill="url(#bl' + k + ')"/>';
+    if (hi - lo > .001) bands += '<rect x="-100" width="200" y="' + (-100 * hi).toFixed(1) + '" height="' + (100 * (hi - lo)).toFixed(1) + '" fill="url(#bl)" stroke="#fff" stroke-opacity=".5" stroke-width=".6"/>';
     labs += '<text class="ll k' + p[0] + (g.mode === 2 ? "" : g.mode === 1 ? " am" : " no") + '" data-k="' + k + '" data-n="' + (p[1] + " " + money(p[2])).length + '" y="' + g.y.toFixed(1) + '" text-anchor="middle"><tspan class="ln">' + p[1] + ' </tspan>' + money(p[2]) + '</text>'; lo = hi; });
   var free = Math.max(0, q.left0);
   return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.freeze === "bud" ? " sel" : "") + '" style="--i:' + i + '" data-bud aria-label="The developer’s offer to the community, ' + money(tot) + ' upfront. ' + parts.filter(function(p){ return p[2] > 0; }).map(function(p){ return p[1] + " takes " + money(p[2]); }).join(", ") + '. ' + (q.over ? "The choices ask for more than the offer." : money(free) + " is left to allocate.") + '">' +
-    '<span class="bfig"><span class="bslot"></span><svg viewBox="-112 -112 224 224" aria-hidden="true"><defs><clipPath id="bclip"><circle r="100"/></clipPath>' + defs + '</defs>' +
+    '<span class="bfig"><span class="bslot"></span><svg viewBox="-112 -112 224 224" aria-hidden="true"><defs><clipPath id="bclip"><circle r="100"/></clipPath><linearGradient id="bl" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="0" y2="-100"><stop offset="0" stop-color="#e67369"/><stop offset="1" stop-color="#618cee"/></linearGradient></defs>' +
     '<g class="bbg"><g clip-path="url(#bclip)">' + bands + '</g><circle class="bgl0" r="100"/></g>' + labs + '</svg></span></button></div>';
 }
 // ---------- the body of the bubble, drawn live ----------
@@ -2157,21 +2171,16 @@ var BVS = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
 var BFS = ["#ifdef GL_FRAGMENT_PRECISION_HIGH", "precision highp float;", "#else", "precision mediump float;", "#endif",
   "uniform vec2 uRes;uniform float uT,uR,uAmp,uNight,uOv,uSl;uniform vec4 uL;",
   "const float TA=" + BTILT.toFixed(2) + ";",
-  "const vec3 G0=vec3(.31,.49,1.),G1=vec3(.5,.42,1.),G2=vec3(.71,.36,.94),G3=vec3(.91,.36,.72),G4=vec3(1.,.69,.34);",
+  "const vec3 CA=vec3(.9,.45,.41),CB=vec3(.38,.55,.93);",
   "float nz(vec3 p){return sin(p.x*1.7+uT*.9)*sin(p.y*1.9-uT*.7)*sin(p.z*1.6+uT*.5)*.6+sin(p.x*3.1-uT*.6+1.3)*sin(p.y*2.7+uT*.8+.7)*sin(p.z*3.3-uT*.4)*.28+sin(dot(p,vec3(1.1,1.3,.9))*2.2+uT*1.1)*.22;}",
   "float sd(vec3 p){float l=length(p);return l-uR*(1.+uAmp*nz(p/max(l,1e-4)*1.35));}",
-  "vec3 liq(float h){",   // the color of what is in the glass at a height: each layer runs between two neighbors of the chapters' ramp, with a fine light seam where two meet
-  " float b0=-1.02;vec3 c=mix(G0,G1,clamp((h-b0)/max(uL.x-b0,1e-3),0.,1.));",
-  " if(h>uL.x)c=mix(G1,G2,clamp((h-uL.x)/max(uL.y-uL.x,1e-3),0.,1.));",
-  " if(h>uL.y)c=mix(G2,G3,clamp((h-uL.y)/max(uL.z-uL.y,1e-3),0.,1.));",
-  " if(h>uL.z)c=mix(G3,G4,clamp((h-uL.z)/max(uL.w-uL.z,1e-3),0.,1.));",
-  " float s=0.,w=.011;",
+  "vec3 liq(float h){",   // what is in the glass runs from one soft color at the bottom to the other at the top, and no more; a fine light seam where two layers meet
+  " vec3 c=mix(CA,CB,smoothstep(-.95,.95,h));float s=0.,w=.011;",
   " if(uL.x>-.985&&uL.x<uL.w-.006)s=max(s,1.-smoothstep(0.,w,abs(h-uL.x)));",
   " if(uL.y>-.985&&uL.y<uL.w-.006)s=max(s,1.-smoothstep(0.,w,abs(h-uL.y)));",
   " if(uL.z>-.985&&uL.z<uL.w-.006)s=max(s,1.-smoothstep(0.,w,abs(h-uL.z)));",
-  " c=mix(c,vec3(1.),s*.5);",
-  " vec3 r=mix(vec3(.8,.1,.2),vec3(1.,.5,.34),clamp(h*.5+.5,0.,1.));",
-  " return mix(c,r,uOv*.9);",
+  " c=mix(c,vec3(1.),s*.55);",
+  " return mix(c,mix(vec3(.74,.2,.2),vec3(.93,.46,.4),clamp(h*.5+.5,0.,1.)),uOv*.92);",
   "}",
   "void main(){",
   " vec2 p=(gl_FragCoord.xy*2.-uRes)/uRes.x;float px=2./uRes.x,Rb=uR*(1.+uAmp*1.15)+px*2.,l2=dot(p,p),a=0.;vec3 col=vec3(0.);",
@@ -2199,7 +2208,7 @@ var BFS = ["#ifdef GL_FRAGMENT_PRECISION_HIGH", "precision highp float;", "#else
   "  }",
   " }",
   " float s=1.-smoothstep(uR*.72,uR*1.36,length(p-vec2(0.,-uR*.13)));s*=s;",
-  " vec3 sc=mix(vec3(.05,.055,.07),G2,uNight);float sa2=s*mix(.2,.26,uNight)*(1.-a);",
+  " vec3 sc=mix(vec3(.05,.055,.07),CB,uNight);float sa2=s*mix(.2,.26,uNight)*(1.-a);",
   " col=col*a+sc*sa2;a+=sa2;",
   " col+=(fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233))+uT)*43758.5453)-.5)*.018*a;",
   " gl_FragColor=vec4(col,a);",
@@ -3053,6 +3062,7 @@ function metricsHTML(bare){
   var acts = '<div class="chosen acts">' + [["design", "D", "Design", chosenName("d")], ["technology", "T", "Technology", chosenName("t")], ["energy", "E", "Energy", chosenName("e")], ["benefits", "B", "Benefits", [b.length ? b.join(" ") : "B", b.length ? b.map(function(c){ return optOf(c)[1]; }).join(" · ") : "No benefit yet"]]].map(function(c, i){
     return '<button type="button" data-ch="' + c[0] + '" class="k' + c[1] + (ST.ch === c[0] ? " now" : "") + (hit === c[1] ? " hit" : "") + '"><small>' + (i + 1) + ' · ' + c[2] + '<i>' + money(bp[i][2]) + '</i></small><em>' + c[3][1] + '</em></button>'; }).join("") + '<button type="button" class="mdb" data-md="1" title="The wheel, the sources and the questions">Details ›</button></div>';
   var rev = cut && hit && !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) ? revealHTML(hit, a0, a1) : "", nowT = Date.now();
+  acts = '<div class="chosen acts solo"><button type="button" class="mdb" data-md="1" title="The wheel, the sources and the questions">Details ›</button></div>';   // the four choices are named in the bubble; on this wall they need no row of their own
   if (rev && !bare) MD.rev = {html:rev, t0:nowT};
   else if (!bare && MD.rev && nowT - MD.rev.t0 < 3000) rev = MD.rev.html.replace('data-reveal', 'data-reveal style="animation-delay:-' + (nowT - MD.rev.t0) + 'ms"');   // a change arrives twice from another window: the second drawing keeps the reveal where it was
   return '<div class="card measure simple film' + (cut ? " cut" : "") + (rev ? " rev" : "") + '" aria-label="What this plan means for the neighborhood"><div class="rwbg" aria-hidden="true"></div><i class="fpage" aria-hidden="true"></i>' + (cut ? '<i class="whip" aria-hidden="true"></i>' : '') + rev + '' + acts +
@@ -3315,7 +3325,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-151021";
+var BUILD = "20261124-151600";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
