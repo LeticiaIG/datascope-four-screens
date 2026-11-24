@@ -268,6 +268,21 @@ a.lab{text-decoration:none}
 .vtag.net{background:#1c2a28;color:#fff} .vtag.syn{background:#f3e7c9;color:#7a5606} .vtag.ses{background:var(--accent-soft, #dcebe5);color:#2f6957} .vtag.tp{background:none;border:1px solid var(--line)}
 .vcard .vtags + p{padding-top:.3rem}
 .vsum{margin:0;padding:0 .9rem .6rem;font-size:.76rem;font-weight:600;color:var(--muted)}
+.vleft .vadd{position:relative} .vadd h3{padding-right:1.6rem}
+.vclose{position:absolute;top:.45rem;right:.5rem;width:1.7rem;height:1.7rem;display:grid;place-items:center;font:inherit;font-size:1.25rem;line-height:1;border:0;border-radius:50%;background:none;color:var(--muted);cursor:pointer} .vclose:hover,.vclose:focus-visible{background:var(--sunk);color:var(--ink)}
+.vopen{position:absolute;z-index:2;left:.9rem;top:4.6rem;display:none;font:inherit;font-size:.86rem;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem;background:var(--surface);color:var(--ink);box-shadow:0 6px 22px rgba(20,40,34,.16);cursor:pointer}
+.stage.vclosed .vleft{display:none} .stage.vclosed .vopen{display:inline-flex}
+.stage.vclosed[data-view="voices"] .leaflet-bottom.leaflet-left{left:.9rem}
+.vthread{position:absolute;left:0;top:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
+.vthread path{fill:none;stroke:var(--c,#1c2a28);stroke-width:2.4;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0} .vthread path.new{animation:vthread .45s cubic-bezier(.3,.7,.2,1) both} .vthread circle{fill:var(--c,#1c2a28)}
+@keyframes vthread{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion: reduce){ .vthread path.new{animation:none} }
+.vlist .vcard[data-vi]{cursor:pointer;transition:box-shadow .2s} .vlist .vcard[data-vi]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.vcard.sel{box-shadow:0 0 0 2px var(--c),0 8px 20px rgba(20,40,34,.18)}
+.vcard small{padding-bottom:.3rem}
+.vsrc{display:flex;align-items:center;gap:.4rem;padding:.35rem .65rem .5rem;border-top:1px solid var(--line);font-size:.72rem;font-weight:700;line-height:1.2;color:var(--muted);text-decoration:none}
+.vsrc svg{flex:none;width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round} .vsrc > span{min-width:0}
+a.vsrc{color:var(--accent)} a.vsrc:hover{text-decoration:underline} .vsrc a{margin-left:auto;flex:none;color:var(--accent);text-decoration:none} .vsrc a:hover{text-decoration:underline}
 .vdot{display:inline-block;width:.7rem;height:.7rem;border-radius:50%;margin-right:.3rem;vertical-align:-1px;background:#5d6d69} .vdot.r{background:#fff;border:2.5px solid #5d6d69}
 .leaflet-vheat-pane{filter:blur(16px)}
 .stage[data-view="voices"] .leaflet-bottom.leaflet-left{left:22.4rem}
@@ -1107,7 +1122,7 @@ html[data-look="c"] .measure.simple.film:not(.zz) > .reveal{background:linear-gr
   .stage > .note{position:static;width:auto;max-width:none}
 }
 </style>
-<script>(function(){ try { var m = location.search.match(/[?&]look=([abcd0])/), k = "dcscope-look"; if (m){ if (m[1] === "0") localStorage.removeItem(k); else localStorage.setItem(k, m[1]); } var v = localStorage.getItem(k); if (v) document.documentElement.setAttribute("data-look", v); window.addEventListener("storage", function(ev){ if (ev.key === k){ if (ev.newValue) document.documentElement.setAttribute("data-look", ev.newValue); else document.documentElement.removeAttribute("data-look"); } }); } catch(e){} })();</script>
+<script>(function(){ try { var m = location.search.match(/[?&]look=([abcd0])/), k = "dcscope-look"; if (m) localStorage.setItem(k, m[1]); var v = localStorage.getItem(k) || "c"; if (v !== "0") document.documentElement.setAttribute("data-look", v); window.addEventListener("storage", function(ev){ if (ev.key === k){ var n = ev.newValue || "c"; if (n !== "0") document.documentElement.setAttribute("data-look", n); else document.documentElement.removeAttribute("data-look"); } });   /* look c is the one chosen; ?look=0 shows the tool without a look */ } catch(e){} })();</script>
 </head>
 <body>
 <script>
@@ -1910,14 +1925,48 @@ function okLL(q){ return Array.isArray(q) && isFinite(q[0]) && isFinite(q[1]); }
 function ptsOf(v){ return (Array.isArray(v.pts) ? v.pts : [v.ll, v.ll2]).filter(okLL).map(function(q){ return [+q[0], +q[1]]; }); }
 function whereOf(v){ var q = ptsOf(v), n = v.names || []; if (!q.length) return "The whole project"; if (q.length === 1) return n[0] ? "At " + n[0] : "On the map";
   return q.map(function(_, i){ return n[i] || (i ? "another place" : "One place"); }).join(" ↔ "); }
-function vcard(v){
+var VICON = {press:'<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2.5" width="12" height="11" rx="1.6"/><path d="M4.6 5.6h6.8M4.6 8h6.8M4.6 10.4h4"/></svg>',
+  social:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 3.5h11v7.2H8l-3.2 2.6v-2.6H2.5z"/></svg>',
+  session:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.8 5.2h12.4M3.6 5.2v7.4M12.4 5.2v7.4M6 8.6h4"/></svg>'};
+function okUrl(u){ return typeof u === "string" && /^https:\/\/[^\s"'<>]+$/.test(u); }
+function vcard(v, i){   // i: its place in the list shown, when it is in the list
   var k = kindOf(v), tp = (v.tp || []).map(topicName).filter(function(x){ return x; }).join(", "),
     tag = k === "social" ? '<span class="vtag net">' + netName(v.net) + '</span><span class="vtag syn">Synthetic</span>' : k === "press" ? '<span class="vtag">Reported</span>' : '<span class="vtag ses">Session</span>',
-    from = k === "social" ? "invented for this sample · near " + v.near : k === "press" ? v.src : (v.sess ? v.sess + " · " : "") + whereOf(v) + (v.about ? " · on a closed scenario" : "");
-  return '<div class="vcard" style="--c:' + STANCE[v.s][1] + '">' + (okPic(v.img) ? '<img src="' + v.img + '" alt="">' : '') + '<div class="vtags">' + tag + (tp ? '<span class="vtag tp">' + esc(tp) + '</span>' : '') + '</div><p>' + esc(v.t) + '</p><small>' + STANCE[v.s][0] + ' · ' + esc(from) + '</small></div>'; }
+    where = k === "social" ? "near " + v.near : k === "press" ? "" : whereOf(v) + (v.about ? " · on a closed scenario" : ""),
+    src = k === "press" ? '<span class="vsrc">' + VICON.press + '<span>' + esc(v.src) + '</span>' + (okUrl(v.url) ? '<a href="' + esc(v.url) + '" target="_blank" rel="noopener">Read it ↗</a>' : '') + '</span>' :   // a reported voice names its source, and links to it where the address is known
+      k === "social" ? '<span class="vsrc">' + VICON.social + '<span>' + esc(netName(v.net)) + ' · invented for this sample, so there is no post to link to</span></span>' :
+      '<a class="vsrc" href="#editor" title="Open the table">' + VICON.session + '<span>' + esc(v.sess || "A session") + ' · said at the table</span></a>';
+  return '<div class="vcard' + (i != null && VO.sel === i ? " sel" : "") + '" style="--c:' + STANCE[v.s][1] + '"' + (i != null ? ' data-vi="' + i + '" tabindex="0" role="button" aria-pressed="' + (VO.sel === i ? "true" : "false") + '"' : '') + '>' + (okPic(v.img) ? '<img src="' + v.img + '" alt="">' : '') + '<div class="vtags">' + tag + (tp ? '<span class="vtag tp">' + esc(tp) + '</span>' : '') + '</div><p>' + esc(v.t) + '</p><small>' + STANCE[v.s][0] + (where ? ' · ' + esc(where) : '') + '</small>' + src + '</div>'; }
+// A voice being looked at is tied to its place: a thread runs from its point on the map to its card in the list, in the color of its position.
+// A point tapped brings its card into view; a card tapped brings its point into view. A tap on the bare map lets go.
+function voSelect(i, from){
+  VO.sel = i == null || VO.sel === i ? null : i; VO.selV = VO.sel != null && VO.list ? VO.list[VO.sel] : null; var body = $("vbody"), v = VO.selV, q = v ? ptsOf(v) : [];
+  if (body) [].forEach.call(body.querySelectorAll(".vcard[data-vi]"), function(c){ var on = +c.getAttribute("data-vi") === VO.sel; c.classList.toggle("sel", on); c.setAttribute("aria-pressed", on ? "true" : "false"); });
+  if (v && from === "map" && body){ var card = body.querySelector('.vcard[data-vi="' + VO.sel + '"]'); if (card) card.scrollIntoView({block:"nearest"}); }
+  if (v && from === "list" && q.length && VO.map && !VO.map.getBounds().pad(-.12).contains(q[0])) VO.map.panTo(q[0], {animate:true});
+  voThread(true);
+}
+function voThread(fresh){
+  var st = VO.el && VO.el.parentNode, v = VO.selV, q = v ? ptsOf(v) : []; if (!st || !VO.map) return;
+  var sv = st.querySelector(".vthread"); if (!sv){ sv = document.createElementNS("http://www.w3.org/2000/svg", "svg"); sv.setAttribute("class", "vthread"); sv.setAttribute("aria-hidden", "true"); st.appendChild(sv); }
+  if (VO.ring){ VO.map.removeLayer(VO.ring); VO.ring = null; }
+  var card = VO.sel != null ? st.querySelector('.vlist .vcard[data-vi="' + VO.sel + '"]') : null, list = st.querySelector(".vlist");
+  if (!v || !q.length || !card || !list){ sv.innerHTML = ""; return; }
+  var c = STANCE[v.s][1]; VO.ring = L.circleMarker(q[0], {radius:15, color:c, weight:3, fill:false, interactive:false}).addTo(VO.map);
+  var R = st.getBoundingClientRect(), k = R.width / (st.offsetWidth || 1) || 1, M = VO.el.getBoundingClientRect(), p = VO.map.latLngToContainerPoint(q[0]), C = card.getBoundingClientRect(), Lr = list.getBoundingClientRect();
+  var x1 = (M.left - R.left) / k + p.x, y1 = (M.top - R.top) / k + p.y, x2 = (C.left - R.left) / k - 2, yc = C.top + Math.min(C.height / 2, 26 * k), y2 = (Math.max(Lr.top + 8, Math.min(Lr.bottom - 8, yc)) - R.top) / k, off = yc < Lr.top || yc > Lr.bottom, dx = Math.max(40, (x2 - x1) * .5);
+  sv.style.setProperty("--c", c);
+  sv.innerHTML = '<path' + (fresh ? ' class="new"' : '') + ' pathLength="1" d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + 'C' + (x1 + dx).toFixed(1) + ' ' + (y1 - 30).toFixed(1) + ' ' + (x2 - dx * .7).toFixed(1) + ' ' + y2.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '"' + (off ? ' opacity=".35"' : '') + '/><circle cx="' + x2.toFixed(1) + '" cy="' + y2.toFixed(1) + '" r="4"' + (off ? ' opacity=".35"' : '') + '/>';
+}
+document.addEventListener("scroll", function(ev){ if (ev.target && ev.target.classList && ev.target.classList.contains("vlist") && VO.selV) voThread(); }, true);
+window.addEventListener("resize", function(){ if (VO.selV) voThread(); });
+document.addEventListener("click", function(ev){ var T = ev.target; if (!T || !T.closest) return; var b = T.closest("[data-vl]");
+  if (b){ VF.left = b.getAttribute("data-vl") === "1"; var st = b.closest('.stage[data-view="voices"]'); if (st) st.classList.toggle("vclosed", !VF.left); return; }   // the panel on the left can be put away, to see the map whole
+  var c = T.closest(".vlist .vcard[data-vi]"); if (c && !T.closest("a")) voSelect(+c.getAttribute("data-vi"), "list"); });
+document.addEventListener("keydown", function(ev){ if ((ev.key === "Enter" || ev.key === " ") && ev.target && ev.target.matches && ev.target.matches(".vlist .vcard[data-vi]")){ ev.preventDefault(); voSelect(+ev.target.getAttribute("data-vi"), "list"); } });
 function sessName(){ try { return (localStorage.getItem("dcscope-session") || "").slice(0, 40); } catch(e){ return ""; } }
 function voicesHTML(){
-  return '<div class="card stage" data-view="voices"><div class="vleft"><form class="vadd" id="vadd" autocomplete="off"><h3>Add your voice</h3>' +
+  return '<div class="card stage' + (VF.left === false ? " vclosed" : "") + '" data-view="voices"><button type="button" class="vopen" data-vl="1">Add your voice +</button><div class="vleft"><form class="vadd" id="vadd" autocomplete="off"><button type="button" class="vclose" data-vl="0" aria-label="Close this panel" title="Close">×</button><h3>Add your voice</h3>' +
     '<p class="vhint" id="vwhere">' + MARKS[Math.min(2, VO.pts.length)] + '</p>' +
     '<div class="stances" role="radiogroup" aria-label="Your position">' + Object.keys(STANCE).map(function(k){ return '<label style="--c:' + STANCE[k][1] + '"><input type="radio" name="vs" value="' + k + '"><span>' + STANCE[k][0] + '</span></label>'; }).join("") + '</div>' +
     '<textarea name="vt" maxlength="160" placeholder="One sentence: your opinion" aria-label="Your sentence"></textarea>' +
@@ -1967,7 +2016,8 @@ function voDraw(stage){
     var cp = map.createPane("context"); cp.style.zIndex = 350; cp.style.pointerEvents = "none";
     var hp = map.createPane("vheat"); hp.style.zIndex = 380; hp.style.pointerEvents = "none"; VO.hrend = L.svg({pane:"vheat", padding:.6}); VO.heat = L.layerGroup().addTo(map);   // the heat lies under the pins, blurred
     L.control.scale({metric:false, position:"bottomleft"}).addTo(map); VO.live = L.layerGroup().addTo(map);
-    map.on("click", function(e){ voMark(e.latlng); });
+    map.on("click", function(e){ if (VO.sel != null) return voSelect(null); if (VF.left !== false) voMark(e.latlng); });   // a tap on the bare map lets go of the voice looked at; otherwise it marks a place for the voice being written
+    map.on("move zoom", function(){ if (VO.selV) voThread(); });
   } else if (VO.el.parentNode !== stage) stage.insertBefore(VO.el, stage.firstChild);
   VO.map.invalidateSize(false);
   if (VO.site !== ST.site){ VO.site = ST.site; homeView(VO.map, s.zoom);
@@ -1982,15 +2032,15 @@ function voDraw(stage){
   panSync(VO.map);
 }
 function voRefresh(){
-  if (!VO.map) return; var g = VO.live, all = voicesAll(), list = all.filter(shown), n = {support:0, cond:0, concern:0}, kn = {press:0, social:0, session:0}; g.clearLayers(); VO.heat.clearLayers();
-  list.slice().reverse().forEach(function(v){ var k = kindOf(v); n[v.s]++; kn[k]++; var q = ptsOf(v); if (!q.length) return; var c = STANCE[v.s][1], pop = [vcard(v), {maxWidth:260, className:"vpop"}], line = [];   // drawn last to first, so that session voices lie on top
+  if (!VO.map) return; var g = VO.live, all = voicesAll(), list = all.filter(shown), n = {support:0, cond:0, concern:0}, kn = {press:0, social:0, session:0}; g.clearLayers(); VO.heat.clearLayers(); VO.list = list; VO.sel = VO.selV ? list.indexOf(VO.selV) : -1; if (VO.sel < 0){ VO.sel = null; VO.selV = null; }
+  list.slice().reverse().forEach(function(v, rr){ var idx = list.length - 1 - rr, pick = function(e){ L.DomEvent.stopPropagation(e); voSelect(idx, "map"); }; var k = kindOf(v); n[v.s]++; kn[k]++; var q = ptsOf(v); if (!q.length) return; var c = STANCE[v.s][1], pop = [vcard(v), {maxWidth:260, className:"vpop"}], line = [];   // drawn last to first, so that session voices lie on top
     if (VF.heat) q.forEach(function(a){ L.circleMarker(a, {pane:"vheat", renderer:VO.hrend, radius:k === "social" ? 34 : 42, stroke:false, fillColor:c, fillOpacity:.2, interactive:false}).addTo(VO.heat); });
-    if (q.length > 1){ q.forEach(function(b, i){ if (i) line = line.concat(arc(q[i - 1], b)); }); L.polyline(line, {color:c, weight:4, opacity:.85}).bindPopup(pop[0], pop[1]).addTo(g); }
-    q.forEach(function(a){ L.circleMarker(a, k === "social" ? {radius:5.5, color:c, weight:3, fillColor:"#fbfdfc", fillOpacity:1} : {radius:q.length > 1 ? 7 : k === "press" ? 8 : 10, color:"#fbfdfc", weight:2.5, fillColor:c, fillOpacity:.95}).bindPopup(pop[0], pop[1]).addTo(g); }); });
+    if (q.length > 1){ q.forEach(function(b, i){ if (i) line = line.concat(arc(q[i - 1], b)); }); L.polyline(line, {color:c, weight:4, opacity:.85}).on("click", pick).addTo(g); }
+    q.forEach(function(a){ L.circleMarker(a, k === "social" ? {radius:5.5, color:c, weight:3, fillColor:"#fbfdfc", fillOpacity:1} : {radius:q.length > 1 ? 7 : k === "press" ? 8 : 10, color:"#fbfdfc", weight:2.5, fillColor:c, fillOpacity:.95}).on("click", pick).addTo(g); }); });
   var f = $("vfilt"); if (f) f.innerHTML = vfiltHTML(all);
   var parts = [kn.press ? kn.press + " reported in the press" : "", kn.social ? kn.social + " synthetic" : "", kn.session ? kn.session + " added in sessions" : ""].filter(function(x){ return x; });
   var body = $("vbody"); if (body) body.innerHTML = '<div class="vcount">' + Object.keys(STANCE).map(function(k){ return '<div style="--c:' + STANCE[k][1] + '"><b>' + n[k] + '</b><span>' + STANCE[k][0] + '</span></div>'; }).join("") + '</div>' +
-    '<p class="vsum">' + (list.length ? list.length + (list.length === 1 ? " voice: " : " voices: ") + parts.join(", ") + "." : "No voice matches what is chosen on the left.") + '</p><div class="vlist">' + closedAll().slice().reverse().map(ccardHTML).join("") + list.map(vcard).join("") + '</div>';
+    '<p class="vsum">' + (list.length ? list.length + (list.length === 1 ? " voice: " : " voices: ") + parts.join(", ") + "." : "No voice matches what is chosen on the left.") + '</p><div class="vlist">' + closedAll().slice().reverse().map(ccardHTML).join("") + list.map(function(v, i){ return vcard(v, i); }).join("") + '</div>'; voThread();
   var w = $("vwhere"), ab = VO.about && closedAll().filter(function(c){ return c.id === VO.about; })[0]; if (w && ab) w.textContent = "About the closed scenario " + scenKey(ab) + ". Mark a place on the map if you mean one.";
 }
 // The picture is drawn from the visitor's sentence by an open image service (Pollinations). Only the sentence is sent.
@@ -3442,7 +3492,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-155346";
+var BUILD = "20261124-160144";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
