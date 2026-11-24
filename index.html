@@ -573,6 +573,7 @@ body.imm .axo.gv .gmist{display:block}
 .hot i{width:16px;height:16px;border-radius:50%;background:var(--accent);border:3px solid #fbfdfc;box-shadow:0 0 0 0 rgba(59,122,102,.5),0 2px 6px rgba(0,0,0,.35);animation:hotp 2.4s ease-out infinite}
 .hot b{visibility:hidden} .hot:hover b,.hot:focus-visible b,.hot.on b{visibility:visible;background:#1c2a28;border-color:#1c2a28;color:#fff} .hot.on i{background:#1c2a28;animation:none}   /* a dot is named when it is pointed at or chosen: named all at once, they hid one another */
 body.imm .axo .amk.dk,body.imm .axo .amk.en,body.imm .axo .amk.sn{display:none}
+.axo.gv .maplibregl-canvas{filter:blur(1px)}
 /* the first person's readout of the sound: five bars that move when Listen is on, the level where you stand, and whether you would hear it */
 .sndchip{display:none} body.imm .stage[data-view="axo"] .sndchip{display:flex;align-items:center;gap:.85rem;position:absolute;left:1.5rem;bottom:1.5rem;z-index:6;padding:.6rem 1.25rem .6rem 1rem;border-radius:999px;background:color-mix(in srgb,var(--surface) 62%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid color-mix(in srgb,var(--line) 55%,transparent);color:var(--ink);pointer-events:none}
 .sndchip .eq{display:flex;align-items:center;gap:3px;height:1.7rem} .sndchip .eq b{display:block;width:3px;border-radius:2px;background:var(--accent);height:calc(1.7rem * var(--lv,.3));transform:scaleY(.3);transform-origin:50% 50%}
@@ -2841,7 +2842,7 @@ function gvCam(){   // put the eye where the listener is
 }
 // From the ground the land is the aerial photograph laid over the pale map as a wash (darks lifted, contrast down): a middle point between the drawn map and the raw photograph, soft as if painted.
 // Seen from very low (2 m) a flat photograph stretches towards the horizon; the fog of the sky takes the far part of it.
-var GVPAINT = [["bg", "background-color", "#d9e3de", "#dfe6da"], ["green", "fill-color", ["match", ["get", "class"], "wood", "#c3dbd0", "#d0e1d7"], ["match", ["get", "class"], "wood", "#c3d6bd", "#cfdfc8"]], ["park", "fill-color", "#c8ddd0", "#c6dabd"],
+var GVPAINT = [["bg", "background-color", "#d9e3de", "#d9e7ce"], ["green", "fill-color", ["match", ["get", "class"], "wood", "#c3dbd0", "#d0e1d7"], ["match", ["get", "class"], "wood", "#bfd9b6", "#cde2c2"]], ["park", "fill-color", "#c8ddd0", "#c2dcb6"],
   ["water", "fill-color", "#bcd3e2", "#a9cbe0"], ["stream", "line-color", "#a9c6da", "#9bbdd6"], ["road-small", "line-color", "#edf2ef", "#fbfdfc"], ["road-big", "line-color", "#f5f8f6", "#ffffff"], ["bld", "fill-extrusion-color", "#b9c8d0", "#d6d3e0"]];
 function gvMode(){   // the lens, the hands and the colors of the view in use
   var map = AXO.map, on = gvOn(), s = S(); if (!map) return;
@@ -3074,9 +3075,9 @@ function axoInit(stage, light){
   try { AXO.night = !!localStorage.getItem("dcscope-night"); } catch(e){} gvHands(map);
   map.on("load", function(){
     map.addSource("site", {type:"geojson", data:gj([])}); map.addSource("ring", {type:"geojson", data:gj([])}); map.addSource("dc", {type:"geojson", data:gj([])});
-    map.addSource("photo", {type:"raster", tiles:["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize:256, maxzoom:19, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"});
+    map.addSource("photo", {type:"raster", tiles:["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize:256, maxzoom:16, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"});
     var under = map.getLayer("bld") ? "bld" : undefined;   // flat things go under the raised ones
-    map.addLayer({id:"photo", type:"raster", source:"photo", layout:{visibility:"none"}, paint:{"raster-fade-duration":0, "raster-opacity":.88, "raster-saturation":-.1, "raster-contrast":-.24, "raster-brightness-min":.3, "raster-brightness-max":1}}, under);   // between the drawn map and the raw photograph: the photograph laid over the pale ground as a wash, its darks lifted and its contrast taken down, so the real fields and roads show softly, as if painted   // from the ground the land is the aerial photograph, lying flat; if it does not load, the drawn ground stays
+    map.addLayer({id:"photo", type:"raster", source:"photo", layout:{visibility:"none"}, paint:{"raster-fade-duration":0, "raster-opacity":.42, "raster-saturation":-.05, "raster-contrast":-.34, "raster-brightness-min":.42, "raster-brightness-max":1}}, under);   // between the drawn map and the raw photograph: the photograph laid over the pale ground as a wash, its darks lifted and its contrast taken down, so the real fields and roads show softly, as if painted   // from the ground the land is the aerial photograph, lying flat; if it does not load, the drawn ground stays
     map.addLayer({id:"ring-fill", type:"fill", source:"ring", paint:{"fill-color":"#a58be0", "fill-opacity":["*", ["get", "o"], .5]}}, under);   // the rings in the soft violet of the other screens: a faint wash, a thin line and its glow
     map.addLayer({id:"ring-glow", type:"line", source:"ring", layout:{visibility:"none"}, paint:{"line-color":"#d9ccfa", "line-width":12, "line-blur":9, "line-opacity":.5, "line-opacity-transition":{duration:0}}}, under);
     map.addLayer({id:"ring-solid", type:"line", source:"ring", layout:{visibility:"none"}, paint:{"line-color":"#9d84e0", "line-width":1.8, "line-opacity":.9, "line-opacity-transition":{duration:0}}}, under);
@@ -3189,7 +3190,7 @@ function axoKey(){
     '<p class="asrc">1 dot = ' + AXO.per + (AXO.per === 1 ? " resident" : " residents") + ' · 2020 Census blocks, for the ground seen so far.</p>';
   if (S().open) o += '<div class="arow"><span>Size</span>' + sw("data-big", [["ref", "Reference", !ST.big], ["big", "600 MW", ST.big]]) + '</div>' + (ST.big ? '<p class="asrc">What if: 600 MW heard as 23 reference plants in one place, 14 dB louder.</p>' : '');
   o += '<div class="arow"><span>Time</span>' + sw("data-tod", [["day", "Day", !AXO.night], ["night", "Night", AXO.night]]) + '</div>' + (AXO.night ? '<p class="asrc">At night the same sound counts as 10 dB more, as in the day-night level (DNL) of US noise rules, which adds 10 dB between 10 pm and 7 am: more residents hear it, and the background you listen against is 10 dB lower. The dark, the stars and the lamps are scenery.</p>' : '') +
-    '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table. With Listen on, a soft background plays behind the plant (as 45 dBA by day, 10 dB less at night): it is for the ear, not measured.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the aerial photograph, softened; buildings stand up where OpenStreetMap has them. The sky is scenery. The maps are linked: move the table or the sentiment map and this wall goes with them.</p>' : '') + '<p class="asrc imh">First person: the eye is 2 m above the ground, as if you stood there. Press H to hide or show the panels.</p>';
+    '<div class="arow"><span>Listen</span>' + sw("data-snd", [["on", "On", AXO.on], ["off", "Off", !AXO.on]]) + '</div><div class="aear" id="aear">' + earHTML() + '</div><p class="asrc">Sound by distance, air, and the walls, buildings and trees in the way (ISO 9613-2, as in the original). Wall and berm heights are the ones set on the table. With Listen on, a soft background plays behind the plant (as 45 dBA by day, 10 dB less at night): it is for the ear, not measured.</p>' + (gvOn() ? '<p class="asrc">Seen from where you stand, ' + GV.h + ' m above the ground. A ring for every 5 dBA. The ground is the drawn map with the aerial photograph laid over it as a soft wash; buildings stand up where OpenStreetMap has them. The sky is scenery. The maps are linked: move the table or the sentiment map and this wall goes with them.</p>' : '') + '<p class="asrc imh">First person: the eye is 2 m above the ground, as if you stood there. Press H to hide or show the panels.</p>';
   el.innerHTML = o;
 }
 function axoFrame(ts){
@@ -3428,9 +3429,9 @@ function rwbDraw(host){
     var gn = document.createElement("div"); gn.className = "gnight"; el.appendChild(gn); rwbNight();
     map.on("load", function(){
       map.addSource("ring", {type:"geojson", data:gj([])}); map.addSource("dc", {type:"geojson", data:gj([])});
-      map.addSource("photo", {type:"raster", tiles:["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize:256, maxzoom:19});
+      map.addSource("photo", {type:"raster", tiles:["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize:256, maxzoom:16});
       var under = map.getLayer("bld") ? "bld" : undefined;
-      map.addLayer({id:"photo", type:"raster", source:"photo", paint:{"raster-fade-duration":0, "raster-opacity":.88, "raster-saturation":-.1, "raster-contrast":-.24, "raster-brightness-min":.3, "raster-brightness-max":1}}, under);   // between the drawn map and the raw photograph: the photograph laid over the pale ground as a wash, its darks lifted and its contrast taken down, so the real fields and roads show softly, as if painted
+      map.addLayer({id:"photo", type:"raster", source:"photo", paint:{"raster-fade-duration":0, "raster-opacity":.42, "raster-saturation":-.05, "raster-contrast":-.34, "raster-brightness-min":.42, "raster-brightness-max":1}}, under);   // between the drawn map and the raw photograph: the photograph laid over the pale ground as a wash, its darks lifted and its contrast taken down, so the real fields and roads show softly, as if painted
       map.addLayer({id:"dc", type:"fill-extrusion", source:"dc", paint:{"fill-extrusion-color":["get", "c"], "fill-extrusion-height":["get", "h"], "fill-extrusion-base":["get", "b"], "fill-extrusion-opacity":1}});
       RWB.ready = true; var o = RWB.el.closest(".measure"); if (o) o.classList.add("land"); rwbSync();
     });
@@ -3766,7 +3767,7 @@ function filmCard(){
 route();
 if (FILM) filmCard();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-181528";
+var BUILD = "20261124-181727";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}

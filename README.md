@@ -62,6 +62,8 @@ On the Texas table, under Design, the heights of the D2 berm and the D3 walls ca
 
 **A softer plant.** Planted trees have round crowns instead of six-sided blocks, tanks are round, the plant's small parts are paler and the light is softer, so the model reads less as a row of cubes. The sound rings are a thin violet line with a faint wash, in the color of the other screens.
 
+**A softer ground.** From the ground the land is the drawn map, flat and pale, with the aerial photograph laid over it as a blurred wash at under half its strength, and the whole scene is in slightly soft focus. Labels and panels stay sharp.
+
 **The reveal.** When a choice arrives on the right wall, the card that names it is now set as the rest of that wall: the serif, no capitals, and the place still seen through it.
 
 **One look for the four screens.** The look chosen is **c**, pale painted paper with lilac, and it is what the tool opens with. The other three sketches are still there to compare: add `?look=a`, `?look=b` or `?look=d` to the address (remembered for every window of the tool), `?look=c` to come back, and `?look=0` to see the tool with no look at all. A look sets the same few things on all four screens: the ground, the surfaces, the ink, one accent, the face of headings, and the bubble's two colors. **a** is sky blue with pink light and a tall serif (after James Turrell); **b** is dark steel blue with thin type (after Onionlab's The Outcome); **c** is pale painted paper with lilac; **d** is black with heavy white type. The maps themselves keep their colors in every look, and in the two dark looks (b and d) some switches and chips still have their light backgrounds: they are sketches to choose from, not finished.
