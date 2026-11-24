@@ -1023,7 +1023,7 @@ html.checking .app{visibility:hidden}
 .measure.simple.film:not(.zz) .tlead{font-size:1.5rem;font-weight:600;line-height:1.24;letter-spacing:-.012em;max-width:40rem}
 .measure.simple.film:not(.zz) .tlead span{display:block;font-weight:300;opacity:.85}
 .measure.simple.film:not(.zz) .tlead{margin-bottom:1.05rem}
-.measure.simple.film:not(.zz) .bwhy{font-weight:300;font-size:.9rem;opacity:.8}
+.measure.simple.film:not(.zz) .bwhy{font-weight:300;font-size:.9rem;opacity:0} .measure.simple.film:not(.zz).open .bwhy{opacity:.8}
 .measure.simple.film:not(.zz) .thd{font-family:"Space Mono",ui-monospace,Menlo,monospace;font-size:.66rem;font-weight:400;letter-spacing:.16em;opacity:.8}
 .measure.simple.film:not(.zz) .tkb small{font-family:"Space Mono",ui-monospace,Menlo,monospace;font-size:.66rem;font-weight:400;letter-spacing:.16em;opacity:.85}
 .measure.simple.film:not(.zz) .tkb b{font-size:2.7rem;font-weight:200;letter-spacing:-.03em;line-height:1}
@@ -3402,7 +3402,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-153940";
+var BUILD = "20261124-154134";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
