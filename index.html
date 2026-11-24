@@ -358,6 +358,7 @@ label.sm:has(input:focus-visible){outline:2px solid var(--accent);outline-offset
 .leaflet-tooltip.glab.w{background:none;border:0;font-style:italic;font-weight:500}
 .geomap.far .glab.near{display:none}
 .gfp{cursor:grab;touch-action:none}
+.grot.gmov{cursor:move} .grot.gmov svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .grot{display:flex;align-items:center;justify-content:center;background:#1c2a28;color:#fff;border-radius:50%;font-size:18px;font-weight:700;cursor:ew-resize;touch-action:none;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 .stage[data-view="map"]{cursor:grab;touch-action:none}
 .zoomc{position:absolute;right:.9rem;bottom:.9rem;display:flex;gap:4px;background:var(--surface);border-radius:12px;padding:4px;box-shadow:0 2px 10px rgba(20,40,34,.14)}
@@ -1076,6 +1077,21 @@ html.checking .app{visibility:hidden}
 .measure.simple.film:not(.zz) .bud .ll,.measure.simple.film:not(.zz) .bud .ll.kB{font-family:"Instrument Serif","Times New Roman",serif;font-size:12px;font-weight:400;fill:#57207a}
 .measure.simple.film:not(.zz) .bud.over .ll{fill:#fff}
 .measure.simple.film:not(.zz) > .reveal,.measure.simple.film:not(.zz) > .reveal.kD,.measure.simple.film:not(.zz) > .reveal.kT,.measure.simple.film:not(.zz) > .reveal.kE,.measure.simple.film:not(.zz) > .reveal.kB{background:linear-gradient(180deg,#3a82ca 0,#7fbbe9 100%)}
+/* The control panel of the center wall is a ghost until the pointer is over it or it is touched: frosted glass with only its name, so the view
+   stays whole. It folds to a small tab with the button in its corner; the tab opens while the pointer is over it, and a tap unfolds it for good. */
+.stage[data-view="axo"] .akey{max-height:calc(100% - 5.6rem);overflow:hidden auto;scrollbar-width:thin;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:background-color .35s ease,border-color .35s ease,box-shadow .35s ease,max-height .5s cubic-bezier(.2,.8,.2,1),width .5s cubic-bezier(.2,.8,.2,1),border-radius .4s ease}
+.stage[data-view="axo"] .akey > *{transition:opacity .3s ease}
+.stage[data-view="axo"] .akey:not(:hover):not(:has(:focus-visible)):not(.on){background:color-mix(in srgb,var(--surface) 24%,transparent);border-color:color-mix(in srgb,var(--line) 35%,transparent);box-shadow:none}
+.stage[data-view="axo"] .akey:not(:hover):not(:has(:focus-visible)):not(.on) > *:not(.hd){opacity:0}
+.stage[data-view="axo"] .akey:not(:hover):not(:has(:focus-visible)):not(.on) > .hd{opacity:.8}
+.akey .hd{position:relative;flex:none;padding-right:1.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.amin{position:absolute;right:0;top:50%;transform:translateY(-50%);width:1.55rem;height:1.55rem;display:grid;place-items:center;border:0;border-radius:50%;background:none;color:var(--muted);font:inherit;font-size:1.15rem;font-weight:700;line-height:1;cursor:pointer} .amin:hover,.amin:focus-visible{background:var(--sunk);color:var(--ink)}
+.stage[data-view="axo"] .akey.min{width:18.5rem;max-height:2.95rem;overflow:hidden;border-radius:1.5rem;cursor:pointer}
+.stage[data-view="axo"] .akey.min:hover,.stage[data-view="axo"] .akey.min:has(:focus-visible){width:20rem;max-height:calc(100% - 5.6rem);overflow:hidden auto;border-radius:var(--r)}
+@media (prefers-reduced-motion: reduce){ .stage[data-view="axo"] .akey,.stage[data-view="axo"] .akey > *{transition:none} }
+/* the bubble lets the landscape through while nobody is at it */
+.measure.simple.film:not(.zz) .bud .bfig{transition:opacity .45s ease}
+.measure.simple.film:not(.zz):not(.open) .bud:not(:hover):not(:focus-visible) .bfig{opacity:.62}
 /* the ribbons from the bubble to the physical model, on the right wall and carried on by the center wall */
 svg.ribs path{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0}
 svg.ribs .rb{stroke:var(--c);stroke-width:6.5;opacity:.95} svg.ribs .rh{stroke:#fff;stroke-width:1.5;opacity:.7}
@@ -1251,7 +1267,13 @@ var WETLANDS = [[-262, -122, 74, 22], [10, -128, 62, 18], [262, -128, 66, 20]];
 var HOMES = []; [140, 166, 192].forEach(function(hz){ for (var i = 0; i < 17; i++) if (i !== 4 && i !== 8 && i !== 12) HOMES.push([-200 + i * 26, hz]); });
 function local(lx, lz, px, pz, rot){ var a = rot * Math.PI / 180, c = Math.cos(a), sn = Math.sin(a); return [px + lx * c + lz * sn, pz - lx * sn + lz * c]; }
 function corners(px, pz, rot){ var x0 = ST.d === "D3" ? -122 : -74; return [[x0, -34], [61, -34], [61, 14], [x0, 14]].map(function(q){ return local(q[0], q[1], px, pz, rot); }); }
+function freeSite(){ var s = S(); return !!(s.acres && !s.boundary); }   // a site known only by its size, drawn as a circle: no parcel line to keep to
 function clampPose(px, pz, rot){
+  if (freeSite()){   // the building may stand anywhere on that ground, as long as its middle keeps 60 m inside the circle, and may face any way
+    rot = ((rot + 180) % 360 + 360) % 360 - 180; var R = Math.max(60, Math.sqrt(S().acres * 4046.86 / Math.PI) - 60), c = local(-6.5 * MSC - (ST.d === "D3" ? 16 : 0), -10 * MSC, px * MSC, pz * MSC, rot), d = Math.hypot(c[0], c[1]);
+    if (d > R){ px += (c[0] * R / d - c[0]) / MSC; pz += (c[1] * R / d - c[1]) / MSC; }
+    return {px:px, pz:pz, rot:rot};
+  }
   rot = Math.max(-15, Math.min(15, rot)); var c = corners(0, 0, rot), xs = c.map(function(q){ return q[0]; }), zs = c.map(function(q){ return q[1]; });
   function fit(v, lo, hi){ return lo > hi ? (lo + hi) / 2 : Math.max(lo, Math.min(hi, v)); }
   return {px:fit(px, PARCEL.x0 - Math.min.apply(null, xs), PARCEL.x1 - Math.max.apply(null, xs)), pz:fit(pz, PARCEL.z0 - Math.min.apply(null, zs), PARCEL.z1 - Math.max.apply(null, zs)), rot:rot};
@@ -1691,16 +1713,21 @@ function geoDraw(){
   glab([Math.max(cs[0][0], cs[1][0]), (cs[0][1] + cs[1][1]) / 2], "Data center", "dk", "top").addTo(g);
   var south = cs.reduce(function(a, q){ return q[0] < a[0] ? q : a; }), hp = GEO.map.latLngToContainerPoint([south[0], (cs[0][1] + cs[2][1]) / 2]); hp.y += 30;   // the handle keeps clear of the building at any zoom
   var mid = GEO.map.containerPointToLatLng(hp);
+  hp.x += 20; mid = GEO.map.containerPointToLatLng(hp);
   GEO.rh = L.marker(mid, {icon:L.divIcon({className:"grot", html:"↻", iconSize:[32, 32]}), keyboard:false, title:"Turn the building"}).addTo(g);
-  var a = GEO.fp.getElement(), b = GEO.rh.getElement();
+  hp.x -= 40; GEO.mh = L.marker(GEO.map.containerPointToLatLng(hp), {icon:L.divIcon({className:"grot gmov", html:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6v12.8M1.6 8h12.8M8 1.6 6.2 3.4M8 1.6l1.8 1.8M8 14.4l-1.8-1.8M8 14.4l1.8-1.8M1.6 8l1.8-1.8M1.6 8l1.8 1.8M14.4 8l-1.8-1.8M14.4 8l-1.8 1.8"/></svg>', iconSize:[32, 32]}), keyboard:false, title:"Drag to move the data center"}).addTo(g);   // a handle that says it can be moved; the building itself can be dragged too
+  var a = GEO.fp.getElement(), b = GEO.rh.getElement(), mhe = GEO.mh.getElement();
+  if (mhe){ L.DomEvent.disableClickPropagation(mhe); mhe.addEventListener("pointerdown", geoDrag("move")); }
   if (a){ L.DomEvent.disableClickPropagation(a); a.addEventListener("pointerdown", geoDrag("move")); }
   if (b){ L.DomEvent.disableClickPropagation(b); b.addEventListener("pointerdown", geoDrag("rot")); }
 }
 function geoDrag(kind){ return function(ev){
   ev.preventDefault(); ev.stopPropagation();
   var map = GEO.map, a = map.mouseEventToLatLng(ev), p0 = {px:ST.px, pz:ST.pz, rot:ST.rot}, x0 = ev.clientX, now = null; map.dragging.disable();
+  var free = freeSite(), bc = bldg(p0.px, p0.pz, p0.rot), cp = map.latLngToContainerPoint([(bc[0][0] + bc[2][0]) / 2, (bc[0][1] + bc[2][1]) / 2]), mr = map.getContainer().getBoundingClientRect(), a0 = Math.atan2(ev.clientY - mr.top - cp.y, ev.clientX - mr.left - cp.x);
   function mv(e){
-    var to; if (kind === "rot") to = clampPose(p0.px, p0.pz, Math.round(p0.rot + (e.clientX - x0) / 7));
+    var to; if (kind === "rot" && free){ var da = (Math.atan2(e.clientY - mr.top - cp.y, e.clientX - mr.left - cp.x) - a0) * 180 / Math.PI; to = clampPose(p0.px, p0.pz, Math.round(p0.rot - da)); }   // turned by going round it with the handle
+    else if (kind === "rot") to = clampPose(p0.px, p0.pz, Math.round(p0.rot + (e.clientX - x0) / 7));
     else { var b = map.mouseEventToLatLng(e); to = clampPose(p0.px + (b.lng - a.lng) * MXs() / MSC, p0.pz + (a.lat - b.lat) * MY / MSC, p0.rot); }
     if (!inParcel(bldg(to.px, to.pz, to.rot))) return;   // the building stays inside the parcel
     now = to; GEO.fp.setLatLngs(bldg(now.px, now.pz, now.rot));
@@ -2770,7 +2797,8 @@ try { var gv0 = JSON.parse(localStorage.getItem("dcscope-gv") || "null"); if (gv
 GV.tilt = GVTILT[GV.h];
 function gvOn(){ return GV.on; }
 function gvSave(){ try { localStorage.setItem("dcscope-gv", JSON.stringify({on:GV.on, h:GV.h})); } catch(e){} }
-function gvFace(q){ var c = focusM(), dx = c[0] - q[0], dz = c[1] - q[1]; return Math.hypot(dx, dz) < 60 ? GV.b : Math.atan2(dx, -dz) * 180 / Math.PI; }   // the bearing from a place to what the table is centred on: the plant, until someone moves the map
+function gvFace(q){ var c = focusM(), dx = c[0] + (ST.px || 0) * MSC - q[0], dz = c[1] + (ST.pz || 0) * MSC - q[1];   // towards the plant where it now stands
+  return Math.hypot(dx, dz) < 60 ? GV.b : Math.atan2(dx, -dz) * 180 / Math.PI; }   // the bearing from a place to what the table is centred on: the plant, until someone moves the map
 function gvCam(){   // put the eye where the listener is
   var map = AXO.map, q = GV.pos; if (!map || !q) return;
   var th = GV.tilt * Math.PI / 180, br = GV.b * Math.PI / 180, run = GV.h * Math.tan(th), c = ll(q[0] + Math.sin(br) * run, q[1] - Math.cos(br) * run), foc = (AXO.el.clientHeight || 600) / 2 / Math.tan(GVFOV * Math.PI / 360);
@@ -2819,6 +2847,7 @@ function gvSettle(){   // the eye has stopped: name the rings and bring the resi
 }
 function gvGo(q, d){ if (!GV.pos) return; GV.silent = GV.nf = false; GV.from = GV.pos.slice(); GV.to = q; GV.t0 = performance.now(); GV.dur = Math.max(500, Math.min(2200, d * 3.5)); clearTimeout(GV.ct); GV.ct = 0; AXO.hold = GV.t0 + 6000; }   // walk there
 function gvAhead(m){ var p = GV.to || GV.pos, br = GV.b * Math.PI / 180; if (p) gvGo([p[0] + Math.sin(br) * m, p[1] - Math.cos(br) * m], Math.abs(m)); }
+function gvSide(m){ var p = GV.to || GV.pos, br = GV.b * Math.PI / 180; if (p) gvGo([p[0] + Math.cos(br) * m, p[1] + Math.sin(br) * m], Math.abs(m)); }   // a step to the right (or, negative, to the left) without turning
 function gvTurn(d){ GV.bTo = (GV.bTo == null ? GV.b : GV.bTo) + d; GV.auto = false; AXO.hold = performance.now() + 6000; lookTell(GV.bTo); }
 function gvStep(m){   // the wheel: walk while it turns, and settle where it stops
   if (!GV.pos) return; var br = GV.b * Math.PI / 180, now = performance.now(); GV.to = null; GV.auto = false; GV.pos = [GV.pos[0] + Math.sin(br) * m, GV.pos[1] - Math.cos(br) * m]; gvCam(); AXO.hold = now + 6000;
@@ -2835,9 +2864,10 @@ function gvHands(map){   // drag to look around, the wheel to walk
 }
 document.addEventListener("keydown", function(ev){   // the arrows walk and turn
   if (!gvOn() || !AXO.map || !AXO.el || !AXO.el.isConnected || !GV.pos || ev.altKey || ev.ctrlKey || ev.metaKey || /INPUT|TEXTAREA|SELECT/.test(ev.target.tagName || "") || AXO.el.closest(".mini")) return;
-  var k = ev.key; if (k === "ArrowLeft" || k === "ArrowRight") gvTurn(k === "ArrowLeft" ? -15 : 15); else if (k === "ArrowUp" || k === "ArrowDown") gvAhead(k === "ArrowUp" ? 30 : -30); else return; ev.preventDefault();
+  var k = ev.key.length === 1 ? ev.key.toLowerCase() : ev.key, far = ev.shiftKey ? 3 : 1;   // arrows and W A S D; Shift goes three times as far
+  if (k === "ArrowLeft" || k === "ArrowRight" || k === "q" || k === "e") gvTurn(k === "ArrowLeft" || k === "q" ? -15 : 15); else if (k === "ArrowUp" || k === "ArrowDown" || k === "w" || k === "s") gvAhead((k === "ArrowUp" || k === "w" ? 30 : -30) * far); else if (k === "a" || k === "d") gvSide((k === "a" ? -20 : 20) * far); else return; ev.preventDefault();
 });
-function axoHTML(){ var g = gvOn(); return '<div class="card stage" data-view="axo"><div class="card akey" id="akey"></div><div class="zoomc"><button type="button" data-az="left" aria-label="Turn left" title="Turn left">⟲</button><button type="button" data-az="right" aria-label="Turn right" title="Turn right">⟳</button><button type="button" data-az="out" aria-label="' + (g ? "Step back" : "Move away") + '" title="' + (g ? "Step back" : "Move away") + '">' + (g ? "↓" : "−") + '</button><button type="button" data-az="in" aria-label="' + (g ? "Walk forward" : "Come closer") + '" title="' + (g ? "Walk forward" : "Come closer") + '">' + (g ? "↑" : "+") + '</button><button type="button" data-az="reset" aria-label="' + (g ? "Back to the first place, facing the plant" : "Reset the view") + '" title="' + (g ? "Back to the first place, facing the plant" : "Reset the view") + '">⤢</button><button type="button" class="wide" data-az="imm" aria-pressed="' + document.body.classList.contains("imm") + '">Immersive</button></div><div class="card tour" id="tour"></div></div>'; }
+function axoHTML(){ var g = gvOn(); return '<div class="card stage" data-view="axo"><div class="card akey' + (akeyMin() ? " min" : "") + '" id="akey"></div><div class="zoomc"><button type="button" data-az="left" aria-label="Turn left" title="Turn left">⟲</button><button type="button" data-az="right" aria-label="Turn right" title="Turn right">⟳</button><button type="button" data-az="out" aria-label="' + (g ? "Step back" : "Move away") + '" title="' + (g ? "Step back" : "Move away") + '">' + (g ? "↓" : "−") + '</button><button type="button" data-az="in" aria-label="' + (g ? "Walk forward" : "Come closer") + '" title="' + (g ? "Walk forward" : "Come closer") + '">' + (g ? "↑" : "+") + '</button>' + (g ? '<button type="button" data-az="sl" aria-label="Step to the left" title="Step to the left">←</button><button type="button" data-az="sr" aria-label="Step to the right" title="Step to the right">→</button>' : '') + '<button type="button" data-az="reset" aria-label="' + (g ? "Back to the first place, facing the plant" : "Reset the view") + '" title="' + (g ? "Back to the first place, facing the plant" : "Reset the view") + '">⤢</button><button type="button" class="wide" data-az="imm" aria-pressed="' + document.body.classList.contains("imm") + '">Immersive</button></div><div class="card tour" id="tour"></div></div>'; }
 function metres(a, b){ return Math.hypot((a[1] - b[1]) * MY * Math.cos(a[0] * Math.PI / 180), (a[0] - b[0]) * MY); }   // [lat, lng] pairs
 function gj(features){ return {type:"FeatureCollection", features:features}; }
 function poly(pts, props){ var r = pts.map(function(q){ return [q[1], q[0]]; }); r.push(r[0]); return {type:"Feature", properties:props || {}, geometry:{type:"Polygon", coordinates:[r]}}; }
@@ -3095,11 +3125,15 @@ function axoEar(){   // the level where the listener stands (or is being dragged
 }
 function earHTML(){ var k = hearsNow(AXO.earL), nm = AXO.live ? null : earName(), d = AXO.earL - (AXO.earB || AXO.earL);
   return '<b style="color:' + ["#2f6957", "#8a5c08", "#9a3f36"][k] + '">' + ["Where you stand you do not hear it", "Where you stand you hear it", "Where you stand you hear it clearly"][k] + '</b>' +
-    '<small>' + (nm ? "At " + esc(nm) + " · " : "") + 'about ' + about(Math.round(AXO.earD)) + ' m from the plant · ' + Math.round(Math.max(0, AXO.earL)) + ' dBA, ' + dbWords(d) + ' with the conventional campus.' + (AXO.night ? ' At night it counts as ' + Math.round(Math.max(0, AXO.earL) + NIGHTDB) + '.' : '') + '</small><small>' + (gvOn() ? "Tap the ground to walk there, drag to look around." : "Drag the figure, or tap the ground, to stand somewhere else.") + '</small>'; }
+    '<small>' + (nm ? "At " + esc(nm) + " · " : "") + 'about ' + about(Math.round(AXO.earD)) + ' m from the plant · ' + Math.round(Math.max(0, AXO.earL)) + ' dBA, ' + dbWords(d) + ' with the conventional campus.' + (AXO.night ? ' At night it counts as ' + Math.round(Math.max(0, AXO.earL) + NIGHTDB) + '.' : '') + '</small><small>' + (gvOn() ? "Tap the ground to walk there, drag to look around. The arrows or W A S D walk and step aside, Q and E turn." : "Drag the figure, or tap the ground, to stand somewhere else.") + '</small>'; }
+function akeyMin(){ try { return localStorage.getItem("dcscope-akey") === "min"; } catch(e){ return false; } }   // the control panel of the center wall, folded to a tab
+document.addEventListener("click", function(ev){ var T = ev.target; if (!T || !T.closest) return; var k = T.closest(".akey"), b = T.closest("[data-amin]"); if (!k || (!b && !k.classList.contains("min"))) return;
+  var min = b ? !k.classList.contains("min") : false; try { localStorage.setItem("dcscope-akey", min ? "min" : ""); } catch(e){} k.classList.toggle("min", min); k.classList.remove("on"); var bt = k.querySelector("[data-amin]"); if (bt){ bt.textContent = min ? "+" : "–"; bt.setAttribute("aria-label", min ? "Unfold this panel" : "Fold this panel away"); if (ev.detail) bt.blur(); } ev.stopPropagation(); }, true);
+document.addEventListener("pointerdown", function(ev){ var k = document.querySelector('.stage[data-view="axo"] .akey'); if (k) k.classList.toggle("on", !!(ev.target.closest && ev.target.closest(".akey")) && !k.classList.contains("min")); });   // touched, it stays solid until something else is touched
 function axoKey(){
   var el = $("akey"); if (!el) return; var n = [0, 0, 0], more = 0; AXO.agents.forEach(function(a){ n[a.cls < 0 ? 0 : a.cls]++; if (a.cls > 0 && !a.base) more++; if (!a.cls && a.base > 0) more--; });
   var tot = AXO.agents.length, wait = !tot && !AXO.err, sw = function(attr, list){ return '<span class="sw" role="group">' + list.map(function(x){ return '<button type="button" ' + attr + '="' + x[0] + '" aria-pressed="' + !!x[2] + '">' + x[1] + '</button>'; }).join("") + '</span>'; };
-  var o = '<div class="hd">' + esc(S().name === "Texas" ? "College Station" : S().name) + (gvOn() ? ' · from the ground' : ' · axonometric') + '</div>' +
+  var o = '<div class="hd">' + esc(S().name === "Texas" ? "College Station" : S().name) + (gvOn() ? ' · from the ground' : ' · axonometric') + '<button type="button" class="amin" data-amin aria-label="' + (akeyMin() ? "Unfold this panel" : "Fold this panel away") + '">' + (akeyMin() ? "+" : "–") + '</button></div>' +
     '<div class="arow"><span>View</span>' + sw("data-gv", [["on", "Ground", gvOn()], ["off", "Above", !gvOn()]]) + '</div>' +
     (gvOn() ? '<div class="arow"><span>Eye height</span>' + sw("data-gh", GVH.map(function(h){ return [h, h + " m", GV.h === h]; })) + '</div>' : '') +
     '<div class="arow"><span>Residents</span>' + sw("data-ag", [["on", "On", ST.ag], ["off", "Off", !ST.ag]]) + '</div>';
@@ -3533,7 +3567,7 @@ document.addEventListener("click", function(ev){
     if (tw === "x"){ HOT.i = -1; HOT.k = null; tourFill(); } else if (tw === "go"){ if (HOT.list[HOT.i]) hotGo(HOT.list[HOT.i]); } else hotPick(HOT.i < 0 ? 0 : HOT.i + (tw === "next" ? 1 : -1), true); return; }
   if ((b = T.closest("[data-az]")) && AXO.map){ var how = b.getAttribute("data-az"), m = AXO.map, c0 = S().center;
     if (how === "imm"){ immersive(!document.body.classList.contains("imm")); return; }
-    if (gvOn()){ if (how === "in" || how === "out") gvAhead(how === "in" ? 60 : -60); else if (how === "reset"){ GV.auto = true; GV.bTo = null; GV.tilt = GVTILT[GV.h]; GV.earKey = null; GV.rel = null; ST.ear = null; ST.pan = [0, 0]; ST.look = null; render(); tell(); } else gvTurn(how === "left" ? -30 : 30); return; }
+    if (gvOn()){ if (how === "in" || how === "out") gvAhead(how === "in" ? 60 : -60); else if (how === "sl" || how === "sr") gvSide(how === "sl" ? -40 : 40); else if (how === "reset"){ GV.auto = true; GV.bTo = null; GV.tilt = GVTILT[GV.h]; GV.earKey = null; GV.rel = null; ST.ear = null; ST.pan = [0, 0]; ST.look = null; render(); tell(); } else gvTurn(how === "left" ? -30 : 30); return; }
     if (how === "in") m.zoomIn(); else if (how === "out") m.zoomOut(); else if (how === "reset"){ ST.ear = null; ST.pan = [0, 0]; render(); tell(); m.easeTo({center:[c0[1], c0[0]], zoom:15.7, pitch:57, bearing:-28}); } else m.easeTo({bearing:m.getBearing() + (how === "left" ? -30 : 30)}); return; }
 });
 // The immersive view: the whole screen, no bar, a slow turn. H hides the panels for projection; Esc or the button leaves.
@@ -3571,7 +3605,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-162739";
+var BUILD = "20261124-163926";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
