@@ -978,7 +978,6 @@ html.checking .app{visibility:hidden}
 /* White words on a ground that darkens to the right, by day as by night; and two soft colors and no more, the warm and the cool one of the bubble.
    What is given up is said in the warm one; everything else is white. */
 .measure.simple.film:not(.zz),.measure.simple.film:not(.zz):not(.night){--fg:#f6f4ee;--dim:#f6f4eeb3;--gain:#f6f4ee;--loss:#ff9d8f;--line:#f6f4ee47;--halo:transparent;color:var(--fg)}
-.measure.simple.film:not(.zz) > .fpage,.measure.simple.film:not(.zz).night > .fpage{inset:0 0 0 27%;background:linear-gradient(90deg,#0b0c0d00 0,#0b0c0dad 19%,#0b0c0de0 40%,#0b0c0df5 100%);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12%);mask-image:linear-gradient(90deg,transparent 0,#000 12%)}
 .measure.simple.film:not(.zz):not(.night) > .rwbg::after,.measure.simple.film:not(.zz).night > .rwbg::after{background:none}
 .measure.simple.film:not(.zz) .acts.solo{position:absolute;top:5rem;right:2.4rem;z-index:2;display:block;margin:0}
 .measure.simple.film:not(.zz) .acts.solo .mdb{color:var(--fg);border-color:var(--line);background:none}
@@ -989,6 +988,26 @@ html.checking .app{visibility:hidden}
 .measure.simple.film:not(.zz) .fhead p{font-size:1.05rem;opacity:.75}
 .measure.simple.film:not(.zz) .bud .ll,.measure.simple.film:not(.zz) .bud .ll.kB{fill:#fff}
 .measure.simple.film:not(.zz) .bud .bgl0{stroke:#fff}
+/* The ground darkens very gently, all the way to the right edge. Beside the bubble, one row for every choice in the order of its layers: what it takes, what it gives. */
+.measure.simple.film:not(.zz) > .fpage,.measure.simple.film:not(.zz).night > .fpage{inset:0 0 0 22%;background:linear-gradient(90deg,#0b0c0d00 0,#0b0c0d12 8%,#0b0c0d36 19%,#0b0c0d5c 32%,#0b0c0d7a 46%,#0b0c0d96 62%,#0b0c0db3 80%,#0b0c0dcc 100%);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 34%);mask-image:linear-gradient(90deg,transparent 0,#000 34%)}
+.measure.simple.film:not(.zz) .fld{padding-left:13%;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:2rem}   /* everything a little to the right: more of the landscape is seen */
+.measure.simple.film:not(.zz) .fmoney .bud .bfig{width:min(100%,56vh)}
+.measure.simple.film:not(.zz) .ftx.tt{display:flex;flex-direction:column;justify-content:flex-start;gap:0;padding:.4rem 1rem 0 0}
+.film .tlead{margin:0 6.5rem 1.5rem 0;max-width:42rem;font-size:1.4rem;font-weight:700;line-height:1.22;letter-spacing:-.01em;color:var(--fg)} .film .tlead.bad{color:var(--loss)}
+.film .thd,.film .trow{display:grid;grid-template-columns:11rem minmax(0,1fr);column-gap:1.8rem}
+.film .thd{padding-bottom:.5rem;font-size:.74rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--fg);opacity:.78}
+.film .trow{align-items:start;padding:.95rem 0 1rem;border-top:1px solid var(--line);transition:opacity .25s}
+.film .trow.off{opacity:.32}
+.film .tkb{font:inherit;color:var(--fg);background:none;border:0;padding:0;margin:0;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:.12rem;min-width:0}
+.film .tkb small{font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.film .tkb b{font-size:2.5rem;font-weight:900;letter-spacing:-.045em;line-height:.95;font-variant-numeric:tabular-nums}
+.film .tkb em{font-style:normal;font-size:.78rem;font-weight:700;text-transform:uppercase;line-height:1.15;opacity:.78}
+.film .tkb:focus-visible{outline:2px solid var(--fg);outline-offset:4px}
+.film .tnote{margin:.1rem 0 0;font-size:.95rem;font-weight:700;line-height:1.25;color:var(--loss)}
+.film .tsay{margin:.4rem 0 0;max-width:40rem;font-size:1rem;font-weight:600;line-height:1.32;color:var(--fg);opacity:.9}
+.film .tfoot{margin:.2rem 0 0;padding-top:.8rem;border-top:1px solid var(--line);font-size:.88rem;font-weight:600;color:var(--fg);opacity:.78}
+.measure.simple.film:not(.zz) .trow .ft b{font-size:2.2rem}
+.measure.simple.film:not(.zz) .bud .ll{cursor:pointer} .measure.simple.film:not(.zz) .bud.fo .ll:not([data-on]){opacity:.4}
 .measure.simple.film:not(.zz) > .reveal,.measure.simple.film:not(.zz) > .reveal.kD,.measure.simple.film:not(.zz) > .reveal.kT,.measure.simple.film:not(.zz) > .reveal.kE,.measure.simple.film:not(.zz) > .reveal.kB{background:#0b0c0d;--fg:#f6f4ee;--dim:#f6f4eeb3;--c:#f6f4ee;color:#f6f4ee}
 .measure.simple.film:not(.zz):not(.zy) > .reveal.l{--c:var(--loss)}
 @media (prefers-reduced-motion: reduce){ .film .reveal *,.film.cut .ft b,.film.cut .ft span,.film.cut .fcol h4{animation:none} }
@@ -2156,9 +2175,9 @@ function budBubHTML(i){
   var bands = "", labs = "", lo = -1;
   parts.forEach(function(p, k){ var hi = B[k], g = labGeo(lo, hi, 0, (p[1] + " " + money(p[2])).length);
     if (hi - lo > .001) bands += '<rect x="-100" width="200" y="' + (-100 * hi).toFixed(1) + '" height="' + (100 * (hi - lo)).toFixed(1) + '" fill="url(#bl)" stroke="#fff" stroke-opacity=".5" stroke-width=".6"/>';
-    labs += '<text class="ll k' + p[0] + (g.mode === 2 ? "" : g.mode === 1 ? " am" : " no") + '" data-k="' + k + '" data-n="' + (p[1] + " " + money(p[2])).length + '" y="' + g.y.toFixed(1) + '" text-anchor="middle"><tspan class="ln">' + p[1] + ' </tspan>' + money(p[2]) + '</text>'; lo = hi; });
+    labs += '<text class="ll k' + p[0] + (g.mode === 2 ? "" : g.mode === 1 ? " am" : " no") + '" data-k="' + k + '"' + (MD.focus === p[0] ? ' data-on="1"' : '') + ' data-n="' + (p[1] + " " + money(p[2])).length + '" y="' + g.y.toFixed(1) + '" text-anchor="middle"><tspan class="ln">' + p[1] + ' </tspan>' + money(p[2]) + '</text>'; lo = hi; });
   var free = Math.max(0, q.left0);
-  return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.freeze === "bud" ? " sel" : "") + '" style="--i:' + i + '" data-bud aria-label="The developer’s offer to the community, ' + money(tot) + ' upfront. ' + parts.filter(function(p){ return p[2] > 0; }).map(function(p){ return p[1] + " takes " + money(p[2]); }).join(", ") + '. ' + (q.over ? "The choices ask for more than the offer." : money(free) + " is left to allocate.") + '">' +
+  return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.focus ? " fo" : "") + '" style="--i:' + i + '" data-bud aria-label="The developer’s offer to the community, ' + money(tot) + ' upfront. ' + parts.filter(function(p){ return p[2] > 0; }).map(function(p){ return p[1] + " takes " + money(p[2]); }).join(", ") + '. ' + (q.over ? "The choices ask for more than the offer." : money(free) + " is left to allocate.") + '">' +
     '<span class="bfig"><span class="bslot"></span><svg viewBox="-112 -112 224 224" aria-hidden="true"><defs><clipPath id="bclip"><circle r="100"/></clipPath><linearGradient id="bl" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="0" y2="-100"><stop offset="0" stop-color="#e67369"/><stop offset="1" stop-color="#618cee"/></linearGradient></defs>' +
     '<g class="bbg"><g clip-path="url(#bclip)">' + bands + '</g><circle class="bgl0" r="100"/></g>' + labs + '</svg></span></button></div>';
 }
@@ -2169,7 +2188,7 @@ function budBubHTML(i){
 var BLOB = {b:null, bv:[0, 0, 0, 0], bT:null, ov:0, ovT:0, sl:0, t00:0};
 var BVS = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
 var BFS = ["#ifdef GL_FRAGMENT_PRECISION_HIGH", "precision highp float;", "#else", "precision mediump float;", "#endif",
-  "uniform vec2 uRes;uniform float uT,uR,uAmp,uNight,uOv,uSl;uniform vec4 uL;",
+  "uniform vec2 uRes;uniform float uT,uR,uAmp,uNight,uOv,uSl,uF,uFa;uniform vec4 uL;",
   "const float TA=" + BTILT.toFixed(2) + ";",
   "const vec3 CA=vec3(.9,.45,.41),CB=vec3(.38,.55,.93);",
   "float nz(vec3 p){return sin(p.x*1.7+uT*.9)*sin(p.y*1.9-uT*.7)*sin(p.z*1.6+uT*.5)*.6+sin(p.x*3.1-uT*.6+1.3)*sin(p.y*2.7+uT*.8+.7)*sin(p.z*3.3-uT*.4)*.28+sin(dot(p,vec3(1.1,1.3,.9))*2.2+uT*1.1)*.22;}",
@@ -2179,6 +2198,7 @@ var BFS = ["#ifdef GL_FRAGMENT_PRECISION_HIGH", "precision highp float;", "#else
   " if(uL.x>-.985&&uL.x<uL.w-.006)s=max(s,1.-smoothstep(0.,w,abs(h-uL.x)));",
   " if(uL.y>-.985&&uL.y<uL.w-.006)s=max(s,1.-smoothstep(0.,w,abs(h-uL.y)));",
   " if(uL.z>-.985&&uL.z<uL.w-.006)s=max(s,1.-smoothstep(0.,w,abs(h-uL.z)));",
+  " float ix=h<=uL.x?0.:h<=uL.y?1.:h<=uL.z?2.:3.;if(abs(ix-uF)>.5)c=mix(c,vec3(dot(c,vec3(.3,.59,.11)))*.5,.82*uFa);",
   " c=mix(c,vec3(1.),s*.55);",
   " return mix(c,mix(vec3(.74,.2,.2),vec3(.93,.46,.4),clamp(h*.5+.5,0.,1.)),uOv*.92);",
   "}",
@@ -2223,7 +2243,7 @@ function blobInit(){
   var pr = gl.createProgram(); gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr); if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return false;
   gl.useProgram(pr); gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
   var loc = gl.getAttribLocation(pr, "a"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  BLOB.u = {}; ["uRes", "uT", "uR", "uAmp", "uNight", "uOv", "uSl", "uL"].forEach(function(k){ BLOB.u[k] = gl.getUniformLocation(pr, k); });
+  BLOB.u = {}; ["uRes", "uT", "uR", "uAmp", "uNight", "uOv", "uSl", "uF", "uFa", "uL"].forEach(function(k){ BLOB.u[k] = gl.getUniformLocation(pr, k); });
   c.addEventListener("webglcontextlost", function(){ BLOB.dead = true; var b = c.closest(".bud"); if (b) b.classList.remove("gl"); if (c.parentNode) c.parentNode.removeChild(c); });   // the flat drawing takes over
   BLOB.c = c; BLOB.gl = gl; BLOB.t00 = performance.now(); return true;
 }
@@ -2231,7 +2251,7 @@ function blobAim(){ var s = MD.seq; return !s || (s.t0 && Date.now() < s.t0) ? n
 function blobDraw(){
   var gl = BLOB.gl, c = BLOB.c, u = BLOB.u, b = BLOB.b; gl.viewport(0, 0, c.width, c.height); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
   gl.uniform2f(u.uRes, c.width, c.height); gl.uniform1f(u.uT, BLOB.still ? 2.4 : (performance.now() - BLOB.t00) / 1000 * .42); gl.uniform1f(u.uR, 100 / 128); gl.uniform1f(u.uAmp, .028 + BLOB.sl * .03); gl.uniform1f(u.uNight, BLOB.night ? 1 : 0);
-  gl.uniform1f(u.uOv, BLOB.ov); gl.uniform1f(u.uSl, BLOB.sl); gl.uniform4f(u.uL, b[0], b[1], b[2], b[3]); gl.drawArrays(gl.TRIANGLES, 0, 3); BLOB.drawn = performance.now();
+  gl.uniform1f(u.uOv, BLOB.ov); gl.uniform1f(u.uSl, BLOB.sl); gl.uniform1f(u.uF, BLOB.fi || 0); gl.uniform1f(u.uFa, BLOB.fa || 0); gl.uniform4f(u.uL, b[0], b[1], b[2], b[3]); gl.drawArrays(gl.TRIANGLES, 0, 3); BLOB.drawn = performance.now();
 }
 function blobWords(){   // the words ride on their layers
   var c = BLOB.c, bud = c && c.closest(".bud"); if (!bud) return; var b = BLOB.b;
@@ -2245,6 +2265,7 @@ function blobTick(){
   if (BLOB.bT) for (k = 0; k < 4; k++){ BLOB.bv[k] += (-(BLOB.b[k] - BLOB.bT[k]) * 34 - BLOB.bv[k] * 7.4) * dt; BLOB.b[k] = Math.max(k ? BLOB.b[k - 1] : -1, Math.min(1, BLOB.b[k] + BLOB.bv[k] * dt));   // a soft spring: the level goes a little past its mark and comes back
     if (Math.abs(BLOB.bv[k]) > .004 || Math.abs(BLOB.b[k] - BLOB.bT[k]) > .002) rest = false; }
   BLOB.ov += (BLOB.ovT - BLOB.ov) * Math.min(1, dt * 4); BLOB.sl += (0 - BLOB.sl) * Math.min(1, dt * 1.6);
+  var fT = MD.focus ? 1 : 0; if (MD.focus) BLOB.fi = "DTEB".indexOf(MD.focus); BLOB.fa = (BLOB.fa || 0) + (fT - (BLOB.fa || 0)) * Math.min(1, dt * 7); if (Math.abs(fT - BLOB.fa) > .01) rest = false;
   if (!rest || now - (BLOB.drawn || 0) > 30){ blobDraw(); if (!rest || !BLOB.set) blobWords(); BLOB.set = rest; }   // at rest it still breathes, at half the rate
   BLOB.raf = requestAnimationFrame(blobTick);
 }
@@ -2256,6 +2277,7 @@ function blobMount(){   // every drawing of the wall makes its words anew; the l
   var px = Math.round(Math.min(800, host.clientWidth * Math.min(2, window.devicePixelRatio || 1))) || 320; if (c.width !== px){ c.width = px; c.height = px; }
   BLOB.night = !!host.closest(".night"); BLOB.still = still;
   if (!BLOB.b) BLOB.b = [-1, -1, -1, -1];   // the first time the glass is empty, and fills
+  if (still){ BLOB.fa = MD.focus ? 1 : 0; if (MD.focus) BLOB.fi = "DTEB".indexOf(MD.focus); }
   if (still && s){ BLOB.b = s.B.slice(); BLOB.bT = s.B; BLOB.bv = [0, 0, 0, 0]; BLOB.ov = BLOB.ovT = s.over ? 1 : 0; BLOB.sl = 0; }
   BLOB.set = false; blobWords(); blobDraw(); if (!still && !BLOB.raf) BLOB.raf = requestAnimationFrame(blobTick);
 }
@@ -2264,17 +2286,27 @@ document.addEventListener("visibilitychange", function(){ if (!document.hidden) 
 // The story in one picture. On the left the money, as one bubble that has shrunk with every choice. Then one bubble for every result, floating over the
 // group it lands on: green where something is gained, red where it is given up, larger for more, an outline where the size is not known. Who gains and
 // who loses is read from where the bubbles gather and what color they are.
-function fieldHTML(st){   // one bubble to look at, the money; everything else is said in words, group by group
-  var i = 0, q = budState();
+function sayChoice(g){   // the row being looked at says in a sentence what that choice took, and from where
+  var bens = modules(), f = funds(), en = ENERGY[ST.e], p, code;
+  if (g === "E") return f.e > 0 ? 'Energy has no price of its own: it gets what the other three choices leave, ' + money(r2(f.e)) + ', and buys ' + (en ? en.what : "energy") + ' with it. Every dollar another choice takes is a dollar less here.' : 'This energy option uses none of the offer.';
+  if (g === "B") return bens.length ? bens.map(function(c){ return optOf(c)[1] + ': ' + priceWords(price(c)); }).join(". ") + '. Benefits are paid from the same offer, so each one leaves that much less for energy.' : 'No benefit is chosen, so nothing goes straight to people.';
+  code = g === "D" ? ST.d : ST.t; p = price(code); return !p[0] && !p[1] ? optOf(code)[1] + ' costs nothing extra, so it takes nothing from the offer.' : optOf(code)[1] + ' takes ' + priceWords(p) + ' from the offer. That is what it costs to make the plant bother less.';
+}
+function fieldHTML(st){   // one bubble to look at, the money; beside it one row for every choice, in the order of its layers: what it takes of the offer, and what it gives
+  var i = 0, q = budState(), bub = budBubHTML(i++), sq = MD.seq, bens = modules(), amt = {}, moved = null;
+  sq.parts.forEach(function(p){ amt[p[0]] = p[2]; });
+  if (sq.last && sq.last.length === 2 && Math.abs(sq.last[0][1] + sq.last[1][1]) < .005) moved = sq.last[0][1] > 0 ? [sq.last[1][0], sq.last[0][0], sq.last[0][1]] : [sq.last[0][0], sq.last[1][0], sq.last[1][1]];   // from, to, how much
   function line(x){ var p = phraseOf(x); return '<button type="button" class="ft ' + (x.dir > 0 ? "g" : "l") + " d" + (x.deg || 0) + (MD.freeze === x.id ? " sel" : "") + '" style="--i:' + (i++) + '" data-stm="' + x.id + '"><b>' + p[1] + '</b><span>' + p[2] + '</span></button>'; }
-  var cols = GROUPS.map(function(G){ var list = st.filter(function(x){ return G[1](x); }), sc = 0; list.forEach(function(x){ sc += x.dir * (x.deg || 1); });
-    return '<div class="fcol"><h4>' + G[0] + '<i class="' + (sc > 0 ? "g" : sc < 0 ? "l" : "") + '">' + (!list.length ? "no change" : sc > 0 ? "better" : sc < 0 ? "worse" : "even") + '</i></h4><div class="fts">' + (list.length ? list.map(line).join("") : '<p class="fno">Nothing changes for them.</p>') + '</div></div>'; }).join("");
-  var bub = budBubHTML(i++), sq = MD.seq, free = Math.max(0, q.left0), over = q.left0 < 0 ? money(-q.left0) : q.left1 < 0 ? money(-q.left1) + " a year" : "";
-  var head = '<div class="fhead' + (q.over ? " bad" : "") + '"><h3>' + (q.over ? 'The choices ask for ' + over + ' more than the offer.' : 'The offer is ' + money(q.b[0]) + '. <span>' + (free > 0 ? money(free) + ' is still to be allocated.' : 'Every dollar is used once.') + '</span>') + '</h3>' +
-    '<p>' + (function(L){ if (!L || !L.length) return 'What one choice takes, another cannot have. ';   // the trade of the last choice, in words
-      if (L.length === 2 && Math.abs(L[0][1] + L[1][1]) < .005){ var up = L[0][1] > 0 ? L[0] : L[1], dn = L[0][1] > 0 ? L[1] : L[0]; return 'The last choice moved ' + money(up[1]) + ' from ' + dn[0] + ' to ' + up[0] + '. '; }
-      return 'The last choice: ' + L.map(function(x){ return x[0] + ' ' + (x[1] > 0 ? "+" : "−") + money(Math.abs(x[1])); }).join(", ") + '. '; })(sq && sq.last) + (q.left1 >= 0 ? money(q.left1) + ' of ' + money(q.b[1]) + ' a year is left. ' : '') + 'Prices are examples.</p></div>';
-  return '<div class="fld"><div class="fmoney">' + bub + '</div><div class="ftx">' + head + cols + '</div></div>';
+  var CH = [["B", "Benefits", bens.length ? bens.map(function(c){ return optOf(c)[1]; }).join(" + ") : "None chosen"], ["E", "Energy", chosenName("e")[1]], ["T", "Technology", chosenName("t")[1]], ["D", "Design", chosenName("d")[1]]];
+  var rows = CH.map(function(c){ var list = st.filter(function(x){ return String(x.code || "").charAt(0) === c[0]; }), on = MD.focus === c[0];
+    return '<div class="trow' + (on ? " on" : MD.focus ? " off" : "") + '"><button type="button" class="tkb" data-fc="' + c[0] + '" aria-pressed="' + (on ? "true" : "false") + '"><small>' + c[1] + '</small><b>' + money(amt[c[0]] || 0) + '</b><em>' + c[2] + '</em></button><div class="fts">' +
+      (list.length ? list.map(line).join("") : '<p class="fno">' + (amt[c[0]] > 0 ? "Nothing measured changes." : "Nothing taken, nothing changed.") + '</p>') +
+      (moved && moved[0] === c[1].toLowerCase() ? '<p class="tnote">' + money(moved[2]) + ' less than before the last choice: it went to ' + moved[1] + '.</p>' : '') + (on ? '<p class="tsay">' + sayChoice(c[0]) + '</p>' : '') + '</div></div>'; }).join("");
+  var free = Math.max(0, q.left0), over = q.left0 < 0 ? money(-q.left0) : q.left1 < 0 ? money(-q.left1) + " a year" : "";
+  var lead = q.over ? '<p class="tlead bad">The choices ask for ' + over + ' more than the ' + money(q.b[0]) + ' the developer offers the community.</p>' :
+    '<p class="tlead">The developer offers the community ' + money(q.b[0]) + '. Each choice takes part of it, and gives something for it.' + (free > 0 ? ' ' + money(free) + ' is not allocated yet.' : '') + '</p>';
+  return '<div class="fld"><div class="fmoney">' + bub + '</div><div class="ftx tt">' + lead + '<div class="thd"><span>Takes</span><span>Gives</span></div>' + rows +
+    '<p class="tfoot">' + (q.left1 >= 0 ? 'There is also ' + money(q.b[1]) + ' a year: ' + money(q.left1) + ' of it is left. ' : '') + 'Prices are examples.</p></div></div>';
 }
 function sayYou(x){   // one bubble, said to the person looking at it
   var b = bigOf(x), n = b[0].replace(/^[−+]/, ""), up = b[0].charAt(0) === "+", t = TECH[x.code], en = ENERGY[x.code], pr;
@@ -2297,7 +2329,7 @@ function bwhyHTML(st, un){   // the bubble in question, in one breath: what, bec
       return '<p class="sayl">' + fz + (q.over ? "This is the budget. The choices ask for more than there is." : q.full ? "This is the developer’s offer to the community, a fixed share. All of it is allocated." : "This is the developer’s offer to the community, a fixed share. Part of it is still to be allocated.") + go + '</p><p class="saywhy">' + money(q.b[0]) + " upfront and " + money(q.b[1]) + " a year, the developer’s offer for the community to share out. " + (tk.length ? "So far: " + tk.join(", ") + (en0 && fe > 0 ? ", and " + en0.what + " takes the " + money(fe) + " left upfront" : "") + "." : "Nothing is spent yet.") + " Example prices.</p>"; }
     if (MD.freeze === "q") return '<p class="sayl">' + fz + (un.length ? "These are questions. Nobody has answered them yet." : "There is no open question for these choices.") + go + '</p>' + (un.length ? '<p class="saywhy">' + un.slice(0, 3).map(function(u){ return esc(u.t); }).join(" · ") + (un.length > 3 ? " · and " + (un.length - 3) + " more, under “The wheel, the sources and questions”." : ".") + '</p>' : "");
     if (/^face:/.test(MD.freeze || "")){ var f = facesData(st)[+MD.freeze.slice(5)]; return '<p class="sayl">' + fz + ["These are the nearest neighbors.", "This is the wider community.", "This is the water.", "This is the grid, and the climate.", "This is the developer."][+MD.freeze.slice(5)] + go + '</p><p class="saywhy">' + f.why + '</p>'; }
-    if (!fr) return st.length || un.length ? '<p class="saywhy">Tap a figure to see why.</p>' : '';   // the counts are already on the two lists and in the circle
+    if (!fr) return st.length || un.length ? '<p class="saywhy">Tap a layer of the bubble or a figure to see more.</p>' : '';   // the counts are already on the two lists and in the circle
     var op0 = x.code === "ADD" ? ["", "what was added on the table"] : optOf(x.code);
     // held on one figure: one line says what it is, and three questions can be asked of it
     var q = x.un ? "why" : MD.q || "why", alt = q !== "change" ? [] : [x.code.charAt(0) === "B" ? '<button type="button" class="setb" data-set="' + x.code + '"><span class="cd c' + x.code.charAt(0) + '">' + x.code + '</span><b>Leave it out</b></button>' : x.calc ? "" : setBtn(x.code.charAt(0) + "1", "back to the baseline")].concat(others(x.ax, x.code)).filter(function(y){ return y; });
@@ -3248,7 +3280,12 @@ document.addEventListener("click", function(ev){
   if ((b = T.closest("[data-fq]"))){ MD.q = b.getAttribute("data-fq"); wordsFill(); return; }
   if ((b = T.closest("[data-face]"))){ var fk = "face:" + b.getAttribute("data-face"); MD.freeze = MD.freeze === fk ? null : fk; wordsFill(); return; }
   if ((b = T.closest("[data-qs]"))){ MD.freeze = MD.freeze === "q" ? null : "q"; wordsFill(); return; }
-  if ((b = T.closest("[data-bud]"))){ MD.freeze = MD.freeze === "bud" ? null : "bud"; wordsFill(); return; }
+  if ((b = T.closest("[data-fc]"))){ var fg = b.getAttribute("data-fc"); MD.focus = MD.focus === fg ? null : fg; MD.freeze = null; wordsFill(); return; }
+  if ((b = T.closest("[data-bud]"))){ var lg = "", ll = T.closest(".ll"), fig = b.querySelector(".bfig svg"), Bb = BLOB.b || (MD.seq && MD.seq.B);   // which layer of the bubble was touched
+    if (ll) lg = "DTEB".charAt(+ll.getAttribute("data-k"));
+    else if (fig && Bb){ var fr = fig.getBoundingClientRect(), fu = fr.height * 100 / 224, yy = -(ev.clientY - (fr.top + fr.height / 2)) / fu, xx = (ev.clientX - (fr.left + fr.width / 2)) / fu, lk;
+      if (xx * xx + yy * yy <= 1){ var hh = Math.sin(Math.asin(Math.max(-1, Math.min(1, yy))) + (BLOB.b ? BTILT : 0)); for (lk = 0; lk < 4 && !lg; lk++) if (hh <= Bb[lk] && Bb[lk] - (lk ? Bb[lk - 1] : -1) > .004) lg = "DTEB".charAt(lk); } }
+    MD.focus = lg && MD.focus !== lg ? lg : null; MD.freeze = null; wordsFill(); return; }
   if ((b = T.closest("[data-ball]"))){ MD.all = b.getAttribute("data-ball") === "1"; wordsFill(); return; }
   if ((b = T.closest("[data-stm]"))){ var sid = b.getAttribute("data-stm"); if (b.closest(".measure.film")){ MD.freeze = MD.freeze === sid ? null : sid; MD.q = "why"; } SEL.id = sid; SEL.ax = null; SEL.msg = ""; wordsFill(); return; }
   if ((b = T.closest("[data-wax]"))){ pickSpoke(b.getAttribute("data-wax")); return; }
@@ -3325,7 +3362,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-151758";
+var BUILD = "20261124-152412";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
