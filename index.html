@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&family=Jost:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600;700;800;900&family=Jost:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* Layout idea: the Scenario Editor's screen, repeated. One large picture of the site, a floating list of alternatives at top right, a live analysis bar underneath. Light only. */
 :root{
@@ -1008,6 +1008,37 @@ html.checking .app{visibility:hidden}
 .film .tfoot{margin:.2rem 0 0;padding-top:.8rem;border-top:1px solid var(--line);font-size:.88rem;font-weight:600;color:var(--fg);opacity:.78}
 .measure.simple.film:not(.zz) .trow .ft b{font-size:2.2rem}
 .measure.simple.film:not(.zz) .bud .ll{cursor:pointer} .measure.simple.film:not(.zz) .bud.fo .ll:not([data-on]){opacity:.4}
+/* At rest the wall is the landscape, with the bubble alone at its right. Open, the bubble moves in and the page of words stands beside it. */
+.measure.simple.film:not(.zz) > .fpage{opacity:0;transition:opacity .7s ease} .measure.simple.film:not(.zz).open > .fpage{opacity:1}
+.measure.simple.film:not(.zz) .fmoney{transform:translateX(calc(143.9% + 2rem));transition:transform .75s cubic-bezier(.2,.8,.2,1)} .measure.simple.film:not(.zz).open .fmoney{transform:none}
+.measure.simple.film:not(.zz) .ftx.tt{opacity:0;pointer-events:none;transform:translateX(1.5rem);transition:opacity .3s ease,transform .5s ease}
+.measure.simple.film:not(.zz).open .ftx.tt{opacity:1;pointer-events:auto;transform:none;transition:opacity .45s ease .28s,transform .6s cubic-bezier(.2,.8,.2,1) .2s}
+.measure.simple.film:not(.zz) .bwhy,.measure.simple.film:not(.zz) .acts.solo{opacity:0;pointer-events:none;transition:opacity .3s ease}
+.measure.simple.film:not(.zz).open .bwhy,.measure.simple.film:not(.zz).open .acts.solo{opacity:1;pointer-events:auto}
+@media (prefers-reduced-motion: reduce){ .measure.simple.film:not(.zz) > .fpage,.measure.simple.film:not(.zz) .fmoney,.measure.simple.film:not(.zz) .ftx.tt,.measure.simple.film:not(.zz) .bwhy,.measure.simple.film:not(.zz) .acts.solo{transition:none} }
+/* Delicate, after the data slides of The Outcome (Onionlab): the landscape behind the words is blurred into soft fields of color, hardly darkened;
+   the figures are large and thin, the words in sentence case and light, a small spaced label over each part; weight and brightness say what matters. */
+.measure.simple.film:not(.zz) > .fpage,.measure.simple.film:not(.zz).night > .fpage{inset:0 0 0 14%;background:linear-gradient(90deg,#10233800 0,#1023384d 22%,#10233866 50%,#0c1a2a80 80%,#0a1420a3 100%),linear-gradient(#10233857 0,#10233800 46%);-webkit-backdrop-filter:blur(34px) saturate(1.1);backdrop-filter:blur(34px) saturate(1.1);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 30%);mask-image:linear-gradient(90deg,transparent 0,#000 30%)}
+.measure.simple.film:not(.zz){--loss:#f2aaa2;--line:#ffffff3d}
+.measure.simple.film:not(.zz) .tlead{font-size:1.5rem;font-weight:600;line-height:1.24;letter-spacing:-.012em;max-width:40rem}
+.measure.simple.film:not(.zz) .tlead span{display:block;font-weight:300;opacity:.85}
+.measure.simple.film:not(.zz) .tlead{margin-bottom:1.05rem}
+.measure.simple.film:not(.zz) .bwhy{font-weight:300;font-size:.9rem;opacity:.8}
+.measure.simple.film:not(.zz) .thd{font-family:"Space Mono",ui-monospace,Menlo,monospace;font-size:.66rem;font-weight:400;letter-spacing:.16em;opacity:.8}
+.measure.simple.film:not(.zz) .tkb small{font-family:"Space Mono",ui-monospace,Menlo,monospace;font-size:.66rem;font-weight:400;letter-spacing:.16em;opacity:.85}
+.measure.simple.film:not(.zz) .tkb b{font-size:2.7rem;font-weight:200;letter-spacing:-.03em;line-height:1}
+.measure.simple.film:not(.zz) .tkb em{font-size:.92rem;font-weight:400;text-transform:none;letter-spacing:0;opacity:.7}
+.measure.simple.film:not(.zz) .trow{padding:.7rem 0 .8rem}
+.measure.simple.film:not(.zz) .trow .ft{align-items:baseline;gap:.2rem 1rem}
+.measure.simple.film:not(.zz) .trow .ft b{font-size:2.1rem;font-weight:200;letter-spacing:-.02em;line-height:1.02}
+.measure.simple.film:not(.zz) .trow .ft span{font-size:1.08rem;font-weight:400;text-transform:none;letter-spacing:0;line-height:1.25}
+.measure.simple.film:not(.zz) .trow .ft.l span{font-weight:500}
+.measure.simple.film:not(.zz) .fno{font-size:1.05rem;font-weight:300;text-transform:none;opacity:.6}
+.measure.simple.film:not(.zz) .tnote{font-size:.98rem;font-weight:400}
+.measure.simple.film:not(.zz) .tsay{font-size:1.02rem;font-weight:300;line-height:1.4;opacity:.92}
+.measure.simple.film:not(.zz) .tfoot{font-size:.88rem;font-weight:300;opacity:.75}
+.measure.simple.film:not(.zz) .bud .ll{font-size:9px;font-weight:500;text-transform:none;letter-spacing:0}
+.measure.simple.film:not(.zz) .acts.solo .mdb{font-family:"Space Mono",ui-monospace,Menlo,monospace;font-weight:400;letter-spacing:.14em}
 .measure.simple.film:not(.zz) > .reveal,.measure.simple.film:not(.zz) > .reveal.kD,.measure.simple.film:not(.zz) > .reveal.kT,.measure.simple.film:not(.zz) > .reveal.kE,.measure.simple.film:not(.zz) > .reveal.kB{background:#0b0c0d;--fg:#f6f4ee;--dim:#f6f4eeb3;--c:#f6f4ee;color:#f6f4ee}
 .measure.simple.film:not(.zz):not(.zy) > .reveal.l{--c:var(--loss)}
 @media (prefers-reduced-motion: reduce){ .film .reveal *,.film.cut .ft b,.film.cut .ft span,.film.cut .fcol h4{animation:none} }
@@ -2178,7 +2209,7 @@ function budBubHTML(i){
     labs += '<text class="ll k' + p[0] + (g.mode === 2 ? "" : g.mode === 1 ? " am" : " no") + '" data-k="' + k + '"' + (MD.focus === p[0] ? ' data-on="1"' : '') + ' data-n="' + (p[1] + " " + money(p[2])).length + '" y="' + g.y.toFixed(1) + '" text-anchor="middle"><tspan class="ln">' + p[1] + ' </tspan>' + money(p[2]) + '</text>'; lo = hi; });
   var free = Math.max(0, q.left0);
   return '<div class="bcol q"><button type="button" class="ph q bud' + (q.over ? " over" : q.full ? " max" : "") + (MD.focus ? " fo" : "") + '" style="--i:' + i + '" data-bud aria-label="The developer’s offer to the community, ' + money(tot) + ' upfront. ' + parts.filter(function(p){ return p[2] > 0; }).map(function(p){ return p[1] + " takes " + money(p[2]); }).join(", ") + '. ' + (q.over ? "The choices ask for more than the offer." : money(free) + " is left to allocate.") + '">' +
-    '<span class="bfig"><span class="bslot"></span><svg viewBox="-112 -112 224 224" aria-hidden="true"><defs><clipPath id="bclip"><circle r="100"/></clipPath><linearGradient id="bl" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="0" y2="-100"><stop offset="0" stop-color="#e67369"/><stop offset="1" stop-color="#618cee"/></linearGradient></defs>' +
+    '<span class="bfig"><span class="bslot"></span><svg viewBox="-112 -112 224 224" aria-hidden="true"><defs><clipPath id="bclip"><circle r="100"/></clipPath><linearGradient id="bl" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="0" y2="-100"><stop offset="0" stop-color="#de8f8a"/><stop offset="1" stop-color="#6699d1"/></linearGradient></defs>' +
     '<g class="bbg"><g clip-path="url(#bclip)">' + bands + '</g><circle class="bgl0" r="100"/></g>' + labs + '</svg></span></button></div>';
 }
 // ---------- the body of the bubble, drawn live ----------
@@ -2190,7 +2221,7 @@ var BVS = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
 var BFS = ["#ifdef GL_FRAGMENT_PRECISION_HIGH", "precision highp float;", "#else", "precision mediump float;", "#endif",
   "uniform vec2 uRes;uniform float uT,uR,uAmp,uNight,uOv,uSl,uF,uFa;uniform vec4 uL;",
   "const float TA=" + BTILT.toFixed(2) + ";",
-  "const vec3 CA=vec3(.9,.45,.41),CB=vec3(.38,.55,.93);",
+  "const vec3 CA=vec3(.87,.56,.54),CB=vec3(.4,.6,.82);",
   "float nz(vec3 p){return sin(p.x*1.7+uT*.9)*sin(p.y*1.9-uT*.7)*sin(p.z*1.6+uT*.5)*.6+sin(p.x*3.1-uT*.6+1.3)*sin(p.y*2.7+uT*.8+.7)*sin(p.z*3.3-uT*.4)*.28+sin(dot(p,vec3(1.1,1.3,.9))*2.2+uT*1.1)*.22;}",
   "float sd(vec3 p){float l=length(p);return l-uR*(1.+uAmp*nz(p/max(l,1e-4)*1.35));}",
   "vec3 liq(float h){",   // what is in the glass runs from one soft color at the bottom to the other at the top, and no more; a fine light seam where two layers meet
@@ -2282,6 +2313,12 @@ function blobMount(){   // every drawing of the wall makes its words anew; the l
   BLOB.set = false; blobWords(); blobDraw(); if (!still && !BLOB.raf) BLOB.raf = requestAnimationFrame(blobTick);
 }
 window.addEventListener("resize", function(){ clearTimeout(BLOB.rz); BLOB.rz = setTimeout(blobMount, 120); });
+// The right wall is first of all the landscape, with the bubble alone at its right. The page of words comes when the bubble is touched or the pointer
+// is over it, and goes when the pointer has left both for a moment, unless it was opened by a touch: then a touch on the landscape puts it away.
+function rwOpen(on, pin){ MD.open = !!on; if (pin != null) MD.pin = !!pin; clearTimeout(MD.closeT); [].forEach.call(document.querySelectorAll(".measure.simple.film"), function(el){ el.classList.toggle("open", MD.open); }); }
+document.addEventListener("pointerover", function(ev){ var T = ev.target, w = T && T.closest && T.closest(".measure.simple.film"); if (!w || ev.pointerType === "touch") return;
+  if (T.closest(".bud") || (MD.open && T.closest(".ftx,.bwhy,.acts"))){ clearTimeout(MD.closeT); if (!MD.open) rwOpen(true); }
+  else if (MD.open && !MD.pin){ clearTimeout(MD.closeT); MD.closeT = setTimeout(function(){ if (!MD.pin && !MD.focus && !MD.freeze) rwOpen(false); }, 900); } });
 document.addEventListener("visibilitychange", function(){ if (!document.hidden) blobMount(); });
 // The story in one picture. On the left the money, as one bubble that has shrunk with every choice. Then one bubble for every result, floating over the
 // group it lands on: green where something is gained, red where it is given up, larger for more, an outline where the size is not known. Who gains and
@@ -2304,7 +2341,7 @@ function fieldHTML(st){   // one bubble to look at, the money; beside it one row
       (moved && moved[0] === c[1].toLowerCase() ? '<p class="tnote">' + money(moved[2]) + ' less than before the last choice: it went to ' + moved[1] + '.</p>' : '') + (on ? '<p class="tsay">' + sayChoice(c[0]) + '</p>' : '') + '</div></div>'; }).join("");
   var free = Math.max(0, q.left0), over = q.left0 < 0 ? money(-q.left0) : q.left1 < 0 ? money(-q.left1) + " a year" : "";
   var lead = q.over ? '<p class="tlead bad">The choices ask for ' + over + ' more than the ' + money(q.b[0]) + ' the developer offers the community.</p>' :
-    '<p class="tlead">The developer offers the community ' + money(q.b[0]) + '. Each choice takes part of it, and gives something for it.' + (free > 0 ? ' ' + money(free) + ' is not allocated yet.' : '') + '</p>';
+    '<p class="tlead"><span>The developer offers the community ' + money(q.b[0]) + '.' + (free > 0 ? ' ' + money(free) + ' of it is not allocated yet.' : '') + '</span> Each choice takes part of it, and gives something for it.</p>';
   return '<div class="fld"><div class="fmoney">' + bub + '</div><div class="ftx tt">' + lead + '<div class="thd"><span>Takes</span><span>Gives</span></div>' + rows +
     '<p class="tfoot">' + (q.left1 >= 0 ? 'There is also ' + money(q.b[1]) + ' a year: ' + money(q.left1) + ' of it is left. ' : '') + 'Prices are examples.</p></div></div>';
 }
@@ -3097,7 +3134,7 @@ function metricsHTML(bare){
   acts = '<div class="chosen acts solo"><button type="button" class="mdb" data-md="1" title="The wheel, the sources and the questions">Details ›</button></div>';   // the four choices are named in the bubble; on this wall they need no row of their own
   if (rev && !bare) MD.rev = {html:rev, t0:nowT};
   else if (!bare && MD.rev && nowT - MD.rev.t0 < 3000) rev = MD.rev.html.replace('data-reveal', 'data-reveal style="animation-delay:-' + (nowT - MD.rev.t0) + 'ms"');   // a change arrives twice from another window: the second drawing keeps the reveal where it was
-  return '<div class="card measure simple film' + (cut ? " cut" : "") + (rev ? " rev" : "") + '" aria-label="What this plan means for the neighborhood"><div class="rwbg" aria-hidden="true"></div><i class="fpage" aria-hidden="true"></i>' + (cut ? '<i class="whip" aria-hidden="true"></i>' : '') + rev + '' + acts +
+  return '<div class="card measure simple film' + (cut ? " cut" : "") + (rev ? " rev" : "") + (MD.open ? " open" : "") + '" aria-label="What this plan means for the neighborhood"><div class="rwbg" aria-hidden="true"></div><i class="fpage" aria-hidden="true"></i>' + (cut ? '<i class="whip" aria-hidden="true"></i>' : '') + rev + '' + acts +
     '<div class="bubs" data-w="bubbles"></div><div class="faces" data-w="faces"></div><div class="bwhy" data-w="bwhy"></div><i class="crop" aria-hidden="true"></i>' +
     '<p class="rwattr">Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community. Buildings © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="https://openmaptiles.org/">OpenMapTiles</a>, <a href="https://openfreemap.org/">OpenFreeMap</a></p></div>';
 }
@@ -3280,6 +3317,9 @@ document.addEventListener("click", function(ev){
   if ((b = T.closest("[data-fq]"))){ MD.q = b.getAttribute("data-fq"); wordsFill(); return; }
   if ((b = T.closest("[data-face]"))){ var fk = "face:" + b.getAttribute("data-face"); MD.freeze = MD.freeze === fk ? null : fk; wordsFill(); return; }
   if ((b = T.closest("[data-qs]"))){ MD.freeze = MD.freeze === "q" ? null : "q"; wordsFill(); return; }
+  if ((b = T.closest("[data-bud]")) && !MD.open){ rwOpen(true, true); return; }   // the first touch of the bubble opens the page beside it
+  if (MD.open && T.closest(".measure.simple.film") && !T.closest(".bud,.ftx,.bwhy,.acts,.reveal,.rwattr")){ MD.focus = null; MD.freeze = null; rwOpen(false, false); wordsFill(); return; }   // a touch on the landscape puts it away again
+  if (T.closest("[data-bud],[data-fc]")) MD.pin = true;
   if ((b = T.closest("[data-fc]"))){ var fg = b.getAttribute("data-fc"); MD.focus = MD.focus === fg ? null : fg; MD.freeze = null; wordsFill(); return; }
   if ((b = T.closest("[data-bud]"))){ var lg = "", ll = T.closest(".ll"), fig = b.querySelector(".bfig svg"), Bb = BLOB.b || (MD.seq && MD.seq.B);   // which layer of the bubble was touched
     if (ll) lg = "DTEB".charAt(+ll.getAttribute("data-k"));
@@ -3362,7 +3402,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-153251";
+var BUILD = "20261124-153940";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
