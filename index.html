@@ -565,7 +565,7 @@ body.imm .axo.gv .gmist{display:block}
 .amk.pl{display:flex;align-items:center;gap:5px;font-weight:600}
 .amk.pl i{width:8px;height:8px;border-radius:50%;background:#3b7a66;border:1.5px solid #fff}
 .amk.dk{background:#1c2a28;border-color:#1c2a28;color:#fff}
-.amk.sn{background:#fbfdfc;color:#7d3a6c;border:1px solid #c9a9c2;box-shadow:none}
+.amk.sn{background:#fbfdfc;color:#5a4590;border:1px solid #cfc4ee;box-shadow:none}
 .amk.en{color:#2f4a78;border-color:#b3c3dc;font-weight:600}
 .hotm{display:none} body.imm .hotm{display:block}
 .hot{font:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;padding:0;cursor:pointer}
@@ -1118,7 +1118,7 @@ html:not(.fkey) .stage[data-view="axo"] .akey:not(:hover):not(:has(:focus-visibl
 .fcur svg{display:block;width:100%;height:100%;fill:#141318;stroke:#fff;stroke-width:1.5;stroke-linejoin:round;filter:drop-shadow(0 2px 3px #0006)}
 .fcur i{position:absolute;left:-3px;top:-4px;width:16px;height:16px;border-radius:50%;border:2px solid #141318;opacity:0;transform:scale(.4);transition:transform .32s ease,opacity .32s ease} .fcur.dn i{opacity:.75;transform:scale(2.4)}
 .fpart .vthread,.fpart svg.ribs{display:none !important}
-html.fp3 body:not(.nopanels) .akey,html.fp3 body:not(.nopanels) .stage[data-view="axo"] .zoomc{display:flex !important} .filming.fpart .measure.simple.film{padding-bottom:1.2rem}
+html.fp3 body:not(.nopanels) .akey,html.fp3 body:not(.nopanels) .stage[data-view="axo"] .zoomc{display:flex !important} html.fp3 body.imm .tour,html.fp3 body.imm .hotm{display:none !important} html.fp3:not(.fkey) body.imm .akey{opacity:0 !important;pointer-events:none} html.fp3 .akey{transition:opacity .35s ease} .filming.fpart .measure.simple.film{padding-bottom:1.2rem}
 /* the ribbons from the bubble to the physical model, on the right wall and carried on by the center wall */
 svg.ribs path{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0}
 svg.ribs .rb{stroke:var(--c);stroke-width:6.5;opacity:.95} svg.ribs .rh{stroke:#fff;stroke-width:1.5;opacity:.7}
@@ -2874,11 +2874,15 @@ function gvLabels(){   // each ring named where it first crosses the line of sig
   AXO.rings.forEach(function(r){ var best = null, ba = 1e9; r.pts.forEach(function(p){ var dx = p[0] - q[0], dz = p[1] - q[1], al = dx * fx + dz * fz, la = dz * fx - dx * fz; if (al < near || al > 2600 || Math.abs(la / al) > .2 || al >= ba) return; ba = al; best = p; }); if (best) picks.push([ba, best, r.L]); });
   var put = []; picks.sort(function(a, b){ return a[0] - b[0]; }).forEach(function(k){ var g = ll(k[1][0], k[1][1]), sp = AXO.map.project([g[1], g[0]]); if (put.some(function(o){ return Math.abs(o.y - sp.y) < 26 && Math.abs(o.x - sp.x) < 84; })) return; put.push(sp); GV.lab.push(amark(g, k[2] + " dBA", "sn", "center")); });
 }
-var TREEC = ["#7fa56f", "#8db27c", "#6f9a68", "#98b985"];
+var TREEC = ["#86b093", "#97bf9f", "#7aa58b", "#a6caa8"];
+function ngonLL(e, s, r, rot, n){ var o = []; for (var i = 0; i < n; i++){ var a = rot + i * 6.28319 / n; o.push(ll(e + Math.cos(a) * r, s + Math.sin(a) * r)); } return o; }
+function paler(c, k){ var v = parseInt(c.slice(1), 16), r = v >> 16, g = v >> 8 & 255, b = v & 255; r = Math.round(r + (255 - r) * k); g = Math.round(g + (255 - g) * k); b = Math.round(b + (255 - b) * k); return "#" + (16777216 + (r << 16) + (g << 8) + b).toString(16).slice(1); }
 function hexLL(e, s, r, rot){ var o = []; for (var i = 0; i < 6; i++){ var a = rot + i * 1.0472; o.push(ll(e + Math.cos(a) * r, s + Math.sin(a) * r)); } return o; }
-function treeAt(out, e, s, u, base){   // a planted tree as two stacked prisms on a trunk; u, from 0 to 1, sets its size and its green
-  var r = 2.4 + u * 2.2, h = 7 + ((u * 7.3) % 1) * 5, c = TREEC[Math.floor(u * 3.999)], b = base || 0;
-  out.push(poly(hexLL(e, s, .4, 0), {h:b + h * .34, b:b, c:"#8b7b68"}), poly(hexLL(e, s, r, u * 6), {h:b + h * .76, b:b + h * .3, c:c}), poly(hexLL(e, s, r * .6, u * 6 + .5), {h:b + h, b:b + h * .76, c:c}));
+function treeAt(out, e, s, u, base){   // a planted tree: a slim trunk and a round crown, built of four rounded tiers that pale towards the top; u, from 0 to 1, sets its size and its green
+  var r = 2.5 + u * 2.3, h = 7 + ((u * 7.3) % 1) * 5, c = TREEC[Math.floor(u * 3.999)], b = base || 0, y0 = .28, n = 7;
+  out.push(poly(ngonLL(e, s, .34, 0, 8), {h:b + h * .36, b:b, c:"#a3978c"}));
+  for (var i = 0; i < n; i++){ var k = Math.pow(Math.sin(Math.PI * (i + .5) / n), .6);   // the crown's outline is close to a sphere
+    out.push(poly(ngonLL(e, s, r * k, u * 6 + i * .2, 20), {h:b + h * (y0 + (1 - y0) * (i + 1) / n), b:b + h * (y0 + (1 - y0) * i / n), c:paler(c, i * .04)})); }
 }
 function beltTrees(out, a, b, w, base, seed){   // a planted belt as trees: about one for every 7 m square, fewer in a very large belt
   var len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, step = Math.max(7, Math.sqrt(len * w / 500)), nx = Math.max(1, Math.round(len / step)), nz = Math.max(1, Math.round(w / step)), R = rng(seed), ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len;
@@ -2937,9 +2941,9 @@ function dcBlocks(){
   var out = [], cx = -6.5 * MSC, cz = -10 * MSC, px = ST.px * MSC, pz = ST.pz * MSC, i, j, d3 = ST.d === "D3", dry = ST.t === "T2";
   function blk(x0, z0, x1, z1, h, b, c, fixed){ out.push(poly([[x0, z0], [x1, z0], [x1, z1], [x0, z1]].map(function(q){ var p = fixed ? q : local(q[0], q[1], px, pz, ST.rot); return ll(p[0], p[1]); }), {h:h, b:b, c:c})); }
   function B(x0, z0, x1, z1, b, h, c){ blk(cx + x0, cz + z0, cx + x1, cz + z1, h, b, c); }          // a box on the campus, from b to h metres up
-  function C(x, z, r, b, h, c){ var q = campusAt(x, z); out.push(poly(hexLL(q[0], q[1], r, .5), {h:h, b:b, c:c})); }   // a tank or a mast
+  function C(x, z, r, b, h, c){ var q = campusAt(x, z); out.push(poly(ngonLL(q[0], q[1], r, .5, 18), {h:h, b:b, c:c})); }   // a tank or a mast, round
   function T(x, z, u){ var q = campusAt(x, z); treeAt(out, q[0], q[1], u, 0); }
-  var WHITE = "#fbfdfc", CAP = "#e3e9e6", UNIT = "#9fb0b5", FAN = "#73858b", PAD = "#e9eeeb", STEEL = "#8e9a96", WALL = "#c3ccc8";
+  var WHITE = "#fbfdfc", CAP = "#e9eeeb", UNIT = "#cdd6d8", FAN = "#b1bdc0", PAD = "#e9eeeb", STEEL = "#aab5b1", WALL = "#cdd5d1";
   // ground: the service road through the gate, the pads
   B(45.5, -2.6, 96, 2.6, 0, .12, "#dfe5e2"); B(61, 8, 79, 28, 0, .15, "#dfe5e2"); B(61, -22, 79, -5, 0, .25, PAD);
   // the two data halls on their spine
@@ -2951,7 +2955,7 @@ function dcBlocks(){
     [-13.2, 13.2].forEach(function(zc){ for (i = 0; i < per; i++){ var ux = -36 + i * (72 / (per - 1)); B(ux - uw, zc - 3.4, ux + uw, zc + 3.4, 16.8, 16.8 + uh, UNIT); B(ux - uw + .8, zc - 2.6, ux + uw - .8, zc + 2.6, 16.8 + uh, 17.3 + uh, FAN); } });
     // the west yard: the backup generators, each with its exhaust, and their fuel
     B(-78, -22, -48, 22, 0, .25, PAD);
-    [-70, -57].forEach(function(xc){ [-16, -8, 0, 8, 16].forEach(function(zc){ B(xc - 5, zc - 1.7, xc + 5, zc + 1.7, .25, 3.9, "#b5c2c5"); B(xc + 3.6, zc - .5, xc + 4.6, zc + .5, 3.9, 5.6, "#7c8b8f"); }); });
+    [-70, -57].forEach(function(xc){ [-16, -8, 0, 8, 16].forEach(function(zc){ B(xc - 5, zc - 1.7, xc + 5, zc + 1.7, .25, 3.9, "#c6d0d2"); B(xc + 3.6, zc - .5, xc + 4.6, zc + .5, 3.9, 5.6, "#a4b0b3"); }); });
     C(-50.3, -19, 1.6, .25, 3.4, "#c9d3cf"); C(-50.3, -14.6, 1.6, .25, 3.4, "#c9d3cf");
   } else {   // D3: the coolers and the generators together in a yard behind sound walls
     B(-77, -23.2, -45, 23.2, 0, .5, PAD);
@@ -2960,7 +2964,7 @@ function dcBlocks(){
     B(-78, -24.2, -45, -23.2, 0, ST.hw, WALL); B(-78, 23.2, -45, 24.2, 0, ST.hw, WALL); B(-79, -24.2, -78, 24.2, 0, ST.hw, WALL);
   }
   // the substation: transformers under a gantry, and the switchgear house
-  [65, 70, 75].forEach(function(xc){ B(xc - 1.8, -19, xc + 1.8, -15.4, .25, 4.4, "#8fa2a8"); B(xc - .2, -17.4, xc + .2, -17, 4.4, 7.2, STEEL); });
+  [65, 70, 75].forEach(function(xc){ B(xc - 1.8, -19, xc + 1.8, -15.4, .25, 4.4, "#b3c0c4"); B(xc - .2, -17.4, xc + .2, -17, 4.4, 7.2, STEEL); });
   B(62, -10.5, 78, -6.5, .25, 4.6, "#f1f4f2"); B(61.7, -21.3, 62.3, -20.7, 0, 9.5, STEEL); B(77.7, -21.3, 78.3, -20.7, 0, 9.5, STEEL); B(61.7, -21.2, 78.3, -20.8, 9, 9.5, STEEL);
   // the office, with its glass front and its door
   B(45, 4, 58, 19, 0, 8.5, "#f1f4f2"); B(58, 6, 58.4, 17, 1, 7, "#a9cbd6"); B(58, 9.5, 62, 13.5, 3.4, 3.8, CAP);
@@ -3042,7 +3046,7 @@ function hotGo(sp){   // stand beside the part and face it; from above, bring it
   else { var g = ll(p[0], p[1]); map.easeTo({center:[g[1], g[0]], zoom:Math.max(map.getZoom(), 17.8), duration:900}); }
 }
 function axoStyle(light){
-  var st = {version:8, light:{anchor:"viewport", color:"#fff6ea", intensity:.5, position:[1.3, 215, 38]}, sky:{"sky-color":"#9dc3ea", "horizon-color":"#f4f1e8", "fog-color":"#eaf0e2", "fog-ground-blend":.5, "horizon-fog-blend":.7, "sky-horizon-blend":.85, "atmosphere-blend":0}, sources:{}, layers:[{id:"bg", type:"background", paint:{"background-color":"#d9e3de"}}]};
+  var st = {version:8, light:{anchor:"viewport", color:"#fff6ea", intensity:.26, position:[1.3, 215, 38]}, sky:{"sky-color":"#9dc3ea", "horizon-color":"#f4f1e8", "fog-color":"#eaf0e2", "fog-ground-blend":.5, "horizon-fog-blend":.7, "sky-horizon-blend":.85, "atmosphere-blend":0}, sources:{}, layers:[{id:"bg", type:"background", paint:{"background-color":"#d9e3de"}}]};
   var k = light ? Object.keys(light.sources).filter(function(n){ return light.sources[n].type === "vector"; })[0] : null;
   if (!k) return st;
   st.sources.omt = JSON.parse(JSON.stringify(light.sources[k]));
@@ -3073,10 +3077,10 @@ function axoInit(stage, light){
     map.addSource("photo", {type:"raster", tiles:["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize:256, maxzoom:19, attribution:"Imagery © Esri, Vantor, Earthstar Geographics, GIS User Community"});
     var under = map.getLayer("bld") ? "bld" : undefined;   // flat things go under the raised ones
     map.addLayer({id:"photo", type:"raster", source:"photo", layout:{visibility:"none"}, paint:{"raster-fade-duration":0, "raster-opacity":.88, "raster-saturation":-.1, "raster-contrast":-.24, "raster-brightness-min":.3, "raster-brightness-max":1}}, under);   // between the drawn map and the raw photograph: the photograph laid over the pale ground as a wash, its darks lifted and its contrast taken down, so the real fields and roads show softly, as if painted   // from the ground the land is the aerial photograph, lying flat; if it does not load, the drawn ground stays
-    map.addLayer({id:"ring-fill", type:"fill", source:"ring", paint:{"fill-color":"#b0609a", "fill-opacity":["get", "o"]}}, under);
-    map.addLayer({id:"ring-glow", type:"line", source:"ring", layout:{visibility:"none"}, paint:{"line-color":"#ffd0f4", "line-width":16, "line-blur":9, "line-opacity":.5, "line-opacity-transition":{duration:0}}}, under);
-    map.addLayer({id:"ring-solid", type:"line", source:"ring", layout:{visibility:"none"}, paint:{"line-color":"#e069c9", "line-width":3.4, "line-opacity":.9, "line-opacity-transition":{duration:0}}}, under);
-    map.addLayer({id:"ring-line", type:"line", source:"ring", paint:{"line-color":"#7d3a6c", "line-width":1.8, "line-dasharray":[3, 3]}}, under);
+    map.addLayer({id:"ring-fill", type:"fill", source:"ring", paint:{"fill-color":"#a58be0", "fill-opacity":["*", ["get", "o"], .5]}}, under);   // the rings in the soft violet of the other screens: a faint wash, a thin line and its glow
+    map.addLayer({id:"ring-glow", type:"line", source:"ring", layout:{visibility:"none"}, paint:{"line-color":"#d9ccfa", "line-width":12, "line-blur":9, "line-opacity":.5, "line-opacity-transition":{duration:0}}}, under);
+    map.addLayer({id:"ring-solid", type:"line", source:"ring", layout:{visibility:"none"}, paint:{"line-color":"#9d84e0", "line-width":1.8, "line-opacity":.9, "line-opacity-transition":{duration:0}}}, under);
+    map.addLayer({id:"ring-line", type:"line", source:"ring", paint:{"line-color":"#6d55b5", "line-width":1.8, "line-dasharray":[3, 3]}}, under);
     map.addLayer({id:"site-line", type:"line", source:"site", paint:{"line-color":"#1c2a28", "line-width":2.2, "line-dasharray":[5, 4]}}, under);
     map.addLayer({id:"dc", type:"fill-extrusion", source:"dc", paint:{"fill-extrusion-color":["get", "c"], "fill-extrusion-height":["get", "h"], "fill-extrusion-base":["get", "b"], "fill-extrusion-opacity":1}});
     AXO.ready = true; axoSync();
@@ -3725,14 +3729,17 @@ async function filmPart(n, h){
     await press('.alts [data-ch="energy"]', 700); await wait(700); await press("#opt-E3", 700); await wait(1500); await press("#opt-E2", 600); await wait(1500);
     await press('.alts [data-ch="benefits"]', 700); await wait(700); await press("#opt-B4", 700); await wait(1500); await press("#opt-B1", 600); await wait(2400);
   }
-  if (n === 3){   // the place itself: walk and turn, the night, then down to a person's height
-    choose("D2"); choose("T3"); await h.view("view"); await h.until(function(){ return AXO.map && GV.pos; }, 9000); await wait(2400);
+  if (n === 3){   // the place itself, for the ear: down to a person's height, towards the plant and away from it, then the night. The small readout shows what is heard
+    choose("D2"); choose("T3"); var e3 = ear().slice(); ST.ear = [Math.round(e3[0] * .62), Math.round(e3[1] * .62)]; render(); tell();   // a start near enough for the walk to be heard
+    await h.view("view"); await h.until(function(){ return AXO.map && GV.pos; }, 9000); await wait(2600);
     function panel(on){ var k = document.querySelector(".akey"); if (k) k.classList.remove("min"); document.documentElement.classList.toggle("fkey", !!on); }   // the panel is a ghost until the pointer is on it
-    function keyp(k){ document.body.dispatchEvent(new KeyboardEvent("keydown", {key:k, bubbles:true, cancelable:true})); }
-    await press('[data-az="in"]', 900); await wait(2200); await press('[data-az="right"]', 500); await wait(1500); await press('[data-az="right"]', 200); await wait(1900); await press('[data-az="left"]', 500); await wait(1000); await press('[data-az="left"]', 200); await wait(1900);
-    panel(true); await press('[data-tod="night"]', 900); await wait(800); await go([innerWidth * .62, innerHeight * .56], 900); panel(false); await wait(3800);
-    panel(true); await press('[data-tod="day"]', 900); await wait(800); await press('[data-az="imm"]', 1000); panel(false); document.body.classList.add("nopanels"); await go([innerWidth * .5, innerHeight * .62], 700);
-    await wait(2200); keyp("w"); await wait(1500); keyp("w"); await wait(1500); keyp("e"); await wait(1300); keyp("q"); await wait(1300); keyp("q"); await wait(1500); keyp("e"); await wait(1500); immersive(false);
+    await press('[data-az="imm"]', 1100); await wait(2600);
+    for (var w3 = 0; w3 < 5; w3++){ await press('[data-az="in"]', w3 ? 220 : 800); await wait(1500); } await wait(1400);
+    await press('[data-az="right"]', 600); await wait(1500); await press('[data-az="left"]', 500); await wait(1700);
+    await press('[data-az="out"]', 500); await wait(1500); await press('[data-az="out"]', 220); await wait(2200);
+    panel(true); await press('[data-tod="night"]', 1000); await wait(900); await go([innerWidth * .62, innerHeight * .6], 900); panel(false); await wait(4600);
+    await press('[data-az="in"]', 900); await wait(1500); await press('[data-az="in"]', 220); await wait(3200);
+    panel(true); await press('[data-tod="day"]', 1000); await wait(700); panel(false); await go([innerWidth * .62, innerHeight * .6], 800); await wait(1800); immersive(false);
   }
   if (n === 4){   // what a scenario would mean: the bubble at rest over the place, then layer by layer what each choice takes of the offer and what it gives
     choose("D2"); choose("T3"); choose("B4"); MD.key = null; MD.rev = null; await h.view("analysis"); await wait(3400);
@@ -3759,7 +3766,7 @@ function filmCard(){
 route();
 if (FILM) filmCard();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-180649";
+var BUILD = "20261124-181528";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
