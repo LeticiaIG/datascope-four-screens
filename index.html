@@ -2860,7 +2860,7 @@ function gvMode(){   // the lens, the hands and the colors of the view in use
 // and the whole drawing is moved a little, as by a brush, and diffused (an SVG filter over it). The landscape behind the right wall is painted the same way.
 // ?paint=0 in the address leaves it out.
 var PAINT = !/[?&]paint=0/.test(location.search), PAINTPH = [["raster-opacity", .84, .42], ["raster-saturation", .2, -.05], ["raster-contrast", -.06, -.34], ["raster-brightness-min", .2, .42]];
-function paintDefs(){ if (!document.getElementById("vg")) document.body.insertAdjacentHTML("beforeend", '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="vg" x="-3%" y="-3%" width="106%" height="106%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.013 0.021" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="15" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="1.15" result="b"/><feTurbulence type="fractalNoise" baseFrequency="0.42" numOctaves="1" seed="3" result="g"/><feDisplacementMap in="b" in2="g" scale="3.5" xChannelSelector="G" yChannelSelector="B"/></filter></svg>'); }
+function paintDefs(){ if (!document.getElementById("vg")) document.body.insertAdjacentHTML("beforeend", '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="vg" x="-3%" y="-3%" width="106%" height="106%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.013 0.021" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="1.15" result="b"/><feTurbulence type="fractalNoise" baseFrequency="0.42" numOctaves="1" seed="3" result="g"/><feDisplacementMap in="b" in2="g" scale="2.4" xChannelSelector="G" yChannelSelector="B"/></filter></svg>'); }
 function paintLook(map, on){
   if (!PAINT || !map) return; paintDefs();
   if (map.getLayer("photo")) PAINTPH.forEach(function(p){ map.setPaintProperty("photo", p[0], p[on ? 1 : 2]); });
@@ -3781,7 +3781,7 @@ function filmCard(){
 route();
 if (FILM) filmCard();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-183206";
+var BUILD = "20261124-184110";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
