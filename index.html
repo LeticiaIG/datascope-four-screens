@@ -2134,8 +2134,9 @@ function budBubHTML(i){
   var q = budState(), tot = q.b[0] || 1, parts = budParts(), cum = 0, B = [], motion = !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches), nowT = Date.now(), sq = MD.seq;
   parts.forEach(function(p){ cum += Math.max(0, p[2]) / tot; B.push(segH(Math.min(1, cum))); });
   var key = tot + "|" + parts.map(function(p){ return p[2]; }).join("|") + (q.over ? "!" : "");
-  if (!sq || sq.key !== key){ var last = sq && sq.tot === tot ? parts.map(function(p, k){ var d = r2(p[2] - sq.parts[k][2]); return d ? [p[1].toLowerCase(), d] : null; }).filter(function(x){ return x; }) : [];   // what the last choice moved, and from where
-    MD.seq = sq = {key:key, tot:tot, parts:parts, B:B, over:q.over, last:last.length ? last : sq && sq.tot === tot ? sq.last : [], t0:!motion ? 0 : nowT + (MD.rev && nowT - MD.rev.t0 < 3000 ? 3100 - (nowT - MD.rev.t0) : sq ? 200 : 700)}; }   // it moves once the card of that choice has gone
+  var ck = chosen(ST).join(" ");
+  if (!sq || sq.key !== key){ var last = sq && sq.tot === tot && sq.ck !== ck ? parts.map(function(p, k){ var d = r2(p[2] - sq.parts[k][2]); return d ? [p[1].toLowerCase(), d] : null; }).filter(function(x){ return x; }) : [];   // what the last choice moved, and from where
+    MD.seq = sq = {key:key, ck:ck, tot:tot, parts:parts, B:B, over:q.over, last:last.length ? last : sq && sq.tot === tot ? sq.last : [], t0:!motion ? 0 : nowT + (MD.rev && nowT - MD.rev.t0 < 3000 ? 3100 - (nowT - MD.rev.t0) : sq ? 200 : 700)}; }   // it moves once the card of that choice has gone
   function css(c){ return "rgb(" + c.join(",") + ")"; }
   var defs = "", bands = "", labs = "", lo = -1;
   parts.forEach(function(p, k){ var hi = B[k], g = labGeo(lo, hi, 0, (p[1] + " " + money(p[2])).length);
@@ -3314,7 +3315,7 @@ try { var pk = new URLSearchParams(location.search).get("pick"); if (pk){ ST.b =
   setPose(ST.d === "D2" ? 10 : 0, ST.d === "D2" ? -12 : 0, ST.d === "D2" ? 10 : 0); var pc = new URLSearchParams(location.search).get("ch"); if (PAGES[pc]) ST.ch = pc; } } catch(e){}
 route();
 // A browser can keep an old copy of this page for a while. The page asks which version is published and, when it is not this one, reloads itself once.
-var BUILD = "20261124-150829";
+var BUILD = "20261124-151021";
 try { fetch("version.txt?t=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(v){ v = (v || "").trim();
   if (v && v !== BUILD && sessionStorage.getItem("dcscope-reloaded") !== v){ sessionStorage.setItem("dcscope-reloaded", v); if (window.dcKeepOpen) window.dcKeepOpen(); var u = new URL(location.href); u.searchParams.set("v", v); location.replace(u.toString()); } }).catch(function(){}); } catch(e){}
 try { fetch(SENTIMENT, {mode:"no-cors"}).then(function(){ LIVE = true; $("main").removeAttribute("data-shown"); render(); }).catch(function(){}); } catch(e){}
